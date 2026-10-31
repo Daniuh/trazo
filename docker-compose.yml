@@ -31,7 +31,15 @@ x-laravel: &laravel
     SESSION_MAX_MINUTES: ${SESSION_MAX_MINUTES:-480}
     SESSION_IDLE_MINUTES: ${SESSION_IDLE_MINUTES:-60}
     SEED_INCIDENTS: ${SEED_INCIDENTS:-600}
-    BROADCAST_CONNECTION: log
+    # Tiempo real: la app le habla a Reverb por la red interna; el navegador llega por el gateway en /ws
+    BROADCAST_CONNECTION: reverb
+    REVERB_APP_ID: ${REVERB_APP_ID:-trazo}
+    REVERB_APP_KEY: ${REVERB_APP_KEY:-trazo-local-key}
+    REVERB_APP_SECRET: ${REVERB_APP_SECRET:-trazo_local_only}
+    REVERB_HOST: reverb
+    REVERB_PORT: 8080
+    REVERB_SCHEME: http
+    REVERB_ALLOWED_ORIGINS: ${REVERB_ALLOWED_ORIGINS:-localhost}
     MAIL_MAILER: smtp
     MAIL_HOST: ${MAIL_HOST:-mailpit}
     MAIL_PORT: ${MAIL_PORT:-1025}
@@ -139,6 +147,22 @@ services:
     deploy:
       resources:
         limits: { cpus: "0.25", memory: 192M }
+
+  # Websockets del tiempo real. Sin puerto publicado: solo se llega por el gateway en /ws
+  reverb:
+    <<: *laravel
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    depends_on:
+      init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 8080) ? 0 : 1);"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 256M }
 
   frontend:
     image: trazo/web:${TRAZO_IMAGE_TAG:-local}

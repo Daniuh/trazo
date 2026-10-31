@@ -1,9 +1,10 @@
 <!-- Página para crear o editar un incidente (un solo formulario). Al guardar, lleva al detalle.
      Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { messageFor } from '@/shared/errors'
 import { ApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
@@ -27,8 +28,15 @@ const canAssign = computed(() => !editingId && session.can('incidents.assign'))
 
 const toDetail = (id: string) => router.replace({ name: 'incident-detail', params: { id } })
 
+// Otra persona guardó cambios mientras se editaba: se avisa, sin tocar lo que ya se escribió
+const changedElsewhere = ref(false)
+useRealtime('incident', (change) => {
+  if (editingId && change.id === editingId) changedElsewhere.value = true
+})
+
 // Si ya no se puede editar (otro lo cerró, por ejemplo), se vuelve al detalle
 async function load(): Promise<void> {
+  changedElsewhere.value = false
   if ((await prepare()) === 'not-editable' && editingId) await toDetail(editingId)
 }
 
@@ -57,6 +65,11 @@ onMounted(load)
     <form v-else class="incident-form-page__form" novalidate @submit.prevent="save">
       <AppAlert v-if="conflict">
         {{ conflictMessage }}
+        <AppButton variant="link" icon="refresh" @click="load">Recargar</AppButton>
+      </AppAlert>
+      <AppAlert v-else-if="changedElsewhere" tone="info">
+        Otra persona cambió este incidente. Recarga para ver la versión actual antes de guardar; lo que escribiste se
+        reemplaza.
         <AppButton variant="link" icon="refresh" @click="load">Recargar</AppButton>
       </AppAlert>
       <AppAlert v-else-if="formError">{{ formError }}</AppAlert>

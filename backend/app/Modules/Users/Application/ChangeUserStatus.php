@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
@@ -27,6 +28,7 @@ final readonly class ChangeUserStatus
         private AccountSecurity $security,
         private AdminLog $log,
         private AccountNotifier $notifier,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -48,6 +50,7 @@ final readonly class ChangeUserStatus
             $this->log->record($type, $admin->id, $user->id, [], $context);
         });
 
+        $this->signals->changed($user->id);
         $this->notifier->notify($user->id, $active ? AccountEvent::Activated : AccountEvent::Deactivated);
 
         return $this->gate->reload($user);

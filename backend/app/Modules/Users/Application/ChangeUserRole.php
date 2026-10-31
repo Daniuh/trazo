@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\RoleInfo;
 use App\Modules\Users\Application\Data\UserRecord;
@@ -38,6 +39,7 @@ final readonly class ChangeUserRole
         private EffectivePermissions $permissions,
         private AdminLog $log,
         private AccountNotifier $notifier,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -72,6 +74,7 @@ final readonly class ChangeUserRole
         });
 
         $this->permissions->forget($user->id);
+        $this->signals->changed($user->id);
         $this->notifier->notify($user->id, AccountEvent::RoleChanged, ['role' => $role->name]);
 
         return $this->gate->reload($user);

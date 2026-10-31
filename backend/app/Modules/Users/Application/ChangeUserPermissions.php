@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
@@ -31,6 +32,7 @@ final readonly class ChangeUserPermissions
         private EffectivePermissions $permissions,
         private AdminLog $log,
         private AccountNotifier $notifier,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -62,6 +64,7 @@ final readonly class ChangeUserPermissions
         });
 
         $this->permissions->forget($user->id);
+        $this->signals->changed($user->id);
         $this->notifier->notify($user->id, AccountEvent::PermissionsChanged);
 
         return $this->gate->reload($user);

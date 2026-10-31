@@ -157,7 +157,7 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 
 ## Aviso de cambios
 
-Cada escritura del repositorio (crear, editar, cambiar de estado, asignar, eliminar y restaurar) emite `IncidentChanged` con el id del incidente. El evento sale solo cuando la transacción se confirma (`ShouldDispatchAfterCommit`), así nadie reacciona a un cambio que al final se deshizo. Hoy lo escucha la caché del dashboard; en la fase de tiempo real avisará también a las pantallas abiertas.
+Cada escritura del repositorio (crear, editar, cambiar de estado, asignar, eliminar y restaurar) emite `IncidentChanged` con el id y el ULID del incidente, qué le pasó (`IncidentChange`: creado, editado, eliminado o restaurado), quién lo creó y a quién estaba y queda asignado. El evento sale solo cuando la transacción se confirma (`ShouldDispatchAfterCommit`), así nadie reacciona a un cambio que al final se deshizo. Lo escuchan la caché del dashboard y el tiempo real, que avisa a las pantallas abiertas ([Módulo Realtime](realtime.md)).
 
 ## Visibilidad en SQL
 

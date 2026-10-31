@@ -5,6 +5,7 @@ import { useQuasar } from 'quasar'
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { messageFor } from '@/shared/errors'
 import { ApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
@@ -35,6 +36,12 @@ const { incident, activities, loadError, actionError, conflict, loading, busy } 
 const conflictMessage = messageFor(new ApiError('http', 'VERSION_CONFLICT'))
 
 onMounted(() => Promise.all([detail.load(), catalogs.load()]))
+
+// Si otra persona lo cambia, se vuelve a leer con su historial; al reconectarse, por si se perdió un aviso
+useRealtime('incident', (change) => {
+  if (change.id === id && !busy.value) void detail.load()
+})
+useRealtime('reconnected', () => void detail.load())
 
 const changeStatus = useStatusChange(incident, detail.changeStatus)
 

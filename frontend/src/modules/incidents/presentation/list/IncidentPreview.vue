@@ -2,6 +2,7 @@
      "Cambiar estado" y "Abrir detalle". Reutiliza las piezas del detalle. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { messageFor } from '@/shared/errors'
 import { ApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
@@ -28,6 +29,11 @@ async function onStatus(code: string): Promise<void> {
 }
 
 onMounted(detail.load)
+
+// Si otra persona lo cambia mientras se ve, la vista previa se actualiza sola
+useRealtime('incident', (change) => {
+  if (change.id === props.id && !detail.busy.value) void detail.load()
+})
 </script>
 
 <template>

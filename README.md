@@ -51,7 +51,7 @@ Para ver si todo está listo:
 docker compose ps
 ```
 
-Los servicios deben aparecer como `healthy` (el worker y el scheduler, como `running`). `init` no aparece: prepara la base de datos y termina; se ve con `docker compose ps -a` como `exited (0)`.
+Los servicios deben aparecer como `healthy` (el worker y el scheduler, como `running`), incluido `reverb`, el de tiempo real. `init` no aparece: prepara la base de datos y termina; se ve con `docker compose ps -a` como `exited (0)`.
 
 **No hace falta crear un `.env`.** Los valores por defecto sirven para correr en local. Solo si se quiere cambiar algo (un puerto, el volumen de datos de prueba), se copia `.env.example` a `.env` y se ajusta.
 
@@ -101,6 +101,16 @@ En el menú **Roles** (Super admin):
 - **Editar:** los cambios aplican de inmediato a todas las personas con ese rol; antes de guardar se muestra a cuántas afecta. El rol Super admin no se edita.
 - **Eliminar:** solo un rol creado que nadie tenga. Los cinco roles base no se eliminan.
 
+### Tiempo real
+
+Con dos ventanas abiertas (por ejemplo, el supervisor en una y un agente en otra), lo que cambia una persona aparece en la otra sin recargar:
+
+- **Listado:** un aviso "Hay N incidentes con cambios de otras personas" con "Actualizar"; las filas no se mueven mientras lees.
+- **Detalle:** se actualiza solo, con su historial. **Edición:** avisa que otra persona cambió el incidente.
+- **Inicio:** las cifras se refrescan solas.
+- **"Te asignaron INC-…"** con "Abrir" cuando alguien te asigna un incidente.
+- **Permisos y sesión:** si te cambian el rol o los permisos, el menú se ajusta solo; si te desactivan, la sesión se cierra al instante.
+
 ### Auditoría
 
 En el menú **Auditoría** se ve quién hizo qué, cuándo y desde dónde (IP y navegador):
@@ -132,6 +142,9 @@ Están todas en [`.env.example`](.env.example), con su valor por defecto para lo
 | `MAIL_HOST`, `MAIL_PORT` | `mailpit`, `1025` | Servidor de correo. En local los correos llegan a Mailpit |
 | `MAIL_USERNAME`, `MAIL_PASSWORD` | vacías | Credenciales del servidor de correo (solo en producción) |
 | `MAIL_FROM_ADDRESS` | `no-reply@trazo.local` | Remitente de los correos |
+| `REVERB_APP_ID`, `REVERB_APP_KEY` | `trazo`, `trazo-local-key` | Identificación del servidor de tiempo real. La clave es pública |
+| `REVERB_APP_SECRET` | `trazo_local_only` | Firma las suscripciones al tiempo real. **Solo para local**: en producción se define otro |
+| `REVERB_ALLOWED_ORIGINS` | `localhost` | Dominios desde los que se aceptan conexiones de tiempo real (sin `http://`) |
 
 El resto de la configuración (conexiones a MySQL y Redis, colas, caché) está fija en [`docker-compose.yml`](docker-compose.yml), porque no cambia entre equipos. El repositorio es público: ningún secreto real se guarda en él.
 
@@ -216,6 +229,7 @@ La [estrategia de pruebas](docs/calidad/estrategia-de-pruebas.md) explica qué c
 |---|---|
 | http://localhost:8088 | La aplicación |
 | http://localhost:8088/api/v1/... | La API que usa la interfaz |
+| ws://localhost:8088/ws/... | Tiempo real: los cambios de otras personas llegan sin recargar |
 | http://localhost:8025 | Mailpit: buzón donde llegan los correos en local |
 
 Solo el gateway publica un puerto. MySQL y Redis viven en una red interna, sin acceso desde fuera. El detalle de cada contenedor está en [Docker](docs/operacion/docker.md).
