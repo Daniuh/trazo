@@ -50,3 +50,5 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0036](0036-exportacion-csv.md) | Exportación en CSV |
 | [ADR-0037](0037-idempotencia.md) | Idempotency-Key en la creación de incidentes |
 | [ADR-0038](0038-versiones-del-stack.md) | Versiones del stack |
+| [ADR-0039](0039-quasar-como-plugin-de-vite.md) | Quasar integrado como plugin de Vite |
+| [ADR-0040](0040-axios.md) | Axios como base del cliente HTTP |

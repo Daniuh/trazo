@@ -1,0 +1,17 @@
+// Conecta los tokens de Trazo con las variables de Quasar. Aquí no se definen valores propios.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+@use 'sass:math';
+@use '../tokens/colors' as c;
+@use '../tokens/breakpoints' as bp;
+
+$primary: c.$color-primary;
+$secondary: c.$color-success;
+$accent: c.$color-blue-base;
+$positive: c.$color-success;
+$warning: c.$color-warning;
+$dark: c.$color-text;
+
+// Quasar define cada breakpoint por su límite superior: un píxel antes de la siguiente vista
+$breakpoint-xs: bp.$bp-tablet - 1px;
+$breakpoint-sm: bp.$bp-laptop - 1px;
+$breakpoint-md: bp.$bp-desktop - 1px;
