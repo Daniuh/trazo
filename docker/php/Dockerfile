@@ -23,12 +23,11 @@ WORKDIR /var/www/html
 ENTRYPOINT ["/sbin/tini", "--", "trazo-entrypoint"]
 CMD ["php-fpm"]
 
-# Desarrollo: el código llega montado desde el host y se usa composer dentro del contenedor
+# Desarrollo: el código (y el script de arranque, dev-init.sh) llega montado desde el host y se usa composer dentro del contenedor
 FROM base AS dev
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
     && apk add --no-cache su-exec
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
-COPY --chmod=755 docker/php/dev-init.sh /usr/local/bin/trazo-dev-init
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS=1 COMPOSER_HOME=/tmp/composer
 USER www-data
 

@@ -21,7 +21,13 @@ services:
   init:
     <<: *laravel-dev
     user: root
-    command: ["trazo-dev-init"]
+    # El script se monta desde el repositorio, como el código: un cambio en él no exige reconstruir la imagen
+    command: ["sh", "/usr/local/bin/trazo-dev-init"]
+    volumes:
+      - ./backend:/var/www/html
+      - vendor:/var/www/html/vendor
+      - app-key:/run/trazo
+      - ./docker/php/dev-init.sh:/usr/local/bin/trazo-dev-init:ro
 
   app:
     <<: *laravel-dev

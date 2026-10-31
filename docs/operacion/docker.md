@@ -42,7 +42,7 @@ flowchart LR
 |---|---|---|
 | `gateway` | `nginx-unprivileged` 1.30 | Única entrada pública. `/api` y `/up` van a Laravel; el resto, al frontend. Agrega las cabeceras de seguridad. |
 | `app` | `trazo/api` (PHP 8.4 FPM) | API de Laravel 13 |
-| `init` | `trazo/api` | Corre una vez antes que la API: migraciones (y seeders cuando existan). Si falla, la API no arranca. |
+| `init` | `trazo/api` | Corre una vez antes que la API: migraciones y seeders. Si falla, la API no arranca. |
 | `worker` | `trazo/api` | Procesa las colas |
 | `scheduler` | `trazo/api` | Tareas programadas |
 | `frontend` | `trazo/web` | En local, Vite con recarga en caliente. En producción, el build servido por Nginx sin root. |
@@ -76,6 +76,8 @@ flowchart LR
 ## Entorno local en Windows y macOS
 
 El código se monta desde el disco del equipo, y en estos sistemas llega al contenedor sin permiso de escritura para el usuario sin privilegios. Por eso, en local, `init` arranca como root solo para ajustar los permisos de `vendor/`, `storage/` y `bootstrap/cache/`; la instalación de dependencias y las migraciones corren como `www-data`.
+
+El script de arranque local (`docker/php/dev-init.sh`) también se monta desde el repositorio en vez de copiarse a la imagen. Docker no reconstruye una imagen que ya existe, así que con el script copiado, un equipo con una imagen anterior seguía usando la versión vieja: migraba pero no cargaba los datos de prueba. Montado, siempre corre la versión actual.
 
 Las dependencias de PHP (`vendor/`) no se leen desde la carpeta del equipo sino desde un volumen de Docker (`trazo_vendor`). PHP abre cientos de archivos de `vendor/` en cada petición, y leerlos a través de la carpeta compartida de Windows es lento: con el volumen, cada petición bajó de varios segundos a menos de uno, y arrancar Laravel desde la consola, de 26 s a poco más de 1 s. `init` instala las dependencias en ese volumen con `composer install`. La carpeta `backend/vendor/` del equipo, si existe, ya no la usa ningún contenedor; sirve solo para el editor.
 
