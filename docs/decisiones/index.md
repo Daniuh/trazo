@@ -49,3 +49,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0035](0035-documentacion.md) | Documentación en Markdown, con ADR y trazabilidad al código |
 | [ADR-0036](0036-exportacion-csv.md) | Exportación en CSV |
 | [ADR-0037](0037-idempotencia.md) | Idempotency-Key en la creación de incidentes |
+| [ADR-0038](0038-versiones-del-stack.md) | Versiones del stack |

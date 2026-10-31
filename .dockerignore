@@ -1,0 +1,14 @@
+# Lo que nunca entra al contexto de build de Docker: dependencias, secretos y archivos ajenos a las imágenes.
+.git
+**/node_modules
+backend/vendor
+backend/storage/logs/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+frontend/dist
+docs
+**/.env
+**/.env.*
+!**/.env.example
+*.log

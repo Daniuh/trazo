@@ -1,0 +1,62 @@
+# Entorno local (se carga solo con `docker compose up`): código montado, Vite con recarga en caliente y Mailpit.
+# Documentado en docs/operacion/docker.md
+
+x-laravel-dev: &laravel-dev
+  image: trazo/api:dev
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: dev
+  environment:
+    APP_DEBUG: "true"
+    LOG_LEVEL: debug
+  volumes:
+    - ./backend:/var/www/html
+    - app-key:/run/trazo
+
+services:
+  # En local ajusta permisos e instala dependencias antes de migrar
+  init:
+    <<: *laravel-dev
+    user: root
+    command: ["trazo-dev-init"]
+
+  app:
+    <<: *laravel-dev
+
+  worker:
+    <<: *laravel-dev
+
+  scheduler:
+    <<: *laravel-dev
+
+  frontend:
+    image: trazo/web:dev
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      target: dev
+    environment:
+      VITE_HMR_CLIENT_PORT: ${TRAZO_HTTP_PORT:-8088}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      start_period: 20s
+
+  gateway:
+    volumes:
+      - ./docker/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/upstream.dev.conf:/etc/nginx/conf.d/upstream.conf:ro
+      - ./docker/nginx/snippets:/etc/nginx/snippets:ro
+
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    ports:
+      - "${TRAZO_MAIL_UI_PORT:-8025}:8025"
+    networks: [edge]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 128M }
