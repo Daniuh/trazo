@@ -79,6 +79,16 @@ El código se monta desde el disco del equipo, y en estos sistemas llega al cont
 
 Si los builds fallan con errores como `no such host` o `TLS: unspecified error`, el problema suele ser un DNS inestable en la red local. Se resuelve agregando `"dns": ["1.1.1.1", "8.8.8.8"]` en *Docker Desktop → Settings → Docker Engine*.
 
+## Gateway y contenedores que se recrean
+
+El gateway vuelve a consultar el DNS interno de Docker (`resolver 127.0.0.11` y `resolve` en cada upstream). Así, si la API o el frontend se recrean con otra IP, el gateway los sigue encontrando sin reiniciarse.
+
+## Frontend en desarrollo
+
+- Vite corre con un límite de 1 GB de memoria (el Nginx de producción usa 128 MB).
+- En Windows y macOS los cambios de archivos montados no llegan al contenedor como eventos, así que Vite los revisa por sondeo (`VITE_USE_POLLING`).
+- Mientras Vite arranca (unos segundos), el gateway puede responder 502: basta con recargar.
+
 ## Llave de cifrado (`APP_KEY`)
 
 La llave cifra datos sensibles, como los secretos del MFA; si se pierde, esos datos no se pueden recuperar.

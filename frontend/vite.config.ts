@@ -26,6 +26,8 @@ export default defineConfig({
     strictPort: true,
     // El navegador entra por el gateway, así que la recarga en caliente usa su puerto
     hmr: { clientPort: Number(process.env.VITE_HMR_CLIENT_PORT ?? 8088) },
+    // En Docker sobre Windows o macOS los archivos montados no avisan cambios: se revisan por sondeo
+    watch: { usePolling: process.env.VITE_USE_POLLING === 'true', interval: 300 },
   },
   test: {
     environment: 'jsdom',

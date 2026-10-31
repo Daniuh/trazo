@@ -1,0 +1,8 @@
+// Sombras y foco. Planas por defecto: la sombra solo marca lo que flota (diálogos, menús).
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+@use 'colors' as c;
+
+$shadow-overlay: 0 0.375rem 1.25rem rgb(22 22 22 / 12%);
+$focus-ring: 0 0 0 2px c.$color-focus;
+$duration-fast: 120ms;
+$duration-base: 200ms;

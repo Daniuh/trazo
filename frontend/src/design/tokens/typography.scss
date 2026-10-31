@@ -1,0 +1,16 @@
+// Tipografía: una sola familia (Inter, autoalojada), tres pesos y seis tamaños.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+$font-family: 'Inter Variable', system-ui, sans-serif;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-size-xs: 0.75rem; // 12 · texto auxiliar
+$font-size-sm: 0.8125rem; // 13 · etiquetas y botones
+$font-size-md: 0.875rem; // 14 · texto base
+$font-size-lg: 1rem; // 16 · subtítulos
+$font-size-xl: 1.25rem; // 20 · títulos de sección
+$font-size-2xl: 1.75rem; // 28 · título de página
+
+$line-height-tight: 1.25;
+$line-height-base: 1.5;
