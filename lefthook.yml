@@ -1,5 +1,13 @@
 # Hooks de Git: revisiones rápidas antes de cada commit. El CI corre la validación completa.
-# Cada app agrega aquí sus comandos (formato y lint) a medida que se crea.
+# Las revisiones del backend se ejecutan dentro del contenedor, así que el stack debe estar levantado.
+# Documentado en docs/operacion/flujo-de-trabajo.md
+
+pre-commit:
+  commands:
+    backend-format:
+      root: backend/
+      glob: "*.php"
+      run: docker compose -p trazo exec -T app vendor/bin/pint --test {staged_files}
 
 commit-msg:
   commands:
