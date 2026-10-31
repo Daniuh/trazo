@@ -29,7 +29,7 @@ Personas que usan Trazo. **Se desactivan, nunca se borran**, para conservar el h
 
 ## Referenciada por
 
-`incidents.created_by`, `incidents.assigned_to`, `incident_activities.user_id` (todas RESTRICT) y `user_role.user_id` (CASCADE).
+`incidents.created_by`, `incidents.assigned_to`, `incident_activities.user_id` (todas RESTRICT) y `user_role.user_id` y `personal_access_tokens.tokenable_id` (CASCADE).
 
 ## Dónde está en el código
 
