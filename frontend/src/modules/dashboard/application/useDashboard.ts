@@ -2,7 +2,7 @@
 // Al volver a la pestaña, si los datos tienen más de un minuto, se actualizan solos. Documentado en docs/frontend/dashboard.md
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { ApiError, toApiError } from '@/shared/http'
-import { readingOrder, type DashboardLayout, type Metrics, type TrendDays } from '../domain/dashboard'
+import { readingOrder, type DashboardLayout, type Metrics, type TrendDays, type WidgetCode } from '../domain/dashboard'
 import { dashboardApi } from '../infrastructure/dashboardApi'
 
 // Coincide con lo que la caché del servidor guarda una cifra
@@ -17,6 +17,8 @@ export function useDashboard() {
   const refreshing = ref(false)
   const error = ref<ApiError | null>(null)
   const metricsError = ref<ApiError | null>(null)
+  // Widgets del borrador mientras se personaliza; null fuera del modo edición
+  const draftCodes = shallowRef<WidgetCode[] | null>(null)
   let current: AbortController | null = null
 
   const widgets = computed(() => (layout.value ? readingOrder(layout.value.widgets) : []))
@@ -35,7 +37,7 @@ export function useDashboard() {
   }
 
   async function loadMetrics(): Promise<void> {
-    const codes = widgets.value.map((widget) => widget.code)
+    const codes = draftCodes.value ?? widgets.value.map((widget) => widget.code)
     if (codes.length === 0) {
       metrics.value = {}
       return
@@ -56,6 +58,20 @@ export function useDashboard() {
     } finally {
       if (current === controller) refreshing.value = false
     }
+  }
+
+  // Mientras se personaliza, las cifras siguen al borrador: así un widget recién agregado muestra sus datos
+  function followDraft(codes: WidgetCode[] | null): void {
+    const missing = codes?.some((code) => metrics.value[code] === undefined) ?? false
+    draftCodes.value = codes
+    if (missing) void loadMetrics()
+  }
+
+  // Tras guardar o restaurar, el diseño nuevo manda y se piden las cifras de lo que quedó visible
+  function applyLayout(next: DashboardLayout): void {
+    layout.value = next
+    draftCodes.value = null
+    void loadMetrics()
   }
 
   function onVisible(): void {
@@ -85,5 +101,7 @@ export function useDashboard() {
     metricsError,
     load,
     loadMetrics,
+    followDraft,
+    applyLayout,
   }
 }

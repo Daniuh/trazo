@@ -1,5 +1,5 @@
-<!-- Menú de opciones que se abre desde el botón que lo contiene. Cada opción puede llevar ícono y marcarse como peligrosa.
-     Se cierra solo al elegir. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
+<!-- Menú de opciones que se abre desde el botón que lo contiene. Cada opción puede llevar ícono, marcarse como peligrosa,
+     quedar desactivada o separarse de las anteriores con una línea. Se cierra solo al elegir. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import { ClosePopup, QMenu } from 'quasar'
 import AppIcon from './AppIcon.vue'
@@ -23,9 +23,13 @@ const vClosePopup = ClosePopup
         :key="item.key"
         v-close-popup
         class="app-action-menu__item"
-        :class="{ 'app-action-menu__item--danger': item.danger }"
+        :class="{
+          'app-action-menu__item--danger': item.danger,
+          'app-action-menu__item--separated': item.separated,
+        }"
         type="button"
         role="menuitem"
+        :disabled="item.disabled"
         @click="emit('select', item.key)"
       >
         <AppIcon v-if="item.icon" :name="item.icon" />
@@ -59,12 +63,21 @@ const vClosePopup = ClosePopup
   text-align: left;
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: $color-page;
+  }
+
+  &:disabled {
+    color: $color-text-secondary;
+    cursor: not-allowed;
   }
 }
 
 .app-action-menu__item--danger {
   color: $color-danger;
+}
+
+.app-action-menu__item--separated {
+  border-top: 1px solid $color-border;
 }
 </style>

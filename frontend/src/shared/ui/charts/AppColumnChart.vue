@@ -89,25 +89,28 @@ const ticks = computed(() => {
       </div>
     </div>
 
-    <table class="app-columns__table">
-      <caption>
-        {{
-          label
-        }}
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">Fecha</th>
-          <th v-for="serie in series" :key="serie.key" scope="col">{{ serie.label }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="point in points" :key="point.key">
-          <th scope="row">{{ point.label }}</th>
-          <td v-for="serie in series" :key="serie.key">{{ point.values[serie.key] ?? 0 }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Una tabla no se deja encoger a 1 px: el contenedor es el que se oculta -->
+    <div class="app-columns__data">
+      <table>
+        <caption>
+          {{
+            label
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th v-for="serie in series" :key="serie.key" scope="col">{{ serie.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="point in points" :key="point.key">
+            <th scope="row">{{ point.label }}</th>
+            <td v-for="serie in series" :key="serie.key">{{ point.values[serie.key] ?? 0 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </figure>
 </template>
 
@@ -198,7 +201,7 @@ const ticks = computed(() => {
   font-size: $font-size-xs;
 }
 
-.app-columns__table {
+.app-columns__data {
   @include visually-hidden;
 }
 </style>

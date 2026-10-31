@@ -56,8 +56,9 @@ Los flujos críticos se prueban en un navegador real contra el stack de Docker c
 | Filtros | Llegan desde la URL, se ven como etiquetas y se quitan |
 | Permisos | El solicitante no ve los filtros de gestión |
 | Dashboard | Cada rol ve su resumen (general o personal, con sus widgets); "Vencidos" lleva al listado filtrado; la tendencia cambia de período |
+| Personalizar | En portátil y monitor: quitar con el menú ⋯, agregar, guardar y restaurar el original; aviso al salir con cambios sin guardar y al cancelar. En tablet y celular no hay botón y el ícono de información explica dónde hacerlo |
 
-- **Accesibilidad:** el login, el formulario, el detalle, el listado y el dashboard pasan por axe-core con las reglas WCAG 2.1 A y AA. Cualquier problema hace fallar la prueba.
+- **Accesibilidad:** el login, el formulario, el detalle, el listado, el dashboard y su modo Personalizar pasan por axe-core con las reglas WCAG 2.1 A y AA. Cualquier problema hace fallar la prueba.
 - **Sesión:** salvo en las pruebas del propio login, la sesión se abre por la API una sola vez por usuario y vista. Así se respeta el límite real de 5 intentos por minuto sin desactivarlo para las pruebas.
 - **Datos:** se usan los usuarios demo, y cada incidente creado lleva un título único, así que las pruebas se pueden repetir sobre la misma base.
 - **Cómo correrlas:** con el stack arriba, `npm run test:e2e` en `frontend/` (o `npx playwright test --project=tablet` para una sola vista). La primera vez hace falta `npx playwright install chromium`. `E2E_BASE_URL` cambia la dirección (por defecto, `http://localhost:8088`).

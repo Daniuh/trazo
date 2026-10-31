@@ -76,3 +76,7 @@ $chart-fills: (
   'muted': $color-muted,
   'danger': $color-red,
 );
+
+// Modo Personalizar del dashboard: marco de los widgets y zona donde cae el que se arrastra (azul base al 15 %)
+$dashboard-edit-border: $color-blue-base;
+$dashboard-drop-zone: rgb(3 168 213 / 15%);

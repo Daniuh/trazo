@@ -18,7 +18,7 @@ Todo valor visual vive en `src/design/tokens/`. Los componentes solo usan tokens
 | `spacing.scss` | Escala de espaciado, radios y medidas del layout |
 | `shadows.scss` | Sombra de elementos flotantes, foco y duraciones |
 | `breakpoints.scss` | Las cuatro vistas y sus mixins |
-| `layout.ts` | Medidas que Quasar necesita como números en JS (ancho del menú) |
+| `layout.ts` | Medidas que se necesitan como números en JS: ancho del menú (Quasar) y alto de fila y separación de la grilla editable del dashboard (`grid-layout-plus`), iguales a `$dashboard-row-height` y `$space-4` |
 
 ## Colores
 
@@ -69,6 +69,11 @@ Escala de 4 px (`$space-1` a `$space-7`: 4, 8, 12, 16, 24, 32 y 48). Radios de 8
 | Token | Valor | Uso |
 |---|---|---|
 | `$dashboard-row-height` | 4,5 rem | Alto de una fila de la grilla de 12 columnas (portátil y monitor) |
+| `$dashboard-resize-handle` | 1,25 rem | Manija para cambiar el tamaño en el modo Personalizar |
+| `$dashboard-edit-border` | azul base | Marco punteado de los widgets y de la zona de destino al arrastrar |
+| `$dashboard-drop-zone` | azul base al 15 % | Fondo de la zona donde cae el widget que se arrastra |
+| `$shadow-dragging` | sombra amplia | Widget que se arrastra o se estira: flota sobre los demás |
+| `$menu-wide-width` | 20 rem | Menús con una descripción por opción ("Agregar widget") |
 | `$chart-bar-height` | 0,625 rem | Grosor de las barras horizontales |
 | `$chart-label-width` | 7 rem | Columna de nombres en las barras |
 | `$chart-donut-size` | 8 rem | Diámetro de la dona |
