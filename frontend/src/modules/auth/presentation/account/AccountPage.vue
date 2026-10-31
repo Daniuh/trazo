@@ -13,7 +13,7 @@ import { useFeedback } from '@/shared/ui/feedback/useFeedback'
 import { useSessionStore } from '../../application/useSessionStore'
 import RecoveryCodesPanel from '../mfa/RecoveryCodesPanel.vue'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
-import MfaCodeDialog from './MfaCodeDialog.vue'
+import AppCodeDialog from '@/shared/ui/feedback/AppCodeDialog.vue'
 
 const session = useSessionStore()
 const router = useRouter()
@@ -131,14 +131,14 @@ function setUp(): void {
       v-model="changingPassword"
       @changed="notify('Tu contraseña cambió. Cerramos tus sesiones en otros equipos.')"
     />
-    <MfaCodeDialog
+    <AppCodeDialog
       v-model="regenerating"
       title="Generar códigos nuevos"
       message="Los códigos de recuperación que tienes dejarán de servir. Escribe el código que muestra ahora tu aplicación."
       confirm-label="Generar"
       :action="regenerate"
     />
-    <MfaCodeDialog
+    <AppCodeDialog
       v-model="disabling"
       title="Desactivar la verificación en dos pasos"
       message="Tu cuenta volverá a pedir solo la contraseña. Escribe el código que muestra ahora tu aplicación para confirmar."

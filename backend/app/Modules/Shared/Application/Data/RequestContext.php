@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-// Desde dónde se hizo un cambio. Se guarda en el historial para la auditoría.
-// Documentado en docs/backend/incidents.md
+// Desde dónde se hizo un cambio. Se guarda en los registros de auditoría.
+// Documentado en docs/backend/shared.md
 
-namespace App\Modules\Incidents\Application\Data;
+namespace App\Modules\Shared\Application\Data;
 
 final readonly class RequestContext
 {

@@ -89,6 +89,16 @@ export async function setUpMfa(page: Page, email: string): Promise<void> {
 
 // WCAG 2.1 nivel AA, el estándar que sigue el sistema de diseño
 export async function expectAccessible(page: Page): Promise<void> {
+  // Un diálogo o un aviso que todavía está apareciendo tiene opacidad parcial y axe lo mide con poco contraste:
+  // se espera a que terminen las animaciones (las infinitas, como la de carga, no cuentan)
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .every(
+        (animation) =>
+          animation.playState !== 'running' || animation.effect?.getComputedTiming().iterations === Infinity,
+      ),
+  )
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
   const summary = results.violations.map(
     (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`,

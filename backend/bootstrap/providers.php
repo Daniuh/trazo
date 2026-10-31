@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Auth\Infrastructure\AuthServiceProvider;
 use App\Modules\Dashboard\Infrastructure\DashboardServiceProvider;
 use App\Modules\Incidents\Infrastructure\IncidentServiceProvider;
+use App\Modules\Users\Infrastructure\UsersServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -12,4 +13,5 @@ return [
     AuthServiceProvider::class,
     IncidentServiceProvider::class,
     DashboardServiceProvider::class,
+    UsersServiceProvider::class,
 ];

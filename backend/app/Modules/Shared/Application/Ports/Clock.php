@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 // La hora actual, inyectada para que las reglas de fechas se puedan probar.
-// Documentado en docs/backend/incidents.md
+// Documentado en docs/backend/shared.md
 
-namespace App\Modules\Incidents\Application\Ports;
+namespace App\Modules\Shared\Application\Ports;
 
 use DateTimeImmutable;
 

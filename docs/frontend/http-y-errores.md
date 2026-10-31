@@ -72,10 +72,25 @@ Las plantillas pueden usar `{traceId}` (código de soporte) y `{wait}`, la esper
 
 Los mensajes de campo no repiten el nombre del campo porque se muestran a su lado. Un código desconocido nunca deja la pantalla en blanco: muestra un mensaje útil con el código de soporte. La lista completa de mensajes está en el [catálogo de errores](../soporte/catalogo-de-errores.md).
 
+## Listados ligados a la URL
+
+`useRouteList` es la base de todo listado: los criterios salen de la URL, cada cambio la actualiza y eso dispara la consulta. Cancela la consulta anterior si llega otra, descarta respuestas viejas, y cambiar un filtro vuelve a la primera página. Cada módulo le pasa:
+
+- `fromQuery` y `toQuery`: cómo se leen y se escriben sus criterios. Se apoyan en `shared/routing/queryValues.ts`: `queryOne`, `queryList`, `queryPositive`, `queryChoice` y `compactQuery`, que ignoran lo que no reconocen y dejan la URL corta.
+- `fetch`: la llamada de su repositorio.
+- `ready` (opcional): cuándo todavía no consultar, por ejemplo una búsqueda incompleta.
+
+La usan los listados de incidentes y de usuarios.
+
+## Revisiones visuales compartidas
+
+`shared/validation/email.ts` (`looksLikeEmail`) es la única revisión de la forma de un correo antes de enviarlo: la usan el login, la recuperación de contraseña y la administración. Solo evita un viaje innecesario; la API valida de verdad.
+
 ## Dónde está en el código
 
 - [`shared/http/client.ts`](../../frontend/src/shared/http/client.ts): cliente e interceptores.
 - [`shared/http/apiError.ts`](../../frontend/src/shared/http/apiError.ts): normalización de errores.
 - [`shared/http/tokenStore.ts`](../../frontend/src/shared/http/tokenStore.ts) y [`events.ts`](../../frontend/src/shared/http/events.ts).
 - [`shared/errors/`](../../frontend/src/shared/errors/): catálogo, mensajes y `formatWait`.
+- [`shared/listing/useRouteList.ts`](../../frontend/src/shared/listing/useRouteList.ts), [`shared/routing/queryValues.ts`](../../frontend/src/shared/routing/queryValues.ts) y [`shared/validation/email.ts`](../../frontend/src/shared/validation/email.ts).
 - Pruebas: archivos `*.spec.ts` junto a cada uno.

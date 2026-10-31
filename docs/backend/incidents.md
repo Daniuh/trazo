@@ -16,7 +16,7 @@ Gestiona el ciclo de vida de los incidentes. **Todas las reglas viven aquí:** q
 | Método | Ruta | Para qué | Permiso |
 |---|---|---|---|
 | `GET` | `/catalogs` | Prioridades y estados con sus transiciones (con `ETag`) | Sesión |
-| `GET` | `/incidents/assignees` | Personas a las que se puede asignar | `incidents.assign` |
+| `GET` | `/incidents/assignees` | Personas a las que se puede asignar: cuentas activas con el permiso `incidents.status.assigned`, por su rol o concedido a la persona ([permisos por persona](users.md#permisos-por-persona)) | `incidents.assign` |
 | `GET` | `/incidents` | Listado paginado, con orden, búsqueda y filtros (ver abajo) | Sesión; cada persona ve lo suyo |
 | `POST` | `/incidents` | Crear (acepta `Idempotency-Key`) | `incidents.create` |
 | `GET` | `/incidents/{id}` | Detalle con `actions` y `next_statuses` | Verlo |
@@ -151,8 +151,8 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 | Capa | Piezas |
 |---|---|
 | Domain | `IncidentAccess` (quién puede qué), `VisibilityScope` (qué ve cada uno), `IncidentSort`, `IncidentRules` (vencimiento, vencido, resolución), `Actor`, `IncidentState`, `StatusFlags`, `Denial`, `IncidentExceptions` |
-| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `RequestContext`); evento `IncidentChanged`; puertos |
-| Infrastructure | `EloquentIncidentList`, `IncidentFilters` y `VisibilitySql` (listado y visibilidad en SQL), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `LaravelSupport` (hora y transacciones), `IncidentServiceProvider` |
+| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`); evento `IncidentChanged`; puertos |
+| Infrastructure | `EloquentIncidentList`, `IncidentFilters` y `VisibilitySql` (listado y visibilidad en SQL), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `IncidentServiceProvider`. La hora y las transacciones vienen de [Shared](shared.md#puertos-que-comparten-los-módulos) |
 | Http | `IncidentController`, `IncidentWorkflowController`, `CatalogController`, `IncidentRequest`, `WorkflowRequest`, `IncidentResource`, `RequestActor` |
 
 ## Aviso de cambios

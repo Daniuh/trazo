@@ -8,7 +8,9 @@ import AppButton from './AppButton.vue'
 import AppCodeField from './form/AppCodeField.vue'
 import AppIcon from './AppIcon.vue'
 import AppInfoTip from './AppInfoTip.vue'
+import AppDataTable from './AppDataTable.vue'
 import AppQrCode from './AppQrCode.vue'
+import AppRadioList from './form/AppRadioList.vue'
 import AppErrorState from './states/AppErrorState.vue'
 
 describe('AppIcon', () => {
@@ -118,5 +120,58 @@ describe('AppQrCode', () => {
     expect(width).toBeGreaterThanOrEqual(29)
     // El patrón de esquina siempre empieza oscuro, justo después del margen
     expect(qr.find('path').attributes('d')).toMatch(/^M4 4h1v1h-1z/)
+  })
+})
+
+describe('AppDataTable', () => {
+  const rows = [
+    { id: 'a', name: 'Ana' },
+    { id: 'b', name: 'Beto' },
+  ]
+  const columns = [
+    { key: 'name', label: 'Nombre', sortable: true },
+    { key: 'actions', label: 'Acciones', hiddenLabel: true },
+  ]
+
+  it('ordena desde el encabezado: primero de mayor a menor y luego al revés', async () => {
+    const table = mount(AppDataTable, {
+      props: { columns, rows, rowKey: (row: unknown) => (row as { id: string }).id, sort: 'name', descending: true },
+    })
+
+    expect(table.get('th').attributes('aria-sort')).toBe('descending')
+    await table.get('th button').trigger('click')
+    expect(table.emitted('sort')?.[0]).toEqual(['name', false])
+  })
+
+  it('abre una fila con clic o con Enter, y la columna sin nombre visible lo conserva para lectores', async () => {
+    const table = mount(AppDataTable, {
+      props: { columns, rows, rowKey: (row: unknown) => (row as { id: string }).id },
+    })
+
+    await table.findAll('tbody tr')[1]?.trigger('keydown.enter')
+    expect(table.emitted('open')?.[0]).toEqual(['b'])
+    expect(table.findAll('th')[1]?.get('span').classes()).toContain('app-data-table__hidden')
+  })
+})
+
+describe('AppRadioList', () => {
+  it('agrupa las opciones con su nombre y descripción, y muestra el error asociado', () => {
+    const list = mount(AppRadioList, {
+      global: { plugins: [Quasar] },
+      props: {
+        label: 'Rol',
+        modelValue: 'agent',
+        error: 'Este campo es obligatorio.',
+        options: [
+          { value: 'agent', label: 'Agente', description: 'Atiende incidentes.' },
+          { value: 'requester', label: 'Solicitante' },
+        ],
+      },
+    })
+
+    expect(list.get('legend').text()).toBe('Rol')
+    expect(list.text()).toContain('Atiende incidentes.')
+    expect(list.findAll('.app-radio-list__option--selected')).toHaveLength(1)
+    expect(list.get('fieldset').attributes('aria-describedby')).toBe(list.get('[role="alert"]').attributes('id'))
   })
 })

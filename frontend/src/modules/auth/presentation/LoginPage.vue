@@ -8,13 +8,12 @@ import { ApiError, toApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
+import { looksLikeEmail } from '@/shared/validation/email'
 import { PASSWORD_CHANGED_REASON, SESSION_EXPIRED_REASON } from '../application/authGuard'
 import { useSessionStore } from '../application/useSessionStore'
 import { safeRedirect } from '../domain/safeRedirect'
 import type { LoginStep } from '../domain/session'
 import AuthPanel from './AuthPanel.vue'
-
-const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const route = useRoute()
 const router = useRouter()
@@ -33,7 +32,7 @@ const passwordChanged = computed(() => route.query.motivo === PASSWORD_CHANGED_R
 function localErrors(): Record<string, string> {
   const errors: Record<string, string> = {}
   if (!form.email.trim()) errors.email = fieldMessageFor({ code: 'REQUIRED' })
-  else if (!EMAIL_SHAPE.test(form.email.trim())) errors.email = fieldMessageFor({ code: 'INVALID_EMAIL' })
+  else if (!looksLikeEmail(form.email.trim())) errors.email = fieldMessageFor({ code: 'INVALID_EMAIL' })
   if (!form.password) errors.password = fieldMessageFor({ code: 'REQUIRED' })
   return errors
 }

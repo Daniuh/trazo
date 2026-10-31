@@ -21,7 +21,7 @@ Las reglas de negocio no conocen HTTP: lanzan una excepción de dominio con un *
 | `ConflictException` | Choca con el estado actual (transición inválida, versión desactualizada) | 409 |
 | `RuleViolationException` | Los datos son válidos en forma pero rompen una regla de negocio | 422 |
 | `AuthenticationFailedException` | No se pudo comprobar quién es la persona | 401 |
-| `ForbiddenException` | Puede ver el recurso, pero su rol no incluye esa acción | 403 |
+| `ForbiddenException` | Puede ver el recurso, pero su rol no incluye esa acción. Por defecto `FORBIDDEN_ACTION`; un módulo puede dar un motivo más preciso (p. ej. `USER_OUTRANKED`) | 403 |
 | `TemporarilyLockedException` | Algo quedó bloqueado por un tiempo; indica cuántos segundos faltan | 423, con `Retry-After` |
 
 ```php
@@ -56,6 +56,17 @@ Las peticiones a `/api/*` se tratan siempre como JSON, aunque el cliente no env�
 
 Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay sesión, y por IP si no la hay. Lo define `AppServiceProvider`. Las rutas sensibles, como el login, suman su propio límite, más estricto.
 
+## Puertos que comparten los módulos
+
+| Pieza | Capa | Para qué |
+|---|---|---|
+| `Clock` | Application | La hora actual, inyectada para que las reglas de fechas se puedan probar |
+| `Transaction` | Application | Varias escrituras como una sola: o se guardan todas o ninguna |
+| `RequestContext` | Application | Desde dónde se hizo un cambio (IP y navegador), para los registros de auditoría |
+| `LaravelSupport` | Infrastructure | Implementa `Clock` y `Transaction` sobre Laravel; se conecta en `AppServiceProvider` |
+
+Vivían en el módulo de incidentes; al necesitarlos también Usuarios y el Dashboard, se movieron aquí para que ningún módulo dependa de otro por algo tan general.
+
 ## Dónde está en el código
 
 - [`Domain/Exceptions/`](../../backend/app/Modules/Shared/Domain/Exceptions/): `DomainException` y sus tipos.
@@ -63,4 +74,5 @@ Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay se
 - [`Http/Errors/ValidationErrorFormatter.php`](../../backend/app/Modules/Shared/Http/Errors/ValidationErrorFormatter.php): reglas de validación a códigos.
 - [`Http/Middleware/AssignRequestId.php`](../../backend/app/Modules/Shared/Http/Middleware/AssignRequestId.php) y [`ForceJsonResponse.php`](../../backend/app/Modules/Shared/Http/Middleware/ForceJsonResponse.php).
 - [`Domain/EmailAddress.php`](../../backend/app/Modules/Shared/Domain/EmailAddress.php) y [`app/Providers/AppServiceProvider.php`](../../backend/app/Providers/AppServiceProvider.php).
+- [`Application/Ports/`](../../backend/app/Modules/Shared/Application/Ports/), [`Application/Data/RequestContext.php`](../../backend/app/Modules/Shared/Application/Data/RequestContext.php) y [`Infrastructure/LaravelSupport.php`](../../backend/app/Modules/Shared/Infrastructure/LaravelSupport.php).
 - Pruebas: [`tests/Feature/Shared/`](../../backend/tests/Feature/Shared/).

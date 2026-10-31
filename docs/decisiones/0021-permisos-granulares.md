@@ -8,7 +8,7 @@ order: 31
 
 # ADR-0021: Roles construidos sobre permisos granulares
 
-- **Estado:** Aceptada
+- **Estado:** Aceptada. Ampliada por [ADR-0053](0053-administracion-de-usuarios.md) (quinto rol, jerarquía por nivel y permisos por persona)
 - **Fecha:** 2026-10-21
 
 ## Contexto

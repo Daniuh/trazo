@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $id
  * @property string $code
  * @property string $name
+ * @property int $level
  */
 class Role extends Model
 {
-    protected $fillable = ['code', 'name'];
+    protected $fillable = ['code', 'name', 'level'];
 
     /**
      * @return BelongsToMany<Permission, $this>

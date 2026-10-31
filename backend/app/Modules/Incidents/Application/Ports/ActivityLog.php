@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Incidents\Application\Ports;
 
-use App\Modules\Incidents\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Data\RequestContext;
 
 interface ActivityLog
 {

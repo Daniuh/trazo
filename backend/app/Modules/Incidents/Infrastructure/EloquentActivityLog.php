@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Incidents\Infrastructure;
 
-use App\Modules\Incidents\Application\Data\RequestContext;
 use App\Modules\Incidents\Application\Ports\ActivityLog;
 use App\Modules\Incidents\Infrastructure\Models\ActivityType;
 use App\Modules\Incidents\Infrastructure\Models\IncidentActivity;
+use App\Modules\Shared\Application\Data\RequestContext;
 use Illuminate\Support\Str;
 use LogicException;
 

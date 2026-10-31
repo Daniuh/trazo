@@ -8,17 +8,17 @@ declare(strict_types=1);
 namespace App\Modules\Incidents\Application;
 
 use App\Modules\Incidents\Application\Data\IncidentRecord;
-use App\Modules\Incidents\Application\Data\RequestContext;
 use App\Modules\Incidents\Application\Ports\ActivityLog;
-use App\Modules\Incidents\Application\Ports\Clock;
 use App\Modules\Incidents\Application\Ports\IncidentCatalog;
 use App\Modules\Incidents\Application\Ports\IncidentRepository;
-use App\Modules\Incidents\Application\Ports\Transaction;
 use App\Modules\Incidents\Domain\Actor;
 use App\Modules\Incidents\Domain\Exceptions\IncidentExceptions;
 use App\Modules\Incidents\Domain\IncidentAction;
 use App\Modules\Incidents\Domain\IncidentRules;
 use App\Modules\Incidents\Domain\StatusFlags;
+use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\Clock;
+use App\Modules\Shared\Application\Ports\Transaction;
 
 final readonly class ChangeIncidentStatus
 {

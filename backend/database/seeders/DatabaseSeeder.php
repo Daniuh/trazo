@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             IncidentCatalogSeeder::class,
             AccessControlSeeder::class,
             MfaPolicySeeder::class,
+            AdminActionTypeSeeder::class,
             DashboardWidgetSeeder::class,
             DemoUserSeeder::class,
             IncidentVolumeSeeder::class,

@@ -9,8 +9,9 @@ namespace App\Modules\Shared\Domain\Exceptions;
 
 class ForbiddenException extends DomainException
 {
-    public function __construct()
+    // Un módulo puede dar un motivo más preciso, por ejemplo que la persona está por encima en la jerarquía
+    public function __construct(string $errorCode = 'FORBIDDEN_ACTION')
     {
-        parent::__construct('FORBIDDEN_ACTION');
+        parent::__construct($errorCode);
     }
 }

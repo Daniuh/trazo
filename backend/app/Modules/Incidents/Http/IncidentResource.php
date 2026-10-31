@@ -9,12 +9,12 @@ namespace App\Modules\Incidents\Http;
 
 use App\Modules\Incidents\Application\Data\IncidentRecord;
 use App\Modules\Incidents\Application\Data\Person;
-use App\Modules\Incidents\Application\Ports\Clock;
 use App\Modules\Incidents\Application\Ports\IncidentCatalog;
 use App\Modules\Incidents\Domain\Actor;
 use App\Modules\Incidents\Domain\IncidentAccess;
 use App\Modules\Incidents\Domain\IncidentRules;
 use App\Modules\Incidents\Domain\StatusFlags;
+use App\Modules\Shared\Application\Ports\Clock;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;

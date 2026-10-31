@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -23,6 +24,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $name
  * @property string $email
  * @property bool $is_active
+ * @property Carbon|null $last_login_at
+ * @property Carbon $created_at
  */
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable
@@ -43,6 +46,7 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 

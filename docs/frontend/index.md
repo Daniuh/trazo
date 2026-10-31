@@ -22,7 +22,7 @@ frontend/src/
 │   ├── layout/          → estructura común (encabezado, menú, contenido)
 │   ├── navigation.ts    → reúne el menú de todos los módulos
 │   └── pages/           → páginas globales (404 y guía visual en desarrollo)
-├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth, incidents y dashboard)
+├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth, incidents, dashboard y admin)
 │   ├── domain/          → tipos y reglas puras
 │   ├── application/     → casos de uso (composables y stores)
 │   ├── infrastructure/  → repositorios de la API y mappers
@@ -32,6 +32,9 @@ frontend/src/
 │   └── errors.ts        → mensajes de sus códigos de error (se registran solos)
 ├── shared/              → lo transversal
 │   ├── format/          → fechas para las personas (completas y relativas)
+│   ├── listing/         → listados ligados a la URL (useRouteList)
+│   ├── routing/         → lectura tolerante de la URL (queryValues)
+│   ├── validation/      → revisiones visuales compartidas (forma de un correo)
 │   ├── http/            → cliente HTTP único, errores normalizados, token de sesión
 │   ├── errors/          → catálogo de mensajes de error
 │   └── ui/              → componentes base reutilizables
