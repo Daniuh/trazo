@@ -10,6 +10,7 @@ namespace App\Modules\Shared\Http\Errors;
 use App\Modules\Shared\Domain\Exceptions\AuthenticationFailedException;
 use App\Modules\Shared\Domain\Exceptions\ConflictException;
 use App\Modules\Shared\Domain\Exceptions\DomainException;
+use App\Modules\Shared\Domain\Exceptions\ForbiddenException;
 use App\Modules\Shared\Domain\Exceptions\ResourceNotFoundException;
 use App\Modules\Shared\Domain\Exceptions\TemporarilyLockedException;
 use App\Modules\Shared\Http\Middleware\AssignRequestId;
@@ -58,6 +59,7 @@ final class ApiExceptionRenderer
     {
         return match (true) {
             $e instanceof AuthenticationFailedException => 401,
+            $e instanceof ForbiddenException => 403,
             $e instanceof ResourceNotFoundException => 404,
             $e instanceof ConflictException => 409,
             $e instanceof TemporarilyLockedException => 423,

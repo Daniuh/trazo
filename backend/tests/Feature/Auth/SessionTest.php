@@ -6,13 +6,10 @@ declare(strict_types=1);
 // Documentado en docs/backend/auth.md
 
 use App\Modules\Users\Infrastructure\Models\User;
-use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 
 uses(RefreshDatabase::class);
-
-beforeEach(fn () => $this->seed(DatabaseSeeder::class));
 
 function startSession(string $email = 'agente1@trazo.test'): string
 {

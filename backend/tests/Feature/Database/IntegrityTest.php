@@ -11,14 +11,11 @@ use App\Modules\Incidents\Infrastructure\Models\IncidentActivity;
 use App\Modules\Incidents\Infrastructure\Models\Status;
 use App\Modules\Users\Infrastructure\Models\Role;
 use App\Modules\Users\Infrastructure\Models\User;
-use Database\Seeders\DatabaseSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
-
-beforeEach(fn () => $this->seed(DatabaseSeeder::class));
 
 it('no permite borrar un usuario que creó un incidente', function (): void {
     $incident = Incident::factory()->create();

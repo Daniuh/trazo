@@ -73,9 +73,22 @@ it('crea usuarios de demostración con su rol y contraseña segura', function ()
 });
 
 it('nunca crea usuarios de demostración en producción', function (): void {
+    User::query()->where('email', 'like', '%@trazo.test')->each(fn (User $user) => $user->roles()->detach());
+    User::query()->where('email', 'like', '%@trazo.test')->delete();
     app()->detectEnvironment(fn (): string => 'production');
 
     $this->seed(DemoUserSeeder::class);
 
     expect(User::query()->count())->toBe(0);
+});
+
+it('volver a sembrar no gasta valores del autoincremental de los catálogos', function (): void {
+    $next = fn (): int => (int) DB::table('activity_types')->insertGetId(['code' => 'probe_'.uniqid(), 'name' => 'Prueba']);
+    $before = $next();
+
+    $this->seed(DatabaseSeeder::class);
+    $this->seed(DatabaseSeeder::class);
+
+    // Si el seeder hubiera intentado insertar filas existentes, el siguiente id habría saltado
+    expect($next())->toBe($before + 1);
 });

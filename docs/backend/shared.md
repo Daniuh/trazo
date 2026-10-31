@@ -21,6 +21,7 @@ Las reglas de negocio no conocen HTTP: lanzan una excepción de dominio con un *
 | `ConflictException` | Choca con el estado actual (transición inválida, versión desactualizada) | 409 |
 | `RuleViolationException` | Los datos son válidos en forma pero rompen una regla de negocio | 422 |
 | `AuthenticationFailedException` | No se pudo comprobar quién es la persona | 401 |
+| `ForbiddenException` | Puede ver el recurso, pero su rol no incluye esa acción | 403 |
 | `TemporarilyLockedException` | Algo quedó bloqueado por un tiempo; indica cuántos segundos faltan | 423, con `Retry-After` |
 
 ```php
