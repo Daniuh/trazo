@@ -39,7 +39,7 @@ const closeOnMobile = () => {
         >
           <AppIcon name="menu" size="lg" />
         </button>
-        <RouterLink to="/" class="shell-header__brand" aria-label="Ir al inicio"><AppLogo /></RouterLink>
+        <RouterLink to="/" class="shell-header__brand"><AppLogo /></RouterLink>
         <AppUserMenu />
       </div>
     </QHeader>

@@ -56,3 +56,5 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0042](0042-sesion-y-bloqueo.md) | Duración de la sesión y bloqueo progresivo por huella del correo |
 | [ADR-0043](0043-reglas-de-acceso-en-el-dominio.md) | Reglas de acceso a incidentes en una sola clase de dominio |
 | [ADR-0044](0044-listado-de-incidentes.md) | Listado de incidentes filtrado en SQL con la misma regla de visibilidad |
+| [ADR-0045](0045-listado-en-el-front.md) | Listado en el front con los filtros en la URL y una presentación por vista |
+| [ADR-0046](0046-pruebas-e2e.md) | Pruebas E2E en las cuatro vistas, con axe bloqueante y sesión por la API |

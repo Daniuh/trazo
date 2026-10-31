@@ -97,6 +97,37 @@ jobs:
         if: always()
         run: docker compose -p trazo down -v
 
+  # Flujos críticos en las cuatro vistas, con revisión de accesibilidad (axe), contra el stack completo
+  e2e:
+    name: E2E
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Levantar el stack
+        run: docker compose -p trazo up -d --build --wait
+      - name: Dependencias y navegador
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Pruebas E2E
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Logs del stack
+        if: failure()
+        run: docker compose -p trazo logs --no-color --tail=200
+      - name: Bajar el stack
+        if: always()
+        run: docker compose -p trazo down -v
+
   # Las imágenes de producción deben construirse siempre; el despliegue las publicará en GHCR
   images:
     name: Imágenes de producción
