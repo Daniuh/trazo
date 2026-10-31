@@ -18,6 +18,7 @@ defineEmits<{ navigate: [] }>()
       class="app-nav__item"
       :active-class="item.exact ? '' : 'app-nav__item--active'"
       exact-active-class="app-nav__item--active"
+      :aria-label="compact ? item.label : undefined"
       @click="$emit('navigate')"
     >
       <AppIcon :name="item.icon" />

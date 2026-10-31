@@ -57,6 +57,7 @@ export const icons = {
   menu: [path('M4 7h16M4 12h16M4 17h16')],
   more: [dot(6, 12), dot(12, 12), dot(18, 12)],
   'chevron-down': [path('M6 9l6 6 6-6')],
+  'chevron-up': [path('M6 15l6-6 6 6')],
   'chevron-left': [path('M15 6l-6 6 6 6')],
   'chevron-right': [path('M9 6l6 6-6 6')],
   eye: [path('M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z'), circle(12, 12, 3)],

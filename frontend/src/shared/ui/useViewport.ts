@@ -21,5 +21,6 @@ export function useViewport() {
     isTablet: computed(() => viewport.value === 'tablet'),
     // Portátil o monitor: hay espacio para textos que en pantallas chicas van solo como ícono
     isLaptopUp: computed(() => viewport.value === 'laptop' || viewport.value === 'desktop'),
+    isDesktop: computed(() => viewport.value === 'desktop'),
   }
 }

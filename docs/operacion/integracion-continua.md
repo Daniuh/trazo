@@ -34,10 +34,9 @@ Los trabajos corren en paralelo.
 | **Documentación** | Que los enlaces relativos de `docs/` apunten a archivos que existen, y que cada documento citado en el encabezado de un archivo de código exista. |
 | **Frontend** | `npm run check` (tipos, ESLint, Stylelint, Prettier y Vitest) y el build de producción. |
 | **Backend** | Levanta el stack de Docker completo, igual que en local, y corre `composer check` (Pint, Larastan y Pest contra MySQL real). Al final comprueba que el gateway responda en `/up` y en `/`. |
+| **E2E** | Levanta el stack completo, instala Chromium y corre los flujos críticos de Playwright en las cuatro vistas, con revisión de accesibilidad (axe). Cada falla queda anotada en el PR. Ver [Estrategia de pruebas](../calidad/estrategia-de-pruebas.md). |
 | **Imágenes de producción** | Que las imágenes `prod` de la API y del frontend se construyan. Son las que el despliegue publicará en GHCR. |
 | **Seguridad** | Gitleaks sobre todo el historial, `composer audit` y `npm audit`. |
-
-Las pruebas de extremo a extremo con Playwright se suman como un trabajo más cuando exista la primera pantalla con flujo completo (el listado de incidentes).
 
 ## Auditoría de dependencias
 
@@ -75,6 +74,7 @@ Mientras el repositorio no esté publicado, estas validaciones se corren en loca
 | Documentación | `node scripts/docs/check-links.mjs` |
 | Frontend | `npm run check` y `npm run build` (en `frontend/`) |
 | Backend | `docker compose -p trazo exec app composer check` |
+| E2E | `npm run test:e2e` (en `frontend/`, con el stack arriba) |
 | Imágenes de producción | `docker compose -p trazo -f docker-compose.yml build` |
 | Secretos | `node scripts/git/scan-secrets.mjs` (cambios preparados); el CI revisa todo el historial |
 | Validar el flujo | `docker run --rm -v "<ruta del repo>:/repo" -w /repo rhysd/actionlint:1.7.12` |

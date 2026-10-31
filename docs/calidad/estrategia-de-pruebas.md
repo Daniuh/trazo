@@ -43,12 +43,30 @@ Una prueba de entorno garantiza que las pruebas corren en `testing` y contra `tr
 | **Stylelint** | Ningún color, función de color ni `@media` fuera de `design/` |
 | **Prettier** | Formato uniforme |
 
-`npm run check` ejecuta tipos, lint y pruebas. Antes de cada commit, Lefthook corre ESLint, Prettier y Stylelint sobre los archivos modificados. Las pruebas de extremo a extremo (Playwright en las cuatro vistas) se agregan con las primeras pantallas.
+`npm run check` ejecuta tipos, lint y pruebas. Antes de cada commit, Lefthook corre ESLint, Prettier y Stylelint sobre los archivos modificados.
+
+### De extremo a extremo (Playwright)
+
+Los flujos críticos se prueban en un navegador real contra el stack de Docker completo, **en las cuatro vistas**: celular (375 × 812, táctil), tablet (768 × 1024, táctil), portátil (1280 × 800) y monitor (1680 × 1000). Cada flujo corre una vez por vista.
+
+| Flujo | Qué comprueba |
+|---|---|
+| Login | Mensaje claro con datos incorrectos; sin sesión lleva al login y vuelve a la página pedida; cerrar sesión |
+| Incidentes | Crear, ver el detalle, cambiar el estado y encontrarlo con la búsqueda del listado |
+| Filtros | Llegan desde la URL, se ven como etiquetas y se quitan |
+| Permisos | El solicitante no ve los filtros de gestión |
+
+- **Accesibilidad:** el login, el formulario, el detalle y el listado pasan por axe-core con las reglas WCAG 2.1 A y AA. Cualquier problema hace fallar la prueba.
+- **Sesión:** salvo en las pruebas del propio login, la sesión se abre por la API una sola vez por usuario y vista. Así se respeta el límite real de 5 intentos por minuto sin desactivarlo para las pruebas.
+- **Datos:** se usan los usuarios demo, y cada incidente creado lleva un título único, así que las pruebas se pueden repetir sobre la misma base.
+- **Cómo correrlas:** con el stack arriba, `npm run test:e2e` en `frontend/` (o `npx playwright test --project=tablet` para una sola vista). La primera vez hace falta `npx playwright install chromium`. `E2E_BASE_URL` cambia la dirección (por defecto, `http://localhost:8088`).
+- **Tiempos de espera holgados:** en Docker sobre Windows cada petición a Laravel tarda un par de segundos, porque el código se lee desde una carpeta montada. En el CI, sobre Linux, no pasa.
 
 ## Dónde está en el código
 
 - [`backend/tests/`](../../backend/tests/) y [`backend/phpunit.xml`](../../backend/phpunit.xml)
 - [`backend/phpstan.neon`](../../backend/phpstan.neon) y [`backend/pint.json`](../../backend/pint.json)
 - [`frontend/eslint.config.js`](../../frontend/eslint.config.js) y [`frontend/stylelint.config.js`](../../frontend/stylelint.config.js)
+- E2E: [`frontend/playwright.config.ts`](../../frontend/playwright.config.ts) y [`frontend/e2e/`](../../frontend/e2e/) (ayudas en `support.ts`)
 - [`lefthook.yml`](../../lefthook.yml)
-- Decisiones: [ADR-0031](../decisiones/0031-estrategia-de-pruebas.md) y [ADR-0032](../decisiones/0032-calidad-estatica.md).
+- Decisiones: [ADR-0031](../decisiones/0031-estrategia-de-pruebas.md), [ADR-0032](../decisiones/0032-calidad-estatica.md) y [ADR-0046](../decisiones/0046-pruebas-e2e.md).

@@ -20,6 +20,7 @@ import IncidentActions from './components/IncidentActions.vue'
 import IncidentBadges from './components/IncidentBadges.vue'
 import IncidentFacts from './components/IncidentFacts.vue'
 import IncidentHistory from './components/IncidentHistory.vue'
+import { useStatusChange } from './useStatusChange'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,21 +36,7 @@ const conflictMessage = messageFor(new ApiError('http', 'VERSION_CONFLICT'))
 
 onMounted(() => Promise.all([detail.load(), catalogs.load()]))
 
-// Cerrar o cancelar no tiene vuelta atrás: se confirma antes
-async function changeStatus(code: string): Promise<void> {
-  const target = incident.value?.nextStatuses.find((status) => status.code === code)
-  if (!target) return
-  if (catalogs.isFinalStatus(code)) {
-    const ok = await confirm({
-      title: `¿Pasar a "${target.name}"?`,
-      message: 'Después de este cambio nadie podrá editar el incidente ni cambiar su estado.',
-      confirmLabel: `Pasar a ${target.name}`,
-      danger: code === 'cancelled',
-    })
-    if (!ok) return
-  }
-  if (await detail.changeStatus(code)) notify(`El incidente pasó a "${target.name}".`)
-}
+const changeStatus = useStatusChange(incident, detail.changeStatus)
 
 async function take(): Promise<void> {
   if (session.user && (await detail.assign(session.user.id))) notify('Tomaste el incidente.')
@@ -72,7 +59,7 @@ async function remove(): Promise<void> {
   })
   if (ok && (await detail.remove())) {
     notify('Incidente eliminado.')
-    await router.replace({ name: 'home' })
+    await router.replace({ name: 'incidents' })
   }
 }
 </script>

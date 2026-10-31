@@ -1,6 +1,6 @@
 ---
 title: Módulo de incidentes (frontend)
-description: Formulario de crear y editar, detalle con acciones e historial, y cómo se manejan los conflictos.
+description: Listado con filtros en la URL, formulario de crear y editar, detalle con acciones e historial, y cómo se manejan los conflictos.
 audience: tecnico
 area: frontend
 module: incidents
@@ -21,11 +21,42 @@ Las reglas están en [Módulo Incidents](../backend/incidents.md).
 
 | Ruta | Pantalla |
 |---|---|
-| `/incidentes/nuevo` | Formulario de creación (menú "Nuevo incidente", visible solo con `incidents.create`) |
+| `/incidentes` | Listado (menú "Incidentes"). El botón "Nuevo incidente" aparece solo con `incidents.create` |
+| `/incidentes/nuevo` | Formulario de creación |
 | `/incidentes/:id` | Detalle |
 | `/incidentes/:id/editar` | El mismo formulario, para editar |
 
-El listado (`/incidentes`) se suma con la fase del listado avanzado.
+## Listado
+
+Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backend/incidents.md)). El front no filtra por su cuenta.
+
+| Vista | Forma |
+|---|---|
+| Monitor | Tabla. Elegir una fila abre a la derecha una **vista previa** con lo esencial, "Cambiar estado" y "Abrir detalle", sin salir del listado. Con la vista previa abierta se oculta la columna "Creado" |
+| Portátil | Tabla. Elegir una fila abre el detalle |
+| Tablet y celular | Tarjetas con código, título, estado, prioridad, asignado y vencimiento. Tocar una tarjeta abre el detalle |
+
+**Barra de filtros**
+
+- **Portátil y monitor:** búsqueda; estado, prioridad y asignado como selectores; y el menú "Más filtros" con los rangos de creación y de vencimiento, "Solo vencidos", "Creados por mí" y "Ver eliminados". El orden se cambia tocando el encabezado de la tabla.
+- **Celular y tablet:** búsqueda, "Filtros (n)" y "Ordenar por". "Filtros" abre un panel inferior con los mismos filtros (estado, prioridad y asignado como chips). El panel se edita en borrador y el botón dice cuántos resultados daría antes de aplicarlo.
+- **Filtros activos:** debajo de la barra, como etiquetas que se quitan con ✕, más "Limpiar filtros". Una etiqueta aparece cuando ya se conoce el nombre de su valor, para no mostrar códigos internos mientras cargan los catálogos.
+- **Búsqueda:** se consulta al dejar de escribir. Con menos de 3 letras se avisa ("Escribe al menos 3 letras para buscar.") y no se consulta. Busca en el código (`INC-000123` o `123`), el título y la descripción.
+
+**Qué opciones ve cada persona**
+
+| Filtro | Quién lo ve |
+|---|---|
+| Asignado: todas las personas y "Sin asignar" | Quien puede asignar (`incidents.assign`) |
+| Asignado: "Asignados a mí" y "Sin asignar" | Un agente, según lo que puede ver |
+| Asignado | Un solicitante no lo ve: solo ve lo que creó |
+| Ver eliminados | Quien puede restaurar (`incidents.restore`). En esa vista, cada fila ofrece "Restaurar" |
+
+**Filtros en la URL.** Todo el criterio vive en la URL (`?status=open,in_progress&priority=critical&page=2`), así que un enlace compartido o una recarga muestran lo mismo. Lo que no se reconoce se ignora y vuelve al valor por defecto. Cambiar un filtro vuelve a la página 1.
+
+**Paginación.** "1–20 de 534", páginas con saltos (…) y 20, 50 o 100 por página. En celular, solo "anterior", "Página 3 de 27" y "siguiente".
+
+**Estados.** Esqueleto mientras carga la primera vez. Dos vacíos distintos: sin resultados para los filtros (con "Limpiar filtros") o sin incidentes todavía (con "Nuevo incidente", si se puede crear). Error con "Reintentar". Si llega una respuesta vieja después de una nueva, se descarta.
 
 ## Formulario (crear y editar)
 
@@ -55,7 +86,7 @@ El listado (`/incidentes`) se suma con la fase del listado avanzado.
 | Tomar | `actions.take` | Se asigna el incidente a uno mismo |
 | Asignar / Reasignar | `actions.assign` | Diálogo con la lista de personas asignables y "Sin asignar". "Guardar" se activa solo si la elección cambió |
 | Editar | `actions.update` | Abre el formulario |
-| Eliminar | `actions.delete` | Pide confirmación, elimina (borrado lógico) y vuelve al inicio |
+| Eliminar | `actions.delete` | Pide confirmación, elimina (borrado lógico) y vuelve al listado |
 
 - **Historial:** frases claras, como "Laura Gómez cambió el estado: Abierto → En progreso", con la fecha relativa ("hace 2 horas", "ayer").
 - **Colores:** salen de `incidentTones.ts`, porque los catálogos no guardan colores. Un estado o prioridad nuevos sin tono asignado se ven en neutro.
@@ -80,12 +111,19 @@ El listado (`/incidentes`) se suma con la fase del listado avanzado.
 | Capa | Pieza | Qué hace |
 |---|---|---|
 | domain | `incident.ts` | Tipos del incidente, borrador, historial y catálogos; límites de largo |
+| domain | `listing.ts` | Criterios del listado, valores por defecto, campos de orden y tamaños de página |
+| infrastructure | `listApi.ts` | Parámetros de `GET /incidents`, página de respuesta y restaurar |
 | infrastructure | `incidentsApi.ts`, `mappers.ts` | Llamadas a la API y traducción entre `snake_case` y el modelo |
 | application | `useCatalogStore` | Catálogos, pedidos una vez por sesión |
 | application | `useIncidentForm` | Carga, validación visual, vencimiento sugerido, idempotencia y envío |
 | application | `useIncidentDetail` | Detalle, historial y acciones con manejo de conflictos |
 | application | `useAssignees` | Lista de personas asignables |
-| presentation | `IncidentFormPage`, `IncidentDetailPage` | Páginas |
+| application | `listQuery.ts` | Criterios ↔ URL, en las dos direcciones |
+| application | `useIncidentList` | Estado del listado ligado a la URL, descarte de respuestas viejas y conteo para el panel de filtros |
+| application | `useListFilterOptions` | Opciones de cada filtro según los catálogos y los permisos |
+| presentation | `IncidentListPage`, `IncidentFormPage`, `IncidentDetailPage` | Páginas |
+| presentation | `list/`: `IncidentToolbar`, `IncidentFilterFields`, `IncidentMoreFilters`, `IncidentFiltersSheet`, `ActiveFilters`, `IncidentTable`, `IncidentCards`, `IncidentPreview`, `sortOptions.ts` | Piezas del listado |
+| presentation | `useStatusChange`, `IncidentStatusButton` | Cambio de estado con confirmación, compartido por el detalle y la vista previa |
 | presentation | `IncidentForm`, `IncidentActions`, `IncidentBadges`, `IncidentFacts`, `IncidentHistory`, `AssignDialog` | Piezas reutilizables (las insignias se reutilizarán en el listado) |
 | presentation | `incidentTones.ts`, `historyText.ts` | Colores por código y frases del historial |
 
@@ -93,5 +131,5 @@ El listado (`/incidentes`) se suma con la fase del listado avanzado.
 
 - [`frontend/src/modules/incidents/`](../../frontend/src/modules/incidents/)
 - [`frontend/src/shared/format/dates.ts`](../../frontend/src/shared/format/dates.ts)
-- Pruebas: archivos `*.spec.ts` dentro del módulo y en `shared/format/`.
-- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0037](../decisiones/0037-idempotencia.md) y [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md)
+- Pruebas: archivos `*.spec.ts` dentro del módulo y en `shared/format/`; flujos completos en [`frontend/e2e/incidents.spec.ts`](../../frontend/e2e/incidents.spec.ts).
+- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md), [ADR-0044](../decisiones/0044-listado-de-incidentes.md) y [ADR-0045](../decisiones/0045-listado-en-el-front.md)

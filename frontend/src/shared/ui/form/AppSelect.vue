@@ -22,7 +22,12 @@ const id = useId()
 
 // El selector de Quasar no muestra el texto de ejemplo cuando está vacío: se muestra aquí, en gris
 const isEmpty = computed(() => model.value === null || (Array.isArray(model.value) && model.value.length === 0))
-const displayValue = computed(() => (isEmpty.value ? props.placeholder : undefined))
+// Mientras llegan las opciones (catálogos), no se muestra el código interno del valor elegido
+const isPending = computed(() => {
+  const values = Array.isArray(model.value) ? model.value : [model.value]
+  return !isEmpty.value && !values.some((value) => props.options.some((option) => option.value === value))
+})
+const displayValue = computed(() => (isEmpty.value ? props.placeholder : isPending.value ? '' : undefined))
 </script>
 
 <template>

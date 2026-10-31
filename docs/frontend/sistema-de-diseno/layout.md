@@ -14,9 +14,11 @@ order: 15
 | Vista | Menú | Contenido |
 |---|---|---|
 | Celular | Oculto; se abre con el botón de menú y se cierra al elegir una sección | Ancho completo |
-| Tablet | Compacto, solo íconos; el nombre aparece al pasar el cursor | Ancho completo |
+| Tablet | Compacto, solo íconos; el nombre aparece al pasar el cursor y cada enlace lo lleva como nombre accesible (`aria-label`) | Ancho completo |
 | Portátil | Expandido, con íconos y nombres | Ancho completo |
 | Monitor | Expandido | Centrado, con ancho máximo de 1280 px |
+
+El logo del encabezado lleva al inicio. Su nombre accesible es el mismo texto que se ve ("Trazo"), para que quien navega por voz pueda nombrarlo tal como lo ve (WCAG 2.5.3).
 
 La sección activa se marca con fondo neutro y una barra azul a la izquierda: nunca con fondo tintado y texto del mismo color. "Inicio" se marca solo en su ruta exacta (`exact` en `NavItem`), porque todas las demás rutas cuelgan de él.
 
