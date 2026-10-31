@@ -2,8 +2,9 @@
      asignación a la derecha. Celular y tablet: una columna. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { formatDateTime } from '@/shared/format/dates'
+import { formatShortDateTime } from '@/shared/format/dates'
 import AppCard from '@/shared/ui/AppCard.vue'
+import AppDateTimeField from '@/shared/ui/form/AppDateTimeField.vue'
 import AppSelect from '@/shared/ui/form/AppSelect.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
 import type { SelectOption } from '@/shared/ui/form/types'
@@ -14,6 +15,8 @@ import { DESCRIPTION_MAX, TITLE_MAX } from '../../domain/incident'
 const props = defineProps<{
   errors: Record<string, string>
   suggestedDueDate: string | null
+  // Al crear, el vencimiento se puede dejar vacío para que se calcule solo
+  creating: boolean
   // Solo al crear y con permiso de asignar
   canAssign: boolean
 }>()
@@ -21,7 +24,7 @@ const props = defineProps<{
 const title = defineModel<string>('title', { required: true })
 const description = defineModel<string>('description', { required: true })
 const priority = defineModel<string>('priority', { required: true })
-const dueDate = defineModel<string>('dueDate', { required: true })
+const dueDate = defineModel<string | null>('dueDate', { required: true })
 const assignee = defineModel<string | null>('assignee', { required: true })
 
 const catalogs = useCatalogStore()
@@ -34,7 +37,7 @@ const assigneeOptions = computed<SelectOption<string>[]>(() =>
   assignees.people.value.map((person) => ({ label: person.name, value: person.id })),
 )
 const duePlaceholder = computed(() =>
-  props.suggestedDueDate ? `Sugerida: ${formatDateTime(props.suggestedDueDate)}` : undefined,
+  props.suggestedDueDate ? `Sugerida: ${formatShortDateTime(props.suggestedDueDate)}` : undefined,
 )
 
 onMounted(() => {
@@ -70,14 +73,19 @@ onMounted(() => {
     <AppCard class="incident-form__side">
       <div class="incident-form__fields">
         <AppSelect v-model="priority" label="Prioridad" :options="priorityOptions" :error="errors.priority" required />
-        <AppTextField
+        <AppDateTimeField
           v-model="dueDate"
           label="Vence"
-          type="datetime-local"
-          info="Si la dejas vacía, se calcula sola con el tiempo de resolución de la prioridad elegida."
+          :placeholder="duePlaceholder"
+          :suggestion="suggestedDueDate"
+          :clear-label="creating ? 'Usar la sugerida' : undefined"
+          :info="
+            creating
+              ? 'Si la dejas vacía, se calcula sola con el tiempo de resolución de la prioridad elegida.'
+              : undefined
+          "
           :error="errors.due_date"
         />
-        <p v-if="!dueDate && duePlaceholder" class="incident-form__hint">{{ duePlaceholder }}</p>
         <AppSelect
           v-if="canAssign"
           v-model="assignee"
@@ -99,12 +107,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: $space-4;
-}
-
-.incident-form__hint {
-  margin: -$space-2 0 0;
-  color: $color-text-secondary;
-  font-size: $font-size-xs;
 }
 
 @include laptop {

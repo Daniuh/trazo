@@ -70,6 +70,7 @@ onMounted(load)
         :errors="fieldErrors"
         :suggested-due-date="suggestedDueDate"
         :can-assign="canAssign"
+        :creating="!editingId"
       />
 
       <div class="incident-form-page__actions">

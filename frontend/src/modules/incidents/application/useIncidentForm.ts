@@ -2,7 +2,6 @@
 // vencimiento según la prioridad y protege la creación con Idempotency-Key. Documentado en docs/frontend/incidents.md
 import { computed, reactive, ref, shallowRef } from 'vue'
 import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
-import { fromLocalInput, toLocalInput } from '@/shared/format/dates'
 import { ApiError, toApiError } from '@/shared/http'
 import { DESCRIPTION_MAX, TITLE_MAX, type Incident, type IncidentDraft } from '../domain/incident'
 import { incidentsApi } from '../infrastructure/incidentsApi'
@@ -16,12 +15,12 @@ export function useIncidentForm(id: string | null) {
   const catalogs = useCatalogStore()
   const existing = shallowRef<Incident | null>(null)
 
-  // dueDate va en el formato del campo de fecha y hora local
+  // dueDate: ISO en UTC; null deja que la API lo calcule con la prioridad
   const form = reactive({
     title: '',
     description: '',
     priority: DEFAULT_PRIORITY,
-    dueDate: '',
+    dueDate: null as string | null,
     assignee: null as string | null,
   })
   const status = ref<FormStatus>('loading')
@@ -46,7 +45,7 @@ export function useIncidentForm(id: string | null) {
           title: incident.title,
           description: incident.description,
           priority: incident.priority.code,
-          dueDate: toLocalInput(incident.dueDate),
+          dueDate: incident.dueDate,
         })
       }
       status.value = incident && !incident.actions.update ? 'not-editable' : 'ready'
@@ -77,14 +76,13 @@ export function useIncidentForm(id: string | null) {
   }
 
   function draft(): IncidentDraft {
-    const originalDue = existing.value ? toLocalInput(existing.value.dueDate) : ''
     // Al editar, un vencimiento sin tocar no se envía: así un incidente vencido se puede seguir editando
-    const dueChanged = form.dueDate !== '' && form.dueDate !== originalDue
+    const dueChanged = form.dueDate !== null && form.dueDate !== existing.value?.dueDate
     return {
       title: form.title.trim(),
       description: form.description.trim(),
       priority: form.priority,
-      dueDate: dueChanged ? fromLocalInput(form.dueDate) : null,
+      dueDate: dueChanged ? form.dueDate : null,
       assignee: form.assignee,
     }
   }

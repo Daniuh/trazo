@@ -11,7 +11,7 @@ const props = defineProps<{
   info?: string
   error?: string
   required?: boolean
-  type?: 'text' | 'email' | 'password' | 'textarea' | 'search' | 'datetime-local'
+  type?: 'text' | 'email' | 'password' | 'textarea' | 'search'
   placeholder?: string
   maxlength?: number
   autocomplete?: string

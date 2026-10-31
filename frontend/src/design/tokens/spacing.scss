@@ -18,4 +18,6 @@ $header-height: 3.5rem;
 $content-max-width: 80rem;
 $touch-target: 2.75rem; // 44 px: mínimo cómodo para el dedo
 $textarea-min-height: 6rem; // descripciones: unas cuatro líneas visibles al empezar
+$datetime-calendar-width: 18rem; // calendario del selector de fecha en el menú de portátil y monitor
+$datetime-slots-height: 16rem; // lista de horas del selector de fecha: igual de alta que el calendario
 $auth-card-width: 25rem; // 400 px: tarjeta de las pantallas sin sesión (login)

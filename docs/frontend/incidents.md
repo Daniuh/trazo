@@ -35,9 +35,9 @@ El listado (`/incidentes`) se suma con la fase del listado avanzado.
 | Celular y tablet | Una columna; botones apilados, con la acción principal arriba |
 
 - **Validación visual:** campos obligatorios y largo máximo. La API valida todo de nuevo, y sus errores aparecen junto a cada campo.
-- **Vencimiento:** campo de fecha y hora del navegador, en la hora local, que viaja a la API en UTC.
-  - Si queda vacío, debajo se ve la fecha sugerida según la prioridad, y la aclaración va en el ícono de información.
-  - Al editar, solo se envía si cambió.
+- **Vencimiento:** `AppDateTimeField`, en la hora local, que viaja a la API en UTC.
+  - Al crear, el campo vacío muestra "Sugerida: …" según la prioridad, y el calendario abre en esa fecha redondeada a la media hora. "Usar la sugerida" vuelve a dejarlo vacío para que lo calcule la API. La aclaración va en el ícono de información.
+  - Al editar, el campo abre en el vencimiento guardado y solo se envía si cambió.
 - **"Asignar a"** aparece solo al crear y solo para quien tiene `incidents.assign`. La lista viene de `/incidents/assignees`.
 - **Idempotencia:** cada envío de creación lleva una `Idempotency-Key`. Si se reintenta el mismo envío, viaja la misma clave; si los datos cambiaron, una nueva. Mientras se guarda, el botón queda bloqueado.
 - **Si el incidente ya no se puede editar** (porque otra persona lo cerró, por ejemplo), abrir la edición lleva al detalle.
@@ -73,7 +73,7 @@ El listado (`/incidentes`) se suma con la fase del listado avanzado.
 
 - Fecha completa (`es-CO`, en la hora local).
 - Fecha relativa ("hace un momento", "hace 20 minutos", "ayer"; pasada una semana, la fecha completa).
-- Conversión entre el campo de fecha y hora y UTC.
+- Fecha corta para campos ("25 de oct, 10:30 a. m.").
 
 ## Capas
 
