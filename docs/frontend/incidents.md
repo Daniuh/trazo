@@ -131,5 +131,6 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
 
 - [`frontend/src/modules/incidents/`](../../frontend/src/modules/incidents/)
 - [`frontend/src/shared/format/dates.ts`](../../frontend/src/shared/format/dates.ts)
+- Enlace al listado filtrado desde otros módulos: [`listLink.ts`](../../frontend/src/modules/incidents/application/listLink.ts) (`incidentListLocation`)
 - Pruebas: archivos `*.spec.ts` dentro del módulo y en `shared/format/`; flujos completos en [`frontend/e2e/incidents.spec.ts`](../../frontend/e2e/incidents.spec.ts).
 - Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md), [ADR-0044](../decisiones/0044-listado-de-incidentes.md) y [ADR-0045](../decisiones/0045-listado-en-el-front.md)

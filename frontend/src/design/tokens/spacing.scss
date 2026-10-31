@@ -24,3 +24,10 @@ $preview-width: 26rem; // vista previa del listado en monitor
 $datetime-calendar-width: 18rem; // calendario del selector de fecha en el menú de portátil y monitor
 $datetime-slots-height: 16rem; // lista de horas del selector de fecha: igual de alta que el calendario
 $auth-card-width: 25rem; // 400 px: tarjeta de las pantallas sin sesión (login)
+
+// Dashboard y gráficos
+$dashboard-row-height: 4.5rem; // alto de una fila de la grilla de 12 columnas (portátil y monitor)
+$chart-bar-height: 0.625rem; // grosor de las barras horizontales
+$chart-label-width: 7rem; // columna de nombres en las barras
+$chart-donut-size: 8rem; // diámetro de la dona
+$chart-columns-height: 8rem; // alto de las columnas de la tendencia

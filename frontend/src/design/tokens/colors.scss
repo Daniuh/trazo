@@ -64,3 +64,15 @@ $tones: (
     $color-on-dark,
   ),
 );
+
+// Relleno de gráficos por tono: el color base de cada tono, salvo los neutros, que se oscurecen
+// para distinguirse del fondo de las barras ($color-page)
+$chart-fills: (
+  'blue': $color-blue-base,
+  'green': $color-green-base,
+  'orange': $color-orange-base,
+  'neutral': $color-border-strong,
+  'dark': $color-neutral-dark,
+  'muted': $color-muted,
+  'danger': $color-red,
+);

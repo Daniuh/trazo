@@ -58,3 +58,6 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0044](0044-listado-de-incidentes.md) | Listado de incidentes filtrado en SQL con la misma regla de visibilidad |
 | [ADR-0045](0045-listado-en-el-front.md) | Listado en el front con los filtros en la URL y una presentación por vista |
 | [ADR-0046](0046-pruebas-e2e.md) | Pruebas E2E en las cuatro vistas, con axe bloqueante y sesión por la API |
+| [ADR-0047](0047-metricas-del-dashboard.md) | Métricas del dashboard con la visibilidad del listado y caché invalidada por cambios |
+| [ADR-0048](0048-diseno-del-dashboard-por-persona.md) | Diseño del dashboard guardado widget por widget, con los ocultos en su lugar |
+| [ADR-0049](0049-sesion-sin-conexion.md) | La sesión solo se cierra cuando la API la rechaza |

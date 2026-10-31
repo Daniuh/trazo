@@ -29,13 +29,17 @@ $cases = [
 ];
 $q->search($agent, $all, new C); // calienta la caché antes de medir
 foreach ($cases as $name => [$actor, $scope, $criteria]) {
-    DB::flushQueryLog();
-    DB::enableQueryLog();
-    $t = microtime(true);
-    $page = $q->search($actor, $scope, $criteria);
-    $ms = round((microtime(true) - $t) * 1000);
-    $log = DB::getQueryLog();
-    DB::disableQueryLog();
+    // El mejor de tres intentos: en Docker sobre Windows una sola medición tiene mucho ruido
+    $ms = INF;
+    for ($attempt = 0; $attempt < 3; $attempt++) {
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $t = microtime(true);
+        $page = $q->search($actor, $scope, $criteria);
+        $ms = min($ms, round((microtime(true) - $t) * 1000));
+        $log = DB::getQueryLog();
+        DB::disableQueryLog();
+    }
     echo "\n### {$name} — total {$page->total}, {$ms} ms, ".count($log)." consultas\n";
     foreach ($log as $entry) {
         $kind = str_starts_with($entry['query'], 'select count(*)') ? 'conteo' : (str_contains($entry['query'], 'limit 20') ? 'página' : null);

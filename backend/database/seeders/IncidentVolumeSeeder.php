@@ -18,6 +18,12 @@ class IncidentVolumeSeeder extends Seeder
 {
     private const CHUNK = 1000;
 
+    // Días de historia que cubren los incidentes de demostración
+    private const HISTORY_DAYS = 60;
+
+    // De los que ya debieron atenderse, cuántos siguen abiertos (y vencidos)
+    private const STUCK_PERCENT = 2;
+
     private const WORK_PERMISSION = 'incidents.status.assigned';
 
     public function run(): void
@@ -63,23 +69,27 @@ class IncidentVolumeSeeder extends Seeder
     }
 
     /**
-     * Un incidente coherente: lo pendiente es reciente; lo resuelto o cerrado tiene fecha de resolución.
+     * Un incidente coherente con un flujo parejo: llegan a lo largo de los últimos días y su estado depende de la edad.
+     * Lo reciente sigue abierto; lo viejo ya se atendió, salvo unos pocos que quedaron atascados (y vencidos).
+     * Así lo creado y lo resuelto por día se parecen, como en una mesa de ayuda real.
      *
      * @param  array{priorities: array<string, object>, statuses: array<string, object>, workers: list<int>, people: list<int>, created_type: int}  $context
      * @return array<string, mixed>
      */
     private function row(array $context): array
     {
-        $status = $context['statuses'][IncidentSamples::weighted(IncidentSamples::STATUS_WEIGHTS)];
         $priority = $context['priorities'][IncidentSamples::weighted(IncidentSamples::PRIORITY_WEIGHTS)];
+        $resolution = (int) $priority->default_resolution_minutes;
 
-        // Lo pendiente nace dentro de su ventana de resolución (así solo una parte queda vencida); lo demás, en seis meses
-        $window = $status->is_pending ? (int) round($priority->default_resolution_minutes * 1.6) : 180 * 1440;
-        $createdAt = Carbon::now()->subMinutes(fake()->numberBetween(30, $window));
-        $dueDate = $createdAt->copy()->addMinutes((int) round($priority->default_resolution_minutes * fake()->randomFloat(2, 0.6, 1.4)));
+        $age = fake()->numberBetween(30, self::HISTORY_DAYS * 1440);
+        $createdAt = Carbon::now()->subMinutes($age);
+        $stillOpen = $age <= $resolution * 1.6 || fake()->boolean(self::STUCK_PERCENT);
+        $status = $context['statuses'][IncidentSamples::weighted($stillOpen ? IncidentSamples::PENDING_WEIGHTS : IncidentSamples::FINISHED_WEIGHTS)];
+
+        $dueDate = $createdAt->copy()->addMinutes((int) round($resolution * fake()->randomFloat(2, 0.8, 1.6)));
         $resolvedAt = $status->is_pending || $status->code === 'cancelled'
             ? null
-            : $createdAt->copy()->addMinutes(fake()->numberBetween(20, (int) $priority->default_resolution_minutes));
+            : $createdAt->copy()->addMinutes(min(fake()->numberBetween(20, $resolution), $age - 1));
         $assigned = $status->is_initial && fake()->boolean(60) ? null : fake()->randomElement($context['workers']);
 
         return [

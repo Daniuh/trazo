@@ -23,6 +23,7 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 | No pudimos completar la acción por un problema de nuestro lado… código: X | Falla inesperada del servidor | Pedir el código y buscarlo en los logs del sistema |
 | No pudimos conectarnos… | El navegador no llegó al servidor | Revisar la conexión del usuario |
 | El servidor tardó demasiado en responder… | La respuesta superó el tiempo de espera | Reintentar; si se repite, revisar la salud del sistema |
+| El servidor de Trazo no está respondiendo en este momento… | El gateway respondió 502 o 504: la API está caída, reiniciándose o no contesta | Reintentar en unos minutos; si sigue, revisar que la API esté arriba (salud del sistema) |
 | No pudimos procesar la solicitud… / Esta acción no está disponible… | Petición mal formada o método no permitido (poco habitual) | Recargar la página; si se repite, reportar con el código |
 
 ## Inicio de sesión
@@ -45,6 +46,16 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 | Esta persona no puede recibir incidentes… | La persona elegida se desactivó o su rol ya no atiende incidentes | Elegir a otra persona de la lista |
 | Tu incidente se está creando… | El mismo envío llegó dos veces muy seguidas | Esperar unos segundos; no se crea duplicado |
 | No pudimos confirmar el envío… / No pudimos procesar el envío… | Problema con la clave de idempotencia (poco habitual) | Recargar la página e intentarlo de nuevo |
+
+## Dashboard
+
+| Código | Cuándo aparece | Mensaje |
+|---|---|---|
+| `WIDGET_NOT_AVAILABLE` | Se pidió o guardó un widget que la cuenta ya no puede usar | Uno de los widgets ya no está disponible para tu cuenta. Recarga la página para ver tu dashboard actual. |
+| `WIDGET_DUPLICATED` | El diseño enviado repite un widget | Un widget quedó repetido en el diseño. Recarga la página y vuelve a acomodarlo. |
+| `WIDGET_OUT_OF_GRID` | Un widget se sale de las 12 columnas | Un widget quedó fuera del espacio del dashboard. Muévelo dentro de la grilla e inténtalo de nuevo. |
+| `WIDGET_SIZE_OUT_OF_RANGE` | Un widget es más grande o más pequeño de lo permitido | Un widget quedó más grande o más pequeño de lo permitido. Ajusta su tamaño e inténtalo de nuevo. |
+| `WIDGETS_OVERLAP` | Dos widgets visibles se cruzan | Dos widgets quedaron uno encima del otro. Sepáralos e inténtalo de nuevo. |
 
 ## Mensajes junto a un campo
 

@@ -102,19 +102,31 @@ it('no permite dos usuarios con el mismo correo aunque cambien mayúsculas', fun
         ->toThrow(QueryException::class);
 });
 
-it('tiene los índices pensados para filtros, orden y búsqueda', function (): void {
+it('tiene los índices pensados para filtros, orden, búsqueda y dashboard', function (): void {
     $indexes = collect(DB::select('SHOW INDEX FROM incidents'))
         ->groupBy('Key_name')
         ->map(fn ($cols) => $cols->sortBy('Seq_in_index')->pluck('Column_name')->implode(','));
 
     expect($indexes->values()->all())->toContain(
-        'status_id,priority_id',
+        'status_id,priority_id,deleted_at,created_by,assigned_to',
         'status_id,due_date,deleted_at',
-        'assigned_to,status_id',
+        'assigned_to,status_id,due_date,deleted_at,created_by',
         'priority_id',
         'created_by',
         'due_date,deleted_at',
-        'created_at',
+        'created_at,deleted_at',
+        'resolved_at,deleted_at',
         'title,description',
     );
+});
+
+it('protege la grilla del dashboard con restricciones en la base', function (): void {
+    $user = User::factory()->create();
+    $widget = (int) DB::table('dashboard_widgets')->value('id');
+    $row = ['user_id' => $user->id, 'dashboard_widget_id' => $widget, 'x' => 8, 'y' => 0, 'w' => 6, 'h' => 2, 'is_visible' => true];
+
+    // Se sale de las 12 columnas
+    expect(fn () => DB::table('user_dashboard_widgets')->insert($row))->toThrow(QueryException::class)
+        // Un widget con topes incoherentes no entra al catálogo
+        ->and(fn () => DB::table('dashboard_widgets')->where('id', $widget)->update(['min_w' => 7, 'max_w' => 6]))->toThrow(QueryException::class);
 });

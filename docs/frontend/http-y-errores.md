@@ -47,12 +47,14 @@ Cualquier falla llega a la app con la misma forma, sin importar si vino de la AP
 | Campo | Contenido |
 |---|---|
 | `kind` | `http`, `network`, `timeout` o `canceled` |
-| `code` | Código de la API (`VALIDATION_FAILED`…) o del cliente (`NETWORK_ERROR`, `TIMEOUT`, `REQUEST_CANCELED`, `UNKNOWN_ERROR`) |
+| `code` | Código de la API (`VALIDATION_FAILED`…) o del cliente (`NETWORK_ERROR`, `TIMEOUT`, `REQUEST_CANCELED`, `SERVER_UNREACHABLE`, `UNKNOWN_ERROR`) |
 | `status` | Estado HTTP, si hubo respuesta |
 | `params` | Datos para el mensaje |
 | `fieldErrors` | Errores por campo |
 | `traceId` | Código para soporte |
 | `retryAfter` | Segundos de espera en un 429 o un 423 (cabecera `Retry-After`) |
+
+Si la respuesta no trae el formato de error de la API (por ejemplo, una página HTML del gateway porque la API está caída), el código sale del estado: 502 y 504 dan `SERVER_UNREACHABLE` y 503 da `SERVICE_UNAVAILABLE`. Así la persona ve un mensaje claro en lugar de uno genérico.
 
 ## Sesión vencida
 

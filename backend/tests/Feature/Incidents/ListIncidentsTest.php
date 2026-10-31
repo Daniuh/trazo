@@ -65,8 +65,9 @@ it('ordena por los campos permitidos y rechaza cualquier otro', function (): voi
 it('filtra por estado, prioridad, asignado, creador y vencidos', function (): void {
     $agent = demoUser('agente1@trazo.test');
     $creator = demoUser('solicitante2@trazo.test');
-    incidentWith(['code' => 'INC-800001', 'assigned_to' => $agent->id], 'in_progress', 'high');
-    incidentWith(['code' => 'INC-800002', 'created_by' => $creator->id], 'open', 'low');
+    // Vencimiento futuro explícito: la factory lo elige al azar y podría quedar vencido
+    incidentWith(['code' => 'INC-800001', 'assigned_to' => $agent->id, 'due_date' => now()->addDay()], 'in_progress', 'high');
+    incidentWith(['code' => 'INC-800002', 'created_by' => $creator->id, 'due_date' => now()->addDay()], 'open', 'low');
     incidentWith(['code' => 'INC-800003', 'due_date' => now()->subDay()], 'on_hold', 'high');
     incidentWith(['code' => 'INC-800004', 'due_date' => now()->subDay()], 'closed', 'high');
     actingAsDemo('supervisor@trazo.test');

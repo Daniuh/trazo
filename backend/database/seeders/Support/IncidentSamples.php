@@ -29,8 +29,10 @@ final class IncidentSamples
         'Se probó desde otro equipo y pasa lo mismo.', 'No hay un mensaje de error claro en pantalla.',
     ];
 
-    /** Peso de cada estado y prioridad en los datos de demostración */
-    public const STATUS_WEIGHTS = ['open' => 25, 'in_progress' => 25, 'on_hold' => 10, 'resolved' => 15, 'closed' => 15, 'cancelled' => 10];
+    /** Peso de cada estado y prioridad en los datos de demostración: entre los que siguen abiertos y entre los ya atendidos */
+    public const PENDING_WEIGHTS = ['open' => 40, 'in_progress' => 40, 'on_hold' => 20];
+
+    public const FINISHED_WEIGHTS = ['resolved' => 20, 'closed' => 65, 'cancelled' => 15];
 
     public const PRIORITY_WEIGHTS = ['low' => 25, 'medium' => 40, 'high' => 25, 'critical' => 10];
 

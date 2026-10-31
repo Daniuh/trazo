@@ -5,20 +5,23 @@ import { httpEvents } from '@/shared/http'
 import { useSessionStore } from './useSessionStore'
 
 export const LOGIN_ROUTE = 'login'
+export const CONNECTION_ROUTE = 'connection-error'
 export const SESSION_EXPIRED_REASON = 'sesion-vencida'
 
 export function installAuthGuard(router: Router): void {
   router.beforeEach(async (to) => {
     const session = useSessionStore()
-    const signedIn = await session.restore()
+    const state = await session.restore()
 
     if (to.meta.public) {
       // Quien ya tiene sesión no necesita ver el login
-      return signedIn && to.name === LOGIN_ROUTE ? { name: 'home' } : true
+      return state === 'signed-in' && to.name === LOGIN_ROUTE ? { name: 'home' } : true
     }
-    if (signedIn) return true
+    if (state === 'signed-in') return true
 
-    return { name: LOGIN_ROUTE, query: to.fullPath === '/' ? {} : { volver: to.fullPath } }
+    // Sin poder comprobar la sesión no se manda al login: la sesión puede seguir vigente
+    const back = to.fullPath === '/' ? {} : { volver: to.fullPath }
+    return { name: state === 'unreachable' ? CONNECTION_ROUTE : LOGIN_ROUTE, query: back }
   })
 
   httpEvents.on('session-expired', () => {

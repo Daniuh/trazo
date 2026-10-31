@@ -153,11 +153,7 @@ function applySheet(draft: ListCriteria): void {
 
 // La etiqueta "Ordenar por" queda para lectores de pantalla; el texto del selector ya lo explica
 .incident-toolbar__sort :deep(.app-field__label) {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
+  @include visually-hidden;
 }
 
 .incident-toolbar__menu {

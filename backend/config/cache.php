@@ -38,7 +38,9 @@ return [
 
         'array' => [
             'driver' => 'array',
-            'serialize' => false,
+            // Las pruebas usan esta caché: serializa igual que Redis, así un valor que no sobrevive a la caché real
+            // (p. ej. un objeto, que Laravel no vuelve a crear por seguridad) falla también en las pruebas
+            'serialize' => true,
         ],
 
         'database' => [

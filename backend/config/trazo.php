@@ -28,4 +28,15 @@ return [
         'failures_ttl_minutes' => 1440,
     ],
 
+    // Documentado en docs/backend/dashboard.md
+    'dashboard' => [
+        // Zona horaria en la que se cuentan los días (las fechas se guardan en UTC)
+        'timezone' => env('BUSINESS_TIMEZONE', 'America/Bogota'),
+        // Cada cambio en un incidente invalida la caché; este tiempo cubre lo que cambia solo con la hora (vencidos)
+        'cache_seconds' => (int) env('DASHBOARD_CACHE_SECONDS', 60),
+        'list_limit' => 5,
+        'due_soon_hours' => 48,
+        'workload_limit' => 8,
+    ],
+
 ];

@@ -77,6 +77,10 @@ flowchart LR
 
 El código se monta desde el disco del equipo, y en estos sistemas llega al contenedor sin permiso de escritura para el usuario sin privilegios. Por eso, en local, `init` arranca como root solo para ajustar los permisos de `vendor/`, `storage/` y `bootstrap/cache/`; la instalación de dependencias y las migraciones corren como `www-data`.
 
+Las dependencias de PHP (`vendor/`) no se leen desde la carpeta del equipo sino desde un volumen de Docker (`trazo_vendor`). PHP abre cientos de archivos de `vendor/` en cada petición, y leerlos a través de la carpeta compartida de Windows es lento: con el volumen, cada petición bajó de varios segundos a menos de uno, y arrancar Laravel desde la consola, de 26 s a poco más de 1 s. `init` instala las dependencias en ese volumen con `composer install`. La carpeta `backend/vendor/` del equipo, si existe, ya no la usa ningún contenedor; sirve solo para el editor.
+
+Para reinstalar las dependencias desde cero: `docker compose -p trazo down`, `docker volume rm trazo_vendor` y `docker compose up -d`.
+
 Si los builds fallan con errores como `no such host` o `TLS: unspecified error`, el problema suele ser un DNS inestable en la red local. Se resuelve agregando `"dns": ["1.1.1.1", "8.8.8.8"]` en *Docker Desktop → Settings → Docker Engine*.
 
 ## Gateway y contenedores que se recrean

@@ -32,7 +32,7 @@ final readonly class EloquentIncidentList implements IncidentListQuery
             $query->onlyTrashed();
         }
 
-        $this->visibility($query, $actorId, $scope);
+        VisibilitySql::apply($query, $actorId, $scope);
         $this->filters->apply($query, $criteria, $this->pendingStatusIds());
 
         $total = (clone $query)->count();
@@ -48,35 +48,6 @@ final readonly class EloquentIncidentList implements IncidentListQuery
             $criteria->page,
             $criteria->perPage,
         );
-    }
-
-    /**
-     * La misma regla del detalle (VisibilityScope), escrita como condición SQL.
-     *
-     * @param  Builder<Incident>  $query
-     */
-    private function visibility(Builder $query, int $actorId, VisibilityScope $scope): void
-    {
-        if ($scope->all) {
-            return;
-        }
-        if ($scope->isEmpty()) {
-            $query->whereRaw('1 = 0');
-
-            return;
-        }
-
-        $query->where(function (Builder $visible) use ($actorId, $scope): void {
-            if ($scope->own) {
-                $visible->orWhere('incidents.created_by', $actorId);
-            }
-            if ($scope->assigned) {
-                $visible->orWhere('incidents.assigned_to', $actorId);
-            }
-            if ($scope->unassigned) {
-                $visible->orWhereNull('incidents.assigned_to');
-            }
-        });
     }
 
     /**

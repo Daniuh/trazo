@@ -82,7 +82,7 @@ GET /api/v1/incidents?page=2&per_page=20&sort=-due_date&search=impresora
 - **Respuesta:** `data` trae una versión liviana de cada incidente (sin descripción ni estados siguientes, pero con `actions` e `is_overdue`). `meta` trae `page`, `per_page`, `total` y `last_page`.
 - **Errores de validación:** `OUT_OF_RANGE` (tamaño de página), `INVALID_OPTION` (orden), `SEARCH_TOO_SHORT` (búsqueda) e `INVALID_REFERENCE` (código de catálogo inexistente).
 - **Visibilidad:** la misma regla del detalle (`VisibilityScope`), aplicada en SQL; una prueba compara ambos resultados para cada persona. Ver [ADR-0044](../decisiones/0044-listado-de-incidentes.md).
-- **Rendimiento:** todo responde en menos de 100 ms con 100.000 incidentes; ver [Rendimiento del listado](../base-de-datos/rendimiento.md).
+- **Rendimiento:** validado con `EXPLAIN` sobre 100.000 incidentes. La mayoría de los escenarios responde en menos de 100 ms; los dos que pueden superarlo con la máquina cargada están anotados en [Rendimiento](../base-de-datos/rendimiento.md).
 
 ## Reglas de acceso
 
@@ -151,9 +151,17 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 | Capa | Piezas |
 |---|---|
 | Domain | `IncidentAccess` (quién puede qué), `VisibilityScope` (qué ve cada uno), `IncidentSort`, `IncidentRules` (vencimiento, vencido, resolución), `Actor`, `IncidentState`, `StatusFlags`, `Denial`, `IncidentExceptions` |
-| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `RequestContext`); puertos |
-| Infrastructure | `EloquentIncidentList` e `IncidentFilters` (listado), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `LaravelSupport` (hora y transacciones), `IncidentServiceProvider` |
+| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `RequestContext`); evento `IncidentChanged`; puertos |
+| Infrastructure | `EloquentIncidentList`, `IncidentFilters` y `VisibilitySql` (listado y visibilidad en SQL), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `LaravelSupport` (hora y transacciones), `IncidentServiceProvider` |
 | Http | `IncidentController`, `IncidentWorkflowController`, `CatalogController`, `IncidentRequest`, `WorkflowRequest`, `IncidentResource`, `RequestActor` |
+
+## Aviso de cambios
+
+Cada escritura del repositorio (crear, editar, cambiar de estado, asignar, eliminar y restaurar) emite `IncidentChanged` con el id del incidente. El evento sale solo cuando la transacción se confirma (`ShouldDispatchAfterCommit`), así nadie reacciona a un cambio que al final se deshizo. Hoy lo escucha la caché del dashboard; en la fase de tiempo real avisará también a las pantallas abiertas.
+
+## Visibilidad en SQL
+
+`VisibilitySql` es la traducción a SQL de `VisibilityScope`. La usan el listado y el dashboard, así ambos cuentan exactamente lo mismo.
 
 ## Dónde está en el código
 

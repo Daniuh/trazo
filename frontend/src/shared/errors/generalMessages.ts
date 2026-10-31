@@ -16,6 +16,8 @@ export const generalMessages: MessageCatalog = {
     'No pudimos completar la acción por un problema de nuestro lado. Inténtalo de nuevo; si se repite, comparte este código con soporte: {traceId}.',
   NETWORK_ERROR: 'No pudimos conectarnos. Revisa tu conexión a internet y vuelve a intentarlo.',
   TIMEOUT: 'El servidor tardó demasiado en responder. Vuelve a intentarlo en unos segundos.',
+  SERVER_UNREACHABLE:
+    'El servidor de Trazo no está respondiendo en este momento. Vuelve a intentarlo en unos minutos; si sigue igual, avisa a soporte.',
   REQUEST_CANCELED: 'La acción se canceló antes de terminar.',
   UNKNOWN_ERROR: 'No pudimos completar la acción. Si se repite, comparte este código con soporte: {traceId}.',
 }
