@@ -3,6 +3,7 @@
 // Documentado en docs/frontend/http-y-errores.md
 import type { ApiError, ErrorParams, FieldError } from '@/shared/http'
 import { FALLBACK_FIELD_MESSAGE, fieldMessages } from './fieldMessages'
+import { formatWait } from './formatWait'
 import { generalMessages } from './generalMessages'
 
 export type MessageCatalog = Record<string, string>
@@ -26,7 +27,7 @@ export function messageFor(error: ApiError): string {
   const params: ErrorParams = {
     ...error.params,
     traceId: error.traceId ?? 'sin código',
-    seconds: error.retryAfter ?? 'unos',
+    wait: formatWait(error.retryAfter),
   }
 
   return fill(template, params)

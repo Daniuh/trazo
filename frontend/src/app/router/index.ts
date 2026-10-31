@@ -2,6 +2,14 @@
 // las de "default" van dentro del layout; las de "publicRoutes" (p. ej. el login) van fuera.
 // Documentado en docs/frontend/index.md
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { installAuthGuard } from '@/modules/auth/application/authGuard'
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    // Se puede ver sin sesión
+    public?: boolean
+  }
+}
 
 type ModuleRoutes = { default?: RouteRecordRaw[]; publicRoutes?: RouteRecordRaw[] }
 
@@ -24,3 +32,5 @@ export const router = createRouter({
     { path: '/', component: () => import('../layout/AppShell.vue'), children: shellRoutes },
   ],
 })
+
+installAuthGuard(router)

@@ -41,3 +41,11 @@ body {
 .app-notify--error {
   background: $color-danger;
 }
+
+// Menús desplegables de Quasar: superficie suave, borde y sombra de elemento flotante (nunca blanco puro)
+.q-menu {
+  border: 1px solid $color-border;
+  border-radius: $radius-card;
+  background: $color-surface;
+  box-shadow: $shadow-overlay;
+}

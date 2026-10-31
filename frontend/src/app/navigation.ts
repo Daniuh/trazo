@@ -1,5 +1,5 @@
 // Menú de la aplicación. Cada módulo aporta sus entradas en modules/<módulo>/navigation.ts.
-// El filtrado por permisos se suma con la autenticación. Documentado en docs/frontend/index.md
+// Cada persona ve solo las entradas que sus permisos permiten. Documentado en docs/frontend/index.md
 import type { RouteLocationRaw } from 'vue-router'
 import type { IconName } from '@/design/icons/icons'
 
@@ -26,3 +26,8 @@ const appItems: NavItem[] = [
 ]
 
 export const navigation: NavItem[] = [...appItems, ...moduleItems].sort((a, b) => a.order - b.order)
+
+// Ocultar una entrada es solo comodidad: la API rechaza igual lo que no corresponde
+export function visibleNavigation(can: (permission: string) => boolean): NavItem[] {
+  return navigation.filter((item) => !item.permission || can(item.permission))
+}

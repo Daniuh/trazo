@@ -20,14 +20,25 @@ order: 15
 
 La sección activa se marca con fondo neutro y una barra azul a la izquierda: nunca con fondo tintado y texto del mismo color.
 
+## Menú de la persona conectada
+
+A la derecha del encabezado, `AppUserMenu` muestra quién tiene la sesión abierta:
+
+| Vista | Botón |
+|---|---|
+| Celular y tablet | Solo el ícono de usuario (44 px de alto) |
+| Portátil y monitor | Ícono y nombre |
+
+Al abrirlo se ven el nombre, el correo y los roles, y la opción "Cerrar sesión". Los menús desplegables usan la superficie suave con borde y sombra, nunca blanco puro.
+
 ## Navegación por módulos
 
-Cada módulo aporta sus entradas al menú en `modules/<módulo>/navigation.ts` (etiqueta, ícono, ruta, orden y permiso). El menú las reúne solo; cuando exista la autenticación, mostrará únicamente las entradas que el usuario tiene permitido ver.
+Cada módulo aporta sus entradas al menú en `modules/<módulo>/navigation.ts` (etiqueta, ícono, ruta, orden y permiso). El menú las reúne solo y muestra únicamente las entradas cuyo permiso tiene la persona (`visibleNavigation`).
 
 Las rutas de cada módulo (`modules/<módulo>/routes.ts`) se registran dentro del layout; las que deben verse sin sesión, como el inicio de sesión, se exportan aparte como `publicRoutes`.
 
 ## Dónde está en el código
 
-- [`frontend/src/app/layout/`](../../../frontend/src/app/layout/)
+- [`frontend/src/app/layout/`](../../../frontend/src/app/layout/), incluido `AppUserMenu.vue`
 - [`frontend/src/app/navigation.ts`](../../../frontend/src/app/navigation.ts) y [`frontend/src/app/router/index.ts`](../../../frontend/src/app/router/index.ts)
 - [`frontend/src/design/tokens/layout.ts`](../../../frontend/src/design/tokens/layout.ts)

@@ -87,6 +87,18 @@ describe('cliente HTTP', () => {
     expect(onExpired).toHaveBeenCalledOnce()
   })
 
+  it('no toca la sesión cuando el 401 es por credenciales incorrectas', async () => {
+    const { client, tokens, events } = setup({ status: 401, data: { code: 'INVALID_CREDENTIALS' } })
+    const onExpired = vi.fn()
+    events.on('session-expired', onExpired)
+    tokens.set('vigente')
+
+    await client.post('/auth/login', {}).catch(() => undefined)
+
+    expect(tokens.get()).toBe('vigente')
+    expect(onExpired).not.toHaveBeenCalled()
+  })
+
   it('avisa el modo mantenimiento ante un 503', async () => {
     const { client, events } = setup({ status: 503, data: { code: 'SERVICE_UNAVAILABLE' } })
     const onMaintenance = vi.fn()

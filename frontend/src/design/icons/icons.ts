@@ -59,6 +59,13 @@ export const icons = {
   'chevron-left': [path('M15 6l-6 6 6 6')],
   'chevron-right': [path('M9 6l6 6-6 6')],
   eye: [path('M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z'), circle(12, 12, 3)],
+  'eye-off': [
+    path('M4 4l16 16'),
+    path(
+      'M9.9 5.8A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.2 7.6A16.6 16.6 0 0 0 2.5 12S6 18.5 12 18.5a9 9 0 0 0 4.3-1.1',
+    ),
+    path('M9.9 9.9a3 3 0 0 0 4.2 4.2'),
+  ],
   lock: [rect(5, 10.5, 14, 10, 2), path('M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5')],
   logout: [path('M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4')],
 } satisfies Record<string, IconShape[]>

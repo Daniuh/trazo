@@ -24,7 +24,7 @@ sequenceDiagram
   A-->>C: respuesta o error RFC 9457
   alt error
     C->>C: lo convierte en ApiError
-    C->>C: 401 → borra el token y avisa "session-expired"
+    C->>C: UNAUTHENTICATED → borra el token y avisa "session-expired"
     C->>C: 503 → avisa "maintenance"
     C-->>M: lanza ApiError
   else éxito
@@ -52,7 +52,11 @@ Cualquier falla llega a la app con la misma forma, sin importar si vino de la AP
 | `params` | Datos para el mensaje |
 | `fieldErrors` | Errores por campo |
 | `traceId` | Código para soporte |
-| `retryAfter` | Segundos de espera en un 429 |
+| `retryAfter` | Segundos de espera en un 429 o un 423 (cabecera `Retry-After`) |
+
+## Sesión vencida
+
+Solo el código `UNAUTHENTICATED` cierra la sesión en el navegador. Un 401 con otro código, como `INVALID_CREDENTIALS` en el login, lo maneja la pantalla que hizo la petición. Si no fuera así, una contraseña mal escrita se trataría como una sesión vencida.
 
 ## Catálogo de mensajes
 
@@ -60,7 +64,9 @@ Cualquier falla llega a la app con la misma forma, sin importar si vino de la AP
 
 - `messageFor(error)`: mensaje general (notificación o banner).
 - `fieldMessageFor(fieldError)` / `fieldMessagesFor(error)`: mensaje junto a cada campo del formulario.
-- `registerErrorMessages({...})`: cada módulo registra sus códigos de negocio.
+- `registerErrorMessages({...})`: registra códigos de negocio. Cada módulo los declara en `modules/<módulo>/errors.ts` y el arranque de la app los registra solos.
+
+Las plantillas pueden usar `{traceId}` (código de soporte) y `{wait}`, la espera de `Retry-After` en texto natural ("30 segundos", "5 minutos", "1 hora").
 
 Los mensajes de campo no repiten el nombre del campo porque se muestran a su lado. Un código desconocido nunca deja la pantalla en blanco: muestra un mensaje útil con el código de soporte. La lista completa de mensajes está en el [catálogo de errores](../soporte/catalogo-de-errores.md).
 
@@ -69,5 +75,5 @@ Los mensajes de campo no repiten el nombre del campo porque se muestran a su lad
 - [`shared/http/client.ts`](../../frontend/src/shared/http/client.ts): cliente e interceptores.
 - [`shared/http/apiError.ts`](../../frontend/src/shared/http/apiError.ts): normalización de errores.
 - [`shared/http/tokenStore.ts`](../../frontend/src/shared/http/tokenStore.ts) y [`events.ts`](../../frontend/src/shared/http/events.ts).
-- [`shared/errors/`](../../frontend/src/shared/errors/): catálogo y mensajes.
+- [`shared/errors/`](../../frontend/src/shared/errors/): catálogo, mensajes y `formatWait`.
 - Pruebas: archivos `*.spec.ts` junto a cada uno.
