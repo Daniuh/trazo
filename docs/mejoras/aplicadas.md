@@ -1,0 +1,52 @@
+---
+title: Mejoras aplicadas
+description: Lo que se construyó por encima de lo solicitado en la prueba y por qué.
+audience: todos
+area: mejoras
+order: 2
+---
+
+# Mejoras aplicadas
+
+Este anexo reúne lo que Trazo incorpora más allá de lo solicitado. Ninguna de estas mejoras altera los requisitos obligatorios: los complementan. Cada una enlaza a la decisión que la justifica.
+
+## Seguridad
+
+| Mejora | Por qué | Decisión |
+|---|---|---|
+| MFA con aplicación de autenticación, política por rol y periodo de gracia | Protege las cuentas aunque una contraseña se filtre | [ADR-0017](../decisiones/0017-mfa-totp.md) |
+| Recuperación de contraseña por correo + código del autenticador | Recuperación autónoma sin abrir la puerta a la toma de cuentas | [ADR-0018](../decisiones/0018-recuperacion-contrasena.md) |
+| Argon2id, contraseñas de 12+ caracteres y bloqueo progresivo | Estándar actual frente a fuerza bruta y contraseñas débiles | [ADR-0016](../decisiones/0016-contrasenas.md) |
+| Cifrado en reposo y secretos fuera del código | Protección ante robo de disco o respaldos | [ADR-0019](../decisiones/0019-cifrado.md) |
+| Permisos granulares y cobertura del OWASP Top 10 | Control de acceso fino y verificable | [ADR-0021](../decisiones/0021-permisos-granulares.md) |
+| Identificadores públicos ULID | Evita que se adivinen o enumeren registros | [ADR-0010](../decisiones/0010-ulid.md) |
+
+## Datos y rendimiento
+
+| Mejora | Por qué | Decisión |
+|---|---|---|
+| Catálogos y flujo de estados como datos | Cambiar estados o transiciones sin migraciones | [ADR-0008](../decisiones/0008-catalogos.md) |
+| Borrado lógico y auditoría inmutable | Nunca se pierde la trazabilidad | [ADR-0011](../decisiones/0011-borrado-y-restricciones.md) |
+| Bloqueo optimista | Ningún cambio se pisa sin aviso | [ADR-0012](../decisiones/0012-bloqueo-optimista.md) |
+| Código legible `INC-000123` y fecha de resolución | Más claro para las personas; habilita métricas de tiempo | [ADR-0010](../decisiones/0010-ulid.md) |
+| Seeder con volumen configurable e índices validados sobre 100.000+ registros | Demuestra el rendimiento con datos reales | [ADR-0014](../decisiones/0014-crecimiento.md) |
+| `Idempotency-Key` al crear | Sin duplicados por doble clic o reintentos | [ADR-0037](../decisiones/0037-idempotencia.md) |
+
+## Producto y experiencia
+
+| Mejora | Por qué | Decisión |
+|---|---|---|
+| Dashboard personalizable | Cada usuario organiza lo que necesita ver | [ADR-0030](../decisiones/0030-dashboard-personalizable.md) |
+| Vista previa lateral en monitor | Revisar muchos incidentes sin salir del listado | — |
+| Logs del sistema sin ruido y acciones de sistema seguras | Operación diaria sin acceso al servidor | [ADR-0022](../decisiones/0022-logs-relevantes.md), [ADR-0023](../decisiones/0023-acciones-de-sistema.md) |
+| Identidad visual propia y accesibilidad WCAG 2.2 AA | Producto profesional y usable por cualquier persona | [ADR-0028](../decisiones/0028-identidad-visual.md) |
+
+## Operación y calidad
+
+| Mejora | Por qué | Decisión |
+|---|---|---|
+| CI/CD con promoción de la misma imagen | Producción ejecuta exactamente lo que se probó | [ADR-0034](../decisiones/0034-ci-cd.md) |
+| Pruebas de arquitectura, autorización, N+1 y E2E en 4 vistas | Las reglas del proyecto se verifican solas | [ADR-0031](../decisiones/0031-estrategia-de-pruebas.md) |
+| Escaneo OWASP ZAP como perfil opcional de Docker | Cualquiera puede auditar la seguridad | [ADR-0032](../decisiones/0032-calidad-estatica.md) |
+| Respaldo diario y límites de recursos por contenedor | Recuperación ante fallos y convivencia con otros servicios | [ADR-0026](../decisiones/0026-despliegue.md) |
+| OpenAPI generada desde el código | La referencia de la API nunca se desactualiza | [ADR-0006](../decisiones/0006-contrato-api.md) |

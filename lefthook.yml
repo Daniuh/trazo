@@ -1,0 +1,7 @@
+# Hooks de Git: revisiones rápidas antes de cada commit. El CI corre la validación completa.
+# Cada app agrega aquí sus comandos (formato y lint) a medida que se crea.
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: node scripts/git/check-commit-msg.mjs {1}

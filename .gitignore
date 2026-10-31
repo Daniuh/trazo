@@ -1,0 +1,23 @@
+# Archivos que nunca deben llegar al repositorio. Cada app agrega su propio .gitignore.
+
+# Secretos y entornos locales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencias
+node_modules/
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Logs y temporales
+*.log
+tmp/

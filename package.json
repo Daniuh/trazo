@@ -1,0 +1,12 @@
+{
+  "name": "trazo-workspace",
+  "private": true,
+  "description": "Herramientas compartidas del repositorio (hooks de Git). Cada app tiene sus propias dependencias.",
+  "type": "module",
+  "scripts": {
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "lefthook": "2.2.2"
+  }
+}
