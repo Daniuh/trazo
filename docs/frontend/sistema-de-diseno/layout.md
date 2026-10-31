@@ -18,7 +18,9 @@ order: 15
 | Portátil | Expandido, con íconos y nombres | Ancho completo |
 | Monitor | Expandido | Centrado, con ancho máximo de 1280 px |
 
-La sección activa se marca con fondo neutro y una barra azul a la izquierda: nunca con fondo tintado y texto del mismo color.
+La sección activa se marca con fondo neutro y una barra azul a la izquierda: nunca con fondo tintado y texto del mismo color. "Inicio" se marca solo en su ruta exacta (`exact` en `NavItem`), porque todas las demás rutas cuelgan de él.
+
+La vista se vuelve a crear cuando cambia la ruta o sus parámetros (por ejemplo, de editar un incidente a crear uno nuevo), pero no cuando cambian solo los filtros de la URL.
 
 ## Menú de la persona conectada
 

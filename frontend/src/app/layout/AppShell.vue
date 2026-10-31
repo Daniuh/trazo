@@ -63,7 +63,10 @@ const closeOnMobile = () => {
           <AppLogo spinning />
           <span class="shell-loading__label">Cargando</span>
         </div>
-        <RouterView v-else />
+        <!-- Otra ruta u otro registro crean la vista de nuevo; cambiar solo filtros de la URL no -->
+        <RouterView v-else v-slot="{ Component, route }">
+          <component :is="Component" :key="`${String(route.name)}:${JSON.stringify(route.params)}`" />
+        </RouterView>
       </main>
     </QPageContainer>
   </QLayout>
