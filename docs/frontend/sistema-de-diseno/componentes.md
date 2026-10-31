@@ -25,13 +25,14 @@ Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las p
 | `AppDateRangeField` | Rango de fechas sin hora, para filtros ("1 de oct – 22 de oct"). Toma días completos en la hora local: desde el inicio del primer día hasta el final del último. La lógica vive en `dateRange.ts`, con sus pruebas. |
 | `AppCheckbox` | Casilla con el estilo de Trazo y alto táctil en celular y tablet. |
 | `AppChoiceChips` | Selección múltiple como chips que se activan y desactivan, cómoda para tocar. Activo: fondo azul y texto blanco. |
-| `AppActionMenu` | Menú de opciones que se abre desde el botón que lo contiene. Cada opción puede llevar ícono y marcarse como peligrosa; se cierra al elegir. El tipo de las opciones está en `menu.ts`. |
+| `AppActionMenu` | Menú de opciones que se abre desde el botón que lo contiene. Cada opción puede llevar ícono, marcarse como peligrosa, quedar desactivada (visible pero sin efecto) o separarse de las anteriores con una línea; se cierra al elegir. El tipo de las opciones está en `menu.ts`. |
 | `AppSegmented` | Una opción entre pocas, como botones unidos ("7 días · 30 días · 90 días"). Se anuncia como grupo de opciones (`radiogroup`); la activa va en azul con texto blanco. |
 | `AppPagination` | "1–20 de 534", páginas con saltos (…) y tamaño de página. En celular, solo anterior, "Página 3 de 27" y siguiente. La página actual se anuncia con `aria-current`. |
 | Gráficos | `AppBarList`, `AppDonutChart` y `AppColumnChart`. Ver [Gráficos](graficos.md). |
 | `AppAlert` | Aviso siempre visible dentro de la página (error de un formulario o información imprescindible). Tonos `danger` (rol `alert`) e `info` (rol `status`); fondo de superficie con borde de color, nunca fondo tintado. |
 | `AppSkeleton` · `AppEmptyState` · `AppErrorState` | Estados de carga, vacío y error. El de error usa el catálogo de mensajes y ofrece "Reintentar". |
 | `useFeedback()` | `confirm()` abre el diálogo de confirmación (devuelve `true` o `false`); `notify()` y `notifyError()` muestran notificaciones. Los errores no se cierran solos. |
+| `useLeaveGuard(dirty, mensaje)` | Avisa antes de salir con cambios sin guardar: al cambiar de sección pide confirmación con el estilo de Trazo; al cerrar o recargar la pestaña, el navegador muestra su propio aviso. |
 | `useViewport()` | Vista actual (`mobile`, `tablet`, `laptop` o `desktop`) y atajos como `isMobile`, `isLaptopUp` e `isDesktop`. |
 
 ## Ícono de información

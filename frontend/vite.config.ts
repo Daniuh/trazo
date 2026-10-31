@@ -18,7 +18,16 @@ export default defineConfig({
   },
   // Se preempaquetan al arrancar: así las rutas diferidas no obligan a Vite a reoptimizar en caliente
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'pinia', 'quasar', 'quasar/lang/es', 'axios'],
+    include: [
+      'vue',
+      'vue-router',
+      'pinia',
+      'quasar',
+      'quasar/lang/es',
+      'axios',
+      'grid-layout-plus/es/components/grid-layout.vue.mjs',
+      'grid-layout-plus/es/components/grid-item.vue.mjs',
+    ],
   },
   server: {
     host: true,

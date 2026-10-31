@@ -19,6 +19,7 @@ $content-max-width: 80rem;
 $touch-target: 2.75rem; // 44 px: mínimo cómodo para el dedo
 $textarea-min-height: 6rem; // descripciones: unas cuatro líneas visibles al empezar
 $menu-min-width: 12rem; // ancho mínimo de los menús de opciones
+$menu-wide-width: 20rem; // menús con descripción por opción (p. ej. "Agregar widget")
 $filter-field-width: 11rem; // selectores de la barra de filtros del listado
 $preview-width: 26rem; // vista previa del listado en monitor
 $datetime-calendar-width: 18rem; // calendario del selector de fecha en el menú de portátil y monitor
@@ -27,6 +28,7 @@ $auth-card-width: 25rem; // 400 px: tarjeta de las pantallas sin sesión (login)
 
 // Dashboard y gráficos
 $dashboard-row-height: 4.5rem; // alto de una fila de la grilla de 12 columnas (portátil y monitor)
+$dashboard-resize-handle: 1.25rem; // manija para cambiar el tamaño en el modo Personalizar
 $chart-bar-height: 0.625rem; // grosor de las barras horizontales
 $chart-label-width: 7rem; // columna de nombres en las barras
 $chart-donut-size: 8rem; // diámetro de la dona

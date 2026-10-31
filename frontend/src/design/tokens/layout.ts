@@ -5,4 +5,7 @@ export const layout = {
   sidebarMiniWidth: 72,
   // Hasta este ancho el menú es de celular (coincide con $bp-tablet - 1px)
   mobileMaxWidth: 599,
+  // Grilla del dashboard en el modo Personalizar (px): coinciden con $dashboard-row-height y $space-4
+  dashboardRowHeight: 72,
+  dashboardGap: 16,
 } as const

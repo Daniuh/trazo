@@ -61,3 +61,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0047](0047-metricas-del-dashboard.md) | Métricas del dashboard con la visibilidad del listado y caché invalidada por cambios |
 | [ADR-0048](0048-diseno-del-dashboard-por-persona.md) | Diseño del dashboard guardado widget por widget, con los ocultos en su lugar |
 | [ADR-0049](0049-sesion-sin-conexion.md) | La sesión solo se cierra cuando la API la rechaza |
+| [ADR-0050](0050-editor-del-dashboard.md) | Editor del dashboard con grid-layout-plus, sin sus estilos inyectados y con alternativa de teclado |

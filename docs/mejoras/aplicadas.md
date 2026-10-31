@@ -36,7 +36,7 @@ Este anexo reúne lo que Trazo incorpora más allá de lo solicitado. Ninguna de
 
 | Mejora | Por qué | Decisión |
 |---|---|---|
-| Dashboard personalizable | Cada usuario organiza lo que necesita ver | [ADR-0030](../decisiones/0030-dashboard-personalizable.md) |
+| Dashboard personalizable | Cada usuario organiza lo que necesita ver, también con teclado | [ADR-0030](../decisiones/0030-dashboard-personalizable.md), [ADR-0050](../decisiones/0050-editor-del-dashboard.md) |
 | Vista previa lateral en monitor | Revisar muchos incidentes sin salir del listado | — |
 | Logs del sistema sin ruido y acciones de sistema seguras | Operación diaria sin acceso al servidor | [ADR-0022](../decisiones/0022-logs-relevantes.md), [ADR-0023](../decisiones/0023-acciones-de-sistema.md) |
 | Identidad visual propia y accesibilidad WCAG 2.2 AA | Producto profesional y usable por cualquier persona | [ADR-0028](../decisiones/0028-identidad-visual.md) |
