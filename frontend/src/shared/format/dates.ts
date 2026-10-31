@@ -4,6 +4,12 @@
 const LOCALE = 'es-CO'
 
 const dateTime = new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeStyle: 'short' })
+const shortDateTime = new Intl.DateTimeFormat(LOCALE, {
+  day: 'numeric',
+  month: 'short',
+  hour: 'numeric',
+  minute: '2-digit',
+})
 const relative = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -17,6 +23,11 @@ export function formatDateTime(iso: string): string {
   return dateTime.format(new Date(iso))
 }
 
+// "25 oct, 10:30 a. m.": para campos, donde el espacio es corto
+export function formatShortDateTime(iso: string): string {
+  return shortDateTime.format(new Date(iso))
+}
+
 // "hace un momento", "hace 2 horas", "ayer", "dentro de 3 días"; pasada una semana, la fecha completa
 export function formatRelative(iso: string, now: Date = new Date()): string {
   const seconds = Math.round((new Date(iso).getTime() - now.getTime()) / 1000)
@@ -26,16 +37,4 @@ export function formatRelative(iso: string, now: Date = new Date()): string {
     if (Math.abs(seconds) >= size) return relative.format(Math.round(seconds / size), unit)
   }
   return 'hace un momento'
-}
-
-// Valor para <input type="datetime-local"> (hora local, sin zona): "2026-10-22T16:10"
-export function toLocalInput(iso: string): string {
-  const date = new Date(iso)
-  const offsetMs = date.getTimezoneOffset() * 60_000
-  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
-}
-
-// Del campo local a ISO en UTC, que es lo que espera la API
-export function fromLocalInput(value: string): string {
-  return new Date(value).toISOString()
 }
