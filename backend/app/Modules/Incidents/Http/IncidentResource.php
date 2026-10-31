@@ -33,13 +33,29 @@ final readonly class IncidentResource
      */
     public function toArray(IncidentRecord $incident, Actor $actor): array
     {
-        $actions = $this->access->actions($actor, $incident->state());
+        $summary = $this->summary($incident, $actor);
 
+        return [
+            ...$summary,
+            'description' => $incident->description,
+            // Solo los estados a los que esta persona puede llevarlo
+            'next_statuses' => $summary['actions']['change_status']
+                ? array_map(fn (StatusFlags $status): array => ['code' => $status->code, 'name' => $status->name], $this->catalog->nextStatuses($incident->status->id))
+                : [],
+        ];
+    }
+
+    /**
+     * Versión liviana para el listado: sin descripción ni estados siguientes.
+     *
+     * @return array<string, mixed>&array{actions: array<string, bool>}
+     */
+    public function summary(IncidentRecord $incident, Actor $actor): array
+    {
         return [
             'id' => $incident->ulid,
             'code' => $incident->code,
             'title' => $incident->title,
-            'description' => $incident->description,
             'priority' => ['code' => $incident->priority->code, 'name' => $incident->priority->name, 'level' => $incident->priority->level],
             'status' => $this->status($incident->status),
             'creator' => $this->person($incident->creator),
@@ -51,11 +67,7 @@ final readonly class IncidentResource
             'updated_at' => $this->date($incident->updatedAt),
             'deleted_at' => $this->date($incident->deletedAt),
             'version' => $incident->version,
-            'actions' => $actions,
-            // Solo los estados a los que esta persona puede llevarlo
-            'next_statuses' => $actions['change_status']
-                ? array_map(fn (StatusFlags $status): array => ['code' => $status->code, 'name' => $status->name], $this->catalog->nextStatuses($incident->status->id))
-                : [],
+            'actions' => $this->access->actions($actor, $incident->state()),
         ];
     }
 

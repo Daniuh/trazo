@@ -54,10 +54,7 @@ final class IncidentAccess
             return $actor->can('incidents.restore');
         }
 
-        return $actor->can('incidents.view.any')
-            || ($actor->can('incidents.view.own') && $incident->createdBy === $actor->id)
-            || ($actor->can('incidents.view.assigned') && $incident->assignedTo === $actor->id)
-            || ($actor->can('incidents.view.unassigned') && $incident->assignedTo === null);
+        return VisibilityScope::for($actor)->includes($actor->id, $incident);
     }
 
     // Quien crea un incidente puede corregirlo mientras nadie lo atiende; después, solo quien gestiona cualquiera

@@ -55,3 +55,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0041](0041-ci-con-el-stack-de-docker.md) | El CI prueba el backend dentro del stack de Docker |
 | [ADR-0042](0042-sesion-y-bloqueo.md) | Duración de la sesión y bloqueo progresivo por huella del correo |
 | [ADR-0043](0043-reglas-de-acceso-en-el-dominio.md) | Reglas de acceso a incidentes en una sola clase de dominio |
+| [ADR-0044](0044-listado-de-incidentes.md) | Listado de incidentes filtrado en SQL con la misma regla de visibilidad |

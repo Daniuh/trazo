@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             IncidentCatalogSeeder::class,
             AccessControlSeeder::class,
             DemoUserSeeder::class,
+            IncidentVolumeSeeder::class,
         ]);
     }
 }

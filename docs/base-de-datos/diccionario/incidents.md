@@ -35,15 +35,15 @@ No hay `updated_by`: quién modificó qué ya queda en `incident_activities`, y 
 | Índice | Consulta que atiende |
 |---|---|
 | `(status_id, priority_id)` | Filtros combinados y conteos del dashboard |
-| `(status_id, due_date)` | Conteo de vencidos |
+| `(status_id, due_date, deleted_at)` | Conteo de vencidos, resuelto solo con el índice |
 | `(priority_id)` | Filtro por prioridad (y su FK) |
 | `(assigned_to, status_id)` | Filtro por asignado y "mis incidentes" |
 | `(created_by)` | "Creados por mí" (y su FK) |
-| `(due_date)` | Rango y orden por vencimiento |
+| `(due_date, deleted_at)` | Rango y orden por vencimiento; conteo general solo con el índice |
 | `(created_at)` | Rango y orden por creación, orden por defecto |
 | `FULLTEXT (title, description)` | Búsqueda por texto (palabras de 3 o más letras) |
 
-Los índices se validan con `EXPLAIN` sobre más de 100.000 registros al construir el listado.
+Los índices están validados con `EXPLAIN` sobre 100.000 registros: ver [Rendimiento del listado](../rendimiento.md).
 
 ## Dónde está en el código
 

@@ -32,6 +32,7 @@
         <server name="DB_CONNECTION" value="mysql" force="true"/>
         <server name="DB_DATABASE" value="trazo_test" force="true"/>
         <server name="DB_URL" value="" force="true"/>
+        <server name="SEED_INCIDENTS" value="0" force="true"/>
         <server name="LOG_CHANNEL" value="null" force="true"/>
         <server name="MAIL_MAILER" value="array" force="true"/>
         <server name="QUEUE_CONNECTION" value="sync" force="true"/>
