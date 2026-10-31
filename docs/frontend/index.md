@@ -19,7 +19,9 @@ frontend/src/
 │   ├── bootstrap.ts
 │   ├── plugins/quasar.ts
 │   ├── router/          → reúne las rutas de todos los módulos
-│   └── pages/           → páginas globales (404)
+│   ├── layout/          → estructura común (encabezado, menú, contenido)
+│   ├── navigation.ts    → reúne el menú de todos los módulos
+│   └── pages/           → páginas globales (404 y guía visual en desarrollo)
 ├── modules/<módulo>/    → una carpeta por funcionalidad
 │   ├── domain/          → tipos y reglas puras
 │   ├── application/     → casos de uso (composables y stores)
@@ -28,8 +30,9 @@ frontend/src/
 │   └── routes.ts        → rutas del módulo (se registran solas, con carga diferida)
 ├── shared/              → lo transversal
 │   ├── http/            → cliente HTTP único, errores normalizados, token de sesión
-│   └── errors/          → catálogo de mensajes de error
-└── design/              → tokens y tema (ver sistema de diseño)
+│   ├── errors/          → catálogo de mensajes de error
+│   └── ui/              → componentes base reutilizables
+└── design/              → tokens, tema, íconos y marca
 ```
 
 ## Reglas
@@ -57,7 +60,7 @@ Desde `frontend/` (o dentro del contenedor):
 ## Documentos relacionados
 
 - [Cliente HTTP y errores](http-y-errores.md)
-- Sistema de diseño: [tokens](sistema-de-diseno/tokens.md) y [responsive](sistema-de-diseno/responsive.md)
+- Sistema de diseño: [tokens](sistema-de-diseno/tokens.md), [responsive](sistema-de-diseno/responsive.md), [componentes](sistema-de-diseno/componentes.md), [íconos](sistema-de-diseno/iconos.md), [marca](sistema-de-diseno/marca.md) y [layout](sistema-de-diseno/layout.md)
 - Decisiones: [ADR-0003](../decisiones/0003-frontend-modular.md), [ADR-0039](../decisiones/0039-quasar-como-plugin-de-vite.md) y [ADR-0040](../decisiones/0040-axios.md)
 
 ## Dónde está en el código

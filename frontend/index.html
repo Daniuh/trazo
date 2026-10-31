@@ -3,10 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#eef3f6" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/design/brand/boot-loader.scss" />
     <title>Trazo</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- Pantalla de carga de marca: Vue la reemplaza al montar la app -->
+      <div class="boot-loader" role="status">
+        <div class="boot-loader__logo" aria-hidden="true">
+          Traz<svg class="boot-loader__mark" viewBox="0 0 32 32">
+            <circle class="blue" cx="16" cy="16" r="12" transform="rotate(-80 16 16)" />
+            <circle class="green" cx="16" cy="16" r="12" transform="rotate(40 16 16)" />
+            <circle class="orange" cx="16" cy="16" r="12" transform="rotate(160 16 16)" />
+          </svg>
+        </div>
+        <span class="boot-loader__label">Cargando Trazo</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

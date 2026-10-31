@@ -1,24 +1,66 @@
 // Colores de Trazo, tomados de la "o" del logo de Psicol.
-// Los tonos base van en acentos, gráficos e íconos; los oscuros, en botones y texto (contraste AA con blanco).
+// Regla: sobre un fondo de color el texto es negro o blanco, el que dé contraste AA (calculado, no a ojo).
 // Documentado en docs/frontend/sistema-de-diseno/tokens.md
 
-// Base
+// Base: acentos, gráficos e íconos. Con texto negro pasan AA (6,5 a 8,4:1)
 $color-blue-base: #03a8d5;
 $color-green-base: #86bb24;
 $color-orange-base: #ff9829;
 
-// Tonos oscuros para texto y botones (≥ 5:1 contra blanco)
+// Tonos oscuros: botones y texto de color sobre fondos claros (≥ 5:1 con blanco)
 $color-blue-strong: #027695;
 $color-green-strong: #507016;
 $color-orange-strong: #995b19;
 
-// Texto
+// Rojo armonizado: solo errores, prioridad crítica y "Vencido" (5,1:1 con blanco)
+$color-red: #c93a3a;
+
+// Neutros fríos, sin blanco puro
+$color-page: #eef3f6;
+$color-surface: #f7fafb;
+$color-border: #dde5ea;
+$color-border-strong: #c9ced4;
+$color-muted: #8a929c;
+$color-text-secondary: #5f6670;
+$color-neutral-dark: #3d434a;
 $color-text: #161616;
-$color-text-on-dark: #fff;
+$color-on-dark: #fff;
 
 // Roles
 $color-primary: $color-blue-strong;
 $color-success: $color-green-strong;
 $color-warning: $color-orange-strong;
+$color-danger: $color-red;
+$color-focus: $color-blue-strong;
 
-// El rojo armonizado (errores y prioridad crítica) se define con el sistema de diseño
+// Tonos de etiqueta: fondo + texto ya resueltos con su contraste
+$tones: (
+  'blue': (
+    $color-blue-base,
+    $color-text,
+  ),
+  'green': (
+    $color-green-base,
+    $color-text,
+  ),
+  'orange': (
+    $color-orange-base,
+    $color-text,
+  ),
+  'neutral': (
+    $color-border-strong,
+    $color-text,
+  ),
+  'dark': (
+    $color-neutral-dark,
+    $color-on-dark,
+  ),
+  'muted': (
+    $color-border,
+    $color-text-secondary,
+  ),
+  'danger': (
+    $color-red,
+    $color-on-dark,
+  ),
+);

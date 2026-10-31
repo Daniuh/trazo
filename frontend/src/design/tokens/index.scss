@@ -1,3 +1,6 @@
-// Punto de entrada de los tokens. Tipografía, espaciado y sombras se agregan con el sistema de diseño.
+// Punto de entrada de los tokens: los componentes hacen `@use '@/design/tokens' as *`.
 @forward 'colors';
+@forward 'typography';
+@forward 'spacing';
+@forward 'shadows';
 @forward 'breakpoints';

@@ -1,0 +1,19 @@
+// Espaciado (escala de 4 px), radios y medidas del layout. Los anchos del menú viven en layout.ts porque los usa Quasar desde JS.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+$space-1: 0.25rem; // 4
+$space-2: 0.5rem; // 8
+$space-3: 0.75rem; // 12
+$space-4: 1rem; // 16
+$space-5: 1.5rem; // 24
+$space-6: 2rem; // 32
+$space-7: 3rem; // 48
+
+$radius-control: 8px; // botones y campos (Quasar opera los radios en px)
+$radius-card: 10px; // tarjetas y diálogos
+$radius-pill: 999px; // etiquetas
+
+// Layout
+$header-height: 3.5rem;
+$content-max-width: 80rem;
+$touch-target: 2.75rem; // 44 px: mínimo cómodo para el dedo
