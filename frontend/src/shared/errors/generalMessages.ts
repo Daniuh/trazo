@@ -10,7 +10,7 @@ export const generalMessages: MessageCatalog = {
   RESOURCE_NOT_FOUND: 'No encontramos lo que buscas. Puede que se haya eliminado o que no tengas acceso.',
   METHOD_NOT_ALLOWED: 'Esta acción no está disponible. Recarga la página e inténtalo de nuevo.',
   VALIDATION_FAILED: 'Hay datos por corregir. Revisa los campos marcados.',
-  TOO_MANY_REQUESTS: 'Hiciste demasiados intentos seguidos. Espera {seconds} segundos y vuelve a intentarlo.',
+  TOO_MANY_REQUESTS: 'Hiciste demasiados intentos seguidos. Espera {wait} y vuelve a intentarlo.',
   SERVICE_UNAVAILABLE: 'Trazo está en mantenimiento. Vuelve a intentarlo en unos minutos.',
   INTERNAL_ERROR:
     'No pudimos completar la acción por un problema de nuestro lado. Inténtalo de nuevo; si se repite, comparte este código con soporte: {traceId}.',

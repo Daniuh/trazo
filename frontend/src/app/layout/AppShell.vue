@@ -1,19 +1,23 @@
 <!-- Estructura de la aplicación: encabezado, menú lateral y contenido, adaptados a las cuatro vistas. -->
-<!-- Celular: menú hamburguesa. Tablet: menú de íconos. Portátil y monitor: menú expandido. Documentado en docs/frontend/sistema-de-diseno/layout.md -->
+<!-- Celular: menú hamburguesa. Tablet: menú de íconos. Portátil y monitor: menú expandido. El menú muestra solo lo permitido. Documentado en docs/frontend/sistema-de-diseno/layout.md -->
 <script setup lang="ts">
 import { QDrawer, QHeader, QLayout, QPageContainer } from 'quasar'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { layout } from '@/design/tokens/layout'
+import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import AppLogo from '@/shared/ui/brand/AppLogo.vue'
 import { useViewport } from '@/shared/ui/useViewport'
-import { navigation } from '../navigation'
+import { visibleNavigation } from '../navigation'
 import AppNavigation from './AppNavigation.vue'
+import AppUserMenu from './AppUserMenu.vue'
 import { useRouteLoading } from './useRouteLoading'
 
 const { isMobile, isTablet } = useViewport()
 const { loading } = useRouteLoading()
 const drawerOpen = ref(false)
+const session = useSessionStore()
+const navigation = computed(() => visibleNavigation(session.can))
 
 // En celular el menú se cierra al elegir una sección
 const closeOnMobile = () => {
@@ -36,6 +40,7 @@ const closeOnMobile = () => {
           <AppIcon name="menu" size="lg" />
         </button>
         <RouterLink to="/" class="shell-header__brand" aria-label="Ir al inicio"><AppLogo /></RouterLink>
+        <AppUserMenu />
       </div>
     </QHeader>
 

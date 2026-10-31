@@ -8,6 +8,7 @@ import { tokenStore, type TokenStore } from './tokenStore'
 
 const RETRYABLE_STATUS = new Set([502, 504])
 const MAX_RETRIES = 2
+const SESSION_EXPIRED_CODE = 'UNAUTHENTICATED'
 
 type RetryableConfig = InternalAxiosRequestConfig & { retryCount?: number }
 
@@ -58,7 +59,8 @@ export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance
       return client.request(config)
     }
 
-    if (error.status === 401) {
+    // Solo una sesión vencida cierra la sesión; un 401 por credenciales incorrectas lo maneja el login
+    if (error.code === SESSION_EXPIRED_CODE) {
       tokens.clear()
       events.emit('session-expired')
     }
