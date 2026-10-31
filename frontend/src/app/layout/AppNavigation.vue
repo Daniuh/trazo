@@ -16,7 +16,8 @@ defineEmits<{ navigate: [] }>()
       :key="item.label"
       :to="item.to"
       class="app-nav__item"
-      active-class="app-nav__item--active"
+      :active-class="item.exact ? '' : 'app-nav__item--active'"
+      exact-active-class="app-nav__item--active"
       @click="$emit('navigate')"
     >
       <AppIcon :name="item.icon" />

@@ -11,7 +11,7 @@ const props = defineProps<{
   info?: string
   error?: string
   required?: boolean
-  type?: 'text' | 'email' | 'password' | 'textarea' | 'search'
+  type?: 'text' | 'email' | 'password' | 'textarea' | 'search' | 'datetime-local'
   placeholder?: string
   maxlength?: number
   autocomplete?: string
@@ -60,6 +60,12 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
 
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
+
+// Un texto largo empieza con espacio para varias líneas y crece al escribir
+// (Quasar fija su propio mínimo para el modo compacto, por eso el selector es más específico)
+:deep(.q-textarea.q-field--dense .q-field__native) {
+  min-height: $textarea-min-height;
+}
 
 .app-text-field__reveal {
   display: inline-flex;

@@ -33,6 +33,19 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 | Por seguridad, pausamos el ingreso con este correo… Vuelve a intentarlo en N minutos. | Hubo 5 o más intentos fallidos seguidos con ese correo. La espera crece: 1 min, 5 min, 15 min y 1 hora | Esperar el tiempo indicado. Si nadie más conoce la cuenta, puede ser un intento de acceso: avisar al equipo de seguridad |
 | Tu sesión terminó. Inicia sesión de nuevo para continuar. (en la pantalla de login) | La sesión venció (8 horas), estuvo más de 1 hora sin uso, se cerró o la cuenta se desactivó | Volver a ingresar; se regresa a la página donde estaba |
 
+## Incidentes
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Alguien más guardó cambios en este incidente mientras lo tenías abierto… | Otra persona guardó un cambio antes (conflicto de versión) | Pulsar "Recargar", revisar la versión actual y repetir el cambio si sigue siendo necesario |
+| Este incidente ya está cerrado o cancelado… | Está en un estado final | Si de verdad necesita cambios, crear un incidente nuevo |
+| Este incidente ya lo están atendiendo, así que ya no puedes editarlo… | Quien lo creó intenta editarlo cuando ya pasó del estado Abierto | Pedir el cambio a un supervisor |
+| Otra persona tomó este incidente hace un momento… | Dos personas intentaron tomarlo a la vez | Recargar para ver quién lo tiene |
+| Ese cambio de estado no está permitido desde el estado actual… | El estado cambió mientras tanto y esa transición ya no aplica | Recargar para ver las opciones vigentes |
+| Esta persona no puede recibir incidentes… | La persona elegida se desactivó o su rol ya no atiende incidentes | Elegir a otra persona de la lista |
+| Tu incidente se está creando… | El mismo envío llegó dos veces muy seguidas | Esperar unos segundos; no se crea duplicado |
+| No pudimos confirmar el envío… / No pudimos procesar el envío… | Problema con la clave de idempotencia (poco habitual) | Recargar la página e intentarlo de nuevo |
+
 ## Mensajes junto a un campo
 
 | Mensaje | Causa |

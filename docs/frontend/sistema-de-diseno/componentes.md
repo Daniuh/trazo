@@ -19,7 +19,7 @@ Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las p
 | `AppBadge` | Etiqueta sólida para estados. Recibe un tono; el contraste ya viene resuelto. |
 | `AppDot` | Punto de color con texto, para prioridades. Distinto a propósito de la etiqueta del estado. |
 | `AppCard` | Superficie con título y acciones opcionales. |
-| `AppTextField` · `AppSelect` | Campos con etiqueta arriba, ayuda en el ícono de información y error siempre visible debajo. Comparten la envoltura `AppField`. Con `type="password"`, el campo trae un botón para mostrar u ocultar la contraseña. |
+| `AppTextField` · `AppSelect` | Campos con etiqueta arriba, ayuda en el ícono de información y error siempre visible debajo. Comparten la envoltura `AppField`. Con `type="password"`, el campo trae un botón para mostrar u ocultar la contraseña; `textarea` empieza con espacio para varias líneas; `datetime-local` usa el selector de fecha y hora del navegador. `AppSelect` muestra su texto de ejemplo (en gris) cuando no hay valor. |
 | `AppAlert` | Aviso siempre visible dentro de la página (error de un formulario o información imprescindible). Tonos `danger` (rol `alert`) e `info` (rol `status`); fondo de superficie con borde de color, nunca fondo tintado. |
 | `AppSkeleton` · `AppEmptyState` · `AppErrorState` | Estados de carga, vacío y error. El de error usa el catálogo de mensajes y ofrece "Reintentar". |
 | `useFeedback()` | `confirm()` abre el diálogo de confirmación (devuelve `true` o `false`); `notify()` y `notifyError()` muestran notificaciones. Los errores no se cierran solos. |

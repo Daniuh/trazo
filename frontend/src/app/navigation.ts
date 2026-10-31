@@ -9,6 +9,8 @@ export interface NavItem {
   to: RouteLocationRaw
   order: number
   permission?: string
+  // Solo se marca activa en su ruta exacta (el inicio, que contiene a todas las demás)
+  exact?: boolean
 }
 
 type ModuleNavigation = { default: NavItem[] }
@@ -18,7 +20,7 @@ const moduleItems = Object.values(
 ).flatMap((module) => module.default)
 
 const appItems: NavItem[] = [
-  { label: 'Inicio', icon: 'home', to: { name: 'home' }, order: 0 },
+  { label: 'Inicio', icon: 'home', to: { name: 'home' }, order: 0, exact: true },
   // La guía visual solo existe en desarrollo
   ...(import.meta.env.DEV
     ? [{ label: 'Guía visual', icon: 'eye' as const, to: { name: 'design-guide' }, order: 999 }]
