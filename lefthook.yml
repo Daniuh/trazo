@@ -8,6 +8,14 @@ pre-commit:
       root: backend/
       glob: "*.php"
       run: docker compose -p trazo exec -T app vendor/bin/pint --test {staged_files}
+    frontend-lint:
+      root: frontend/
+      glob: "*.{ts,vue,js}"
+      run: npx eslint {staged_files} && npx prettier --check {staged_files}
+    frontend-styles:
+      root: frontend/
+      glob: "*.{scss,vue}"
+      run: npx stylelint {staged_files}
 
 commit-msg:
   commands:

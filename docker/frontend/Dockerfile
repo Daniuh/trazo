@@ -3,9 +3,11 @@
 
 FROM node:24.22.1-alpine AS dev
 WORKDIR /app
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+# Todo como el usuario sin privilegios: Vite necesita escribir su caché dentro de node_modules
+RUN chown node:node /app
 USER node
+COPY --chown=node:node frontend/package.json frontend/package-lock.json ./
+RUN npm ci
 CMD ["npm", "run", "dev"]
 
 FROM dev AS build

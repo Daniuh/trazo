@@ -1,0 +1,25 @@
+// Las cuatro vistas de Trazo. Los componentes usan estos mixins, nunca anchos escritos a mano.
+// Mobile first: el estilo base es el de celular y cada bloque agrega lo que cambia.
+// Documentado en docs/frontend/sistema-de-diseno/responsive.md
+
+$bp-tablet: 600px;
+$bp-laptop: 1024px;
+$bp-desktop: 1440px;
+
+@mixin tablet {
+  @media (min-width: $bp-tablet) {
+    @content;
+  }
+}
+
+@mixin laptop {
+  @media (min-width: $bp-laptop) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-desktop) {
+    @content;
+  }
+}

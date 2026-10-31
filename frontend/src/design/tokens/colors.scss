@@ -1,0 +1,24 @@
+// Colores de Trazo, tomados de la "o" del logo de Psicol.
+// Los tonos base van en acentos, gráficos e íconos; los oscuros, en botones y texto (contraste AA con blanco).
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+// Base
+$color-blue-base: #03a8d5;
+$color-green-base: #86bb24;
+$color-orange-base: #ff9829;
+
+// Tonos oscuros para texto y botones (≥ 5:1 contra blanco)
+$color-blue-strong: #027695;
+$color-green-strong: #507016;
+$color-orange-strong: #995b19;
+
+// Texto
+$color-text: #161616;
+$color-text-on-dark: #fff;
+
+// Roles
+$color-primary: $color-blue-strong;
+$color-success: $color-green-strong;
+$color-warning: $color-orange-strong;
+
+// El rojo armonizado (errores y prioridad crítica) se define con el sistema de diseño

@@ -1,6 +1,6 @@
 ---
 title: Frontend
-description: Módulos de la SPA en Vue y el sistema de diseño.
+description: Estructura de la SPA en Vue 3, TypeScript y Quasar, organizada por módulos.
 audience: tecnico
 area: frontend
 order: 1
@@ -8,4 +8,59 @@ order: 1
 
 # Frontend
 
-La SPA está organizada por funcionalidad (`auth`, `incidents`, `dashboard`…), cada una con las capas domain, application, infrastructure y presentation. El sistema de diseño (tokens, componentes, íconos y reglas de responsive) se documenta en su propia sección.
+SPA en Vue 3 con TypeScript estricto y Quasar (integrado como plugin de Vite). Sigue la misma idea que el backend: cada funcionalidad es un módulo con sus capas, y la lógica no depende de la librería de interfaz.
+
+## Estructura
+
+```
+frontend/src/
+├── main.ts              → punto de entrada: delega en app/bootstrap
+├── app/                 → arranque, router, plugins y páginas de la aplicación
+│   ├── bootstrap.ts
+│   ├── plugins/quasar.ts
+│   ├── router/          → reúne las rutas de todos los módulos
+│   └── pages/           → páginas globales (404)
+├── modules/<módulo>/    → una carpeta por funcionalidad
+│   ├── domain/          → tipos y reglas puras
+│   ├── application/     → casos de uso (composables y stores)
+│   ├── infrastructure/  → repositorios de la API y mappers
+│   ├── presentation/    → páginas y componentes del módulo
+│   └── routes.ts        → rutas del módulo (se registran solas, con carga diferida)
+├── shared/              → lo transversal
+│   ├── http/            → cliente HTTP único, errores normalizados, token de sesión
+│   └── errors/          → catálogo de mensajes de error
+└── design/              → tokens y tema (ver sistema de diseño)
+```
+
+## Reglas
+
+- **Las vistas nunca llaman a la API.** Usan la capa `application` de su módulo, que usa los repositorios de `infrastructure`.
+- **Quasar queda en la presentación.** Dominio y aplicación no lo importan.
+- **Ningún valor de diseño escrito a mano** fuera de `design/`: lo impide Stylelint.
+- **`v-html` está prohibido** (ESLint), para cerrar la puerta a XSS.
+- **El front no calcula reglas de negocio:** muestra u oculta acciones según lo que indica la API en `actions`.
+
+## Comandos
+
+Desde `frontend/` (o dentro del contenedor):
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo (en Docker ya corre detrás del gateway) |
+| `npm run build` | Verifica tipos y compila |
+| `npm run typecheck` | Verificación de tipos con vue-tsc |
+| `npm run lint` | ESLint, Stylelint y Prettier |
+| `npm run format` | Corrige formato |
+| `npm test` | Pruebas con Vitest |
+| `npm run check` | Tipos, lint y pruebas; debe pasar antes de fusionar a `dev` |
+
+## Documentos relacionados
+
+- [Cliente HTTP y errores](http-y-errores.md)
+- Sistema de diseño: [tokens](sistema-de-diseno/tokens.md) y [responsive](sistema-de-diseno/responsive.md)
+- Decisiones: [ADR-0003](../decisiones/0003-frontend-modular.md), [ADR-0039](../decisiones/0039-quasar-como-plugin-de-vite.md) y [ADR-0040](../decisiones/0040-axios.md)
+
+## Dónde está en el código
+
+- [`frontend/src/app/`](../../frontend/src/app/) y [`frontend/src/shared/`](../../frontend/src/shared/)
+- [`frontend/vite.config.ts`](../../frontend/vite.config.ts), [`eslint.config.js`](../../frontend/eslint.config.js) y [`stylelint.config.js`](../../frontend/stylelint.config.js)
