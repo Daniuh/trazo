@@ -5,14 +5,11 @@ declare(strict_types=1);
 // Bloqueo progresivo y límite de intentos del login.
 // Documentado en docs/backend/auth.md
 
-use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Testing\TestResponse;
 
 uses(RefreshDatabase::class);
-
-beforeEach(fn () => $this->seed(DatabaseSeeder::class));
 
 function attemptLogin(string $email, string $password = 'contraseña-incorrecta'): TestResponse
 {

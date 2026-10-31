@@ -8,11 +8,14 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use Database\Seeders\Concerns\InsertsMissingRows;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class IncidentCatalogSeeder extends Seeder
 {
+    use InsertsMissingRows;
+
     private const PRIORITIES = [
         ['code' => 'low', 'name' => 'Baja', 'level' => 1, 'default_resolution_minutes' => 7200],
         ['code' => 'medium', 'name' => 'Media', 'level' => 2, 'default_resolution_minutes' => 4320],
@@ -48,21 +51,10 @@ class IncidentCatalogSeeder extends Seeder
 
     public function run(): void
     {
-        $this->insertMissing('priorities', self::PRIORITIES);
-        $this->insertMissing('statuses', self::STATUSES);
-        $this->insertMissing('activity_types', self::ACTIVITY_TYPES);
+        $this->insertMissing('priorities', 'code', self::PRIORITIES);
+        $this->insertMissing('statuses', 'code', self::STATUSES);
+        $this->insertMissing('activity_types', 'code', self::ACTIVITY_TYPES);
         $this->seedTransitions();
-    }
-
-    /**
-     * @param  list<array<string, scalar>>  $rows
-     */
-    private function insertMissing(string $table, array $rows): void
-    {
-        $now = now();
-        $rows = array_map(fn (array $row): array => [...$row, 'created_at' => $now, 'updated_at' => $now], $rows);
-
-        DB::table($table)->insertOrIgnore($rows);
     }
 
     private function seedTransitions(): void
@@ -76,6 +68,7 @@ class IncidentCatalogSeeder extends Seeder
             }
         }
 
+        // Sin autoincremental, aquí INSERT IGNORE no gasta nada
         DB::table('status_transitions')->insertOrIgnore($rows);
     }
 }

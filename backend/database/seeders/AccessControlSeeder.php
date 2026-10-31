@@ -8,11 +8,14 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use Database\Seeders\Concerns\InsertsMissingRows;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class AccessControlSeeder extends Seeder
 {
+    use InsertsMissingRows;
+
     private const ROLES = [
         'requester' => 'Solicitante',
         'agent' => 'Agente',
@@ -57,16 +60,14 @@ class AccessControlSeeder extends Seeder
 
     public function run(): void
     {
-        $now = now();
-
-        DB::table('roles')->insertOrIgnore(array_map(
-            fn (string $code, string $name): array => ['code' => $code, 'name' => $name, 'created_at' => $now, 'updated_at' => $now],
+        $this->insertMissing('roles', 'code', array_map(
+            fn (string $code, string $name): array => ['code' => $code, 'name' => $name],
             array_keys(self::ROLES),
             self::ROLES,
         ));
 
-        DB::table('permissions')->insertOrIgnore(array_map(
-            fn (string $code, array $definition): array => ['code' => $code, 'name' => $definition[0], 'created_at' => $now, 'updated_at' => $now],
+        $this->insertMissing('permissions', 'code', array_map(
+            fn (string $code, array $definition): array => ['code' => $code, 'name' => $definition[0]],
             array_keys(self::PERMISSIONS),
             self::PERMISSIONS,
         ));

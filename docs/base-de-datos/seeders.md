@@ -12,6 +12,8 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 
 - Agregan lo que falta, identificándolo por su clave natural (`code` en catálogos, roles y permisos; `email` en usuarios).
 - **Nunca pisan lo que ya existe.** Si un administrador ajusta, por ejemplo, el tiempo sugerido de una prioridad o quita un permiso a un rol, volver a sembrar no lo revierte. Los cambios intencionales a los datos base se hacen con una migración.
+- **Solo insertan las filas que faltan** (`InsertsMissingRows`): primero consultan qué códigos existen y luego insertan los demás. No usan `INSERT IGNORE`, porque MySQL gasta un valor del autoincremental en cada intento aunque la fila ya exista. Los catálogos usan `TINYINT` (máximo 255), así que después de unas decenas de arranques el seeder fallaría y la API no volvería a levantar. Una prueba verifica que volver a sembrar no gasta ningún valor.
+- En las pruebas, los seeders corren **una sola vez por ejecución** y cada prueba trabaja en una transacción que se revierte.
 
 | Seeder | Qué carga | Entorno |
 |---|---|---|
@@ -34,6 +36,6 @@ Los incidentes de prueba (500 o más, con volumen configurable) se agregan junto
 
 ## Dónde está en el código
 
-- [`backend/database/seeders/`](../../backend/database/seeders/)
+- [`backend/database/seeders/`](../../backend/database/seeders/), incluido [`Concerns/InsertsMissingRows.php`](../../backend/database/seeders/Concerns/InsertsMissingRows.php)
 - [`backend/config/trazo.php`](../../backend/config/trazo.php): contraseña de demostración.
 - Pruebas: [`backend/tests/Feature/Database/SeederTest.php`](../../backend/tests/Feature/Database/SeederTest.php)

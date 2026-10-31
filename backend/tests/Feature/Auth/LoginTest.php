@@ -6,15 +6,12 @@ declare(strict_types=1);
 // Documentado en docs/backend/auth.md
 
 use App\Modules\Users\Infrastructure\Models\User;
-use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
 const DEMO_PASSWORD = 'Trazo.Demo.2026';
-
-beforeEach(fn () => $this->seed(DatabaseSeeder::class));
 
 it('entrega token, vencimiento y el usuario con sus permisos', function (): void {
     $response = $this->postJson('/api/v1/auth/login', ['email' => 'supervisor@trazo.test', 'password' => DEMO_PASSWORD]);

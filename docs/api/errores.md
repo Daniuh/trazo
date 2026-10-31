@@ -52,7 +52,7 @@ Los 429 y los 423 incluyen `Retry-After`, y los 405 incluyen `Allow`.
 | `SERVICE_UNAVAILABLE` | 503 | Modo mantenimiento |
 | `INTERNAL_ERROR` | 500 | Error inesperado (el detalle queda solo en los logs) |
 
-Los códigos de negocio de cada módulo (por ejemplo `INVALID_STATUS_TRANSITION`) se documentan en su módulo. Los de sesión (`INVALID_CREDENTIALS` y `ACCOUNT_LOCKED`) están en [Módulo Auth](../backend/auth.md#errores).
+Los códigos de negocio de cada módulo (por ejemplo `INVALID_STATUS_TRANSITION`) se documentan en su módulo. Los de sesión (`INVALID_CREDENTIALS` y `ACCOUNT_LOCKED`) están en [Módulo Auth](../backend/auth.md#errores), y los de incidentes en [Módulo Incidents](../backend/incidents.md#errores).
 
 ## Códigos de validación por campo
 
