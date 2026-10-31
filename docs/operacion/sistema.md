@@ -39,7 +39,7 @@ Para correrla a mano:
 docker compose -p trazo exec app php artisan system:check
 ```
 
-> Al cambiar código de Laravel hay que reiniciar `worker`, `scheduler` y `reverb`: son procesos largos y no recargan el código solos.
+> Al cambiar código de Laravel hay que reiniciar `worker`, `scheduler` y `reverb`: son procesos largos y no recargan el código solos. Si el scheduler ya tiene el código nuevo y el worker no, el worker recibe jobs que no conoce y fallan. Pasó en desarrollo: 10 señales de vida fallaron durante 9 minutos, hasta que se reinició el worker. Al desplegar, los workers se reinician después de que el código nuevo esté en su lugar.
 
 ## Si el modo mantenimiento queda activo
 

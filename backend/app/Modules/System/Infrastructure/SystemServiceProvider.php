@@ -19,6 +19,9 @@ use App\Modules\System\Application\Ports\SystemControls;
 use App\Modules\System\Application\Ports\SystemEventLog;
 use App\Modules\System\Infrastructure\Console\CheckSystemCommand;
 use App\Modules\System\Infrastructure\Console\PruneSystemEventsCommand;
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Events\JobFailed;
@@ -40,6 +43,9 @@ final class SystemServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        // Scramble no publica sus rutas (interfaz con scripts de una CDN): el contrato sale por ApiDocsController
+        Scramble::ignoreDefaultRoutes();
+
         // El catálogo de tipos se lee una vez por petición
         $this->app->scoped(SystemEvents::class, DatabaseSystemEvents::class);
 
@@ -54,6 +60,13 @@ final class SystemServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Datos del contrato OpenAPI y la sesión por token Bearer (Sanctum)
+        Scramble::configure()
+            ->withDocumentTransformers(function (OpenApi $openApi): void {
+                $openApi->info->description = 'API REST de Trazo (gestión de incidentes). Errores en RFC 9457 con código propio; ver docs/api/errores.md.';
+                $openApi->secure(SecurityScheme::http('bearer'));
+            });
+
         Event::listen(JobFailed::class, fn (JobFailed $event) => $this->app->make(FailureEvents::class)->jobFailed($event));
 
         // Acciones de sistema: 5 por minuto por persona

@@ -155,6 +155,7 @@ Están todas en [`.env.example`](.env.example), con su valor por defecto para lo
 | `SESSION_IDLE_MINUTES` | `60` | La sesión se cierra tras este tiempo sin uso |
 | `SEED_INCIDENTS` | `600` | Incidentes de prueba que se cargan (la prueba técnica pide al menos 500) |
 | `SYSTEM_EVENTS_RETENTION_DAYS` | `90` | Días que se guardan los eventos del sistema ya resueltos |
+| `API_RATE_LIMIT` | `120` | Peticiones por minuto a la API por persona. Solo se sube a mano para un escaneo o una prueba de carga local |
 | `DB_DATABASE`, `DB_USERNAME` | `trazo` | Base de datos y usuario de MySQL |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | `*_local_only` | Contraseñas de MySQL. **Solo para local**: en producción se definen otras |
 | `REDIS_PASSWORD` | `trazo_local_only` | Contraseña de Redis. **Solo para local** |
@@ -222,6 +223,9 @@ docker compose exec app composer test
 
 # Pruebas, estilo (Pint) y análisis estático (Larastan nivel 8)
 docker compose exec app composer check
+
+# Pruebas con cobertura: exige 90 % en dominio y aplicación y 80 % en general
+docker compose exec app composer coverage
 ```
 
 **Interfaz** (requiere Node 24 en el equipo):
@@ -233,10 +237,18 @@ npm ci
 # Tipos, lint, estilos y pruebas unitarias
 npm run check
 
+# Pruebas unitarias con cobertura: exige 90 % en dominio y aplicación
+npm run test:coverage
+
 # Pruebas de extremo a extremo en las cuatro vistas, con revisión de accesibilidad.
 # Necesitan el stack levantado y, la primera vez, los navegadores de Playwright: npx playwright install chromium
 npm run test:e2e
+
+# Acciones de sistema reales (reinician workers y Reverb): aparte de la suite normal
+npm run test:e2e:ops
 ```
+
+La seguridad se revisa además con OWASP ZAP, como perfil opcional del Docker: ver [Escaneo con OWASP ZAP](docs/seguridad/zap.md) y [OWASP Top 10](docs/seguridad/owasp-top-10.md).
 
 Las pruebas de extremo a extremo hacen de "teléfono" para la verificación en dos pasos: guardan la clave de cada cuenta de prueba en `frontend/e2e/.auth/` (no se versiona) y calculan sus códigos. Si esa carpeta se borra, las cuentas que ya tenían la verificación activa no se pueden usar en las pruebas hasta recargar los datos (`docker compose exec app php artisan migrate:fresh --seed`).
 

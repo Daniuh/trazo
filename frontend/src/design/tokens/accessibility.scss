@@ -10,3 +10,6 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+// El enlace "Saltar al contenido" queda sobre el encabezado de Quasar (z-index 2000) y bajo sus diálogos (6000)
+$z-skip-link: 3000;

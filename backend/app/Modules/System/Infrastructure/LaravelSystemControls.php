@@ -10,11 +10,19 @@ namespace App\Modules\System\Infrastructure;
 
 use App\Modules\Dashboard\Application\Ports\MetricsCache;
 use App\Modules\System\Application\Ports\SystemControls;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Artisan;
 
 final readonly class LaravelSystemControls implements SystemControls
 {
-    public function __construct(private MetricsCache $metrics) {}
+    // La misma señal que deja "artisan reverb:restart": el servidor la revisa cada pocos segundos y se cierra. Se
+    // escribe directo porque Reverb solo registra sus comandos en la consola, no en una petición web
+    private const REVERB_RESTART_KEY = 'laravel:reverb:restart';
+
+    public function __construct(
+        private MetricsCache $metrics,
+        private Repository $cache,
+    ) {}
 
     public function restartWorkers(): void
     {
@@ -23,7 +31,7 @@ final readonly class LaravelSystemControls implements SystemControls
 
     public function restartRealtime(): void
     {
-        Artisan::call('reverb:restart');
+        $this->cache->forever(self::REVERB_RESTART_KEY, now()->getTimestamp());
     }
 
     public function clearDataCache(): void

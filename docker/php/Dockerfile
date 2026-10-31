@@ -25,8 +25,10 @@ CMD ["php-fpm"]
 
 # Desarrollo: el código (y el script de arranque, dev-init.sh) llega montado desde el host y se usa composer dentro del contenedor
 FROM base AS dev
+# PCOV mide la cobertura de las pruebas (composer coverage); solo en desarrollo, nunca en producción
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
-    && apk add --no-cache su-exec
+    && apk add --no-cache su-exec \
+    && install-php-extensions pcov
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS=1 COMPOSER_HOME=/tmp/composer
 USER www-data

@@ -56,6 +56,11 @@ export async function signInAs(page: Page, email: string): Promise<void> {
   await page.addInitScript(([key, value]) => window.sessionStorage.setItem(key, value), [SESSION_KEY, token] as const)
 }
 
+// Olvida la sesión guardada de una persona (p. ej. después de desactivarla, que revoca su token)
+export function forgetSession(email: string): void {
+  tokens.delete(email)
+}
+
 // Cabecera para llamar a la API como esa persona (después de signInAs), p. ej. para limpiar datos de una prueba
 export function authHeaderOf(email: string): Record<string, string> {
   const token = tokens.get(email)
@@ -96,6 +101,8 @@ export async function setUpMfa(page: Page, email: string): Promise<void> {
 
 // WCAG 2.1 nivel AA, el estándar que sigue el sistema de diseño
 export async function expectAccessible(page: Page): Promise<void> {
+  // Una lista que se está recargando se atenúa (aria-busy) y axe la mediría con poco contraste: se espera a que termine
+  await expect(page.locator('section[aria-busy="true"]')).toHaveCount(0)
   // Un diálogo o un aviso que todavía está apareciendo tiene opacidad parcial y axe lo mide con poco contraste:
   // se espera a que terminen las animaciones (las infinitas, como la de carga, no cuentan)
   await page.waitForFunction(() =>

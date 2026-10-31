@@ -11,6 +11,7 @@ use App\Modules\Shared\Application\SystemEventType;
 use App\Modules\System\Application\Data\HealthMeasurements;
 use App\Modules\System\Application\Ports\HealthProbe;
 use App\Modules\Users\Infrastructure\Models\User;
+use Dedoc\Scramble\CacheableGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -102,6 +103,24 @@ describe('permisos', function (): void {
     ]);
 });
 
+describe('contrato OpenAPI', function (): void {
+    it('lo entrega solo a quien tiene el permiso de salud del sistema', function (): void {
+        // Generar el contrato real tarda casi un minuto; aquí se prueba el acceso (la exportación prueba el contenido)
+        $this->mock(CacheableGenerator::class, fn ($mock) => $mock->shouldReceive('__invoke')->andReturn(['openapi' => '3.1.2']));
+
+        systemOperator('admin@trazo.test');
+        $this->getJson('/api/v1/docs')->assertForbidden();
+
+        systemOperator();
+        $this->getJson('/api/v1/docs')->assertOk()->assertJsonPath('openapi', '3.1.2');
+    });
+
+    it('no existen las rutas públicas de Scramble', function (): void {
+        $this->get('/docs/api')->assertNotFound();
+        $this->get('/docs/api.json')->assertNotFound();
+    });
+});
+
 describe('salud', function (): void {
     it('interpreta cada medición y el estado general es el peor', function (): void {
         fakeHealth(['redisMs' => null, 'pendingJobs' => 150, 'workerSecondsAgo' => null]);
@@ -166,6 +185,26 @@ describe('eventos', function (): void {
         $this->getJson('/api/v1/system/events?filter[status]=resolved')->assertJsonCount(0, 'data');
         $this->getJson('/api/v1/system/events?filter[status]=closed')->assertUnprocessable();
         $this->getJson('/api/v1/system/events?cursor=no-es-un-cursor')->assertUnprocessable()->assertJsonPath('errors.cursor.0.code', 'INVALID_CURSOR');
+    });
+
+    it('la lista hace las mismas consultas con pocos o con muchos eventos (sin N+1)', function (): void {
+        systemOperator();
+        $count = function (): int {
+            $this->getJson('/api/v1/system/events?filter[status]=open');
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $this->getJson('/api/v1/system/events?filter[status]=open')->assertOk();
+
+            return count(DB::getQueryLog());
+        };
+
+        recordEvent(SystemEventType::JobFailed, 'a');
+        $few = $count();
+        foreach (range(1, 20) as $index) {
+            recordEvent(SystemEventType::LoginLocked, "cuenta-{$index}");
+        }
+
+        expect($count())->toBe($few);
     });
 
     it('entrega el catálogo de tipos y responde 404 si el evento no existe', function (): void {
@@ -248,6 +287,14 @@ describe('acciones', function (): void {
         expect(cache()->get('illuminate:queue:restart'))->not->toBeNull()
             ->and(DB::table('admin_actions')->join('admin_action_types as t', 't.id', '=', 'admin_action_type_id')->pluck('t.code')->all())
             ->toBe(['system_workers_restarted']);
+    });
+
+    it('reiniciar el tiempo real deja la señal que Reverb revisa', function (): void {
+        $operator = systemOperator();
+
+        $this->postJson('/api/v1/system/actions/restart-realtime', ['mfa_code' => systemCode($operator)])->assertNoContent();
+
+        expect(cache()->get('laravel:reverb:restart'))->toBeInt();
     });
 
     it('limpiar la caché de datos no borra bloqueos ni límites', function (): void {

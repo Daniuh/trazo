@@ -30,11 +30,17 @@ final class DatabaseEventLog implements SystemEventLog
         if ($criteria->statuses !== []) {
             $query->whereIn('e.status', $criteria->statuses);
         }
-        if ($criteria->severities !== []) {
-            $query->whereIn('t.severity', $criteria->severities);
-        }
-        if ($criteria->types !== []) {
-            $query->whereIn('t.code', $criteria->types);
+        // Los filtros del tipo van por subconsulta: así la consulta recorre los eventos por su fecha y no ordena todo
+        if ($criteria->severities !== [] || $criteria->types !== []) {
+            $query->whereIn('e.system_event_type_id', function (Builder $types) use ($criteria): void {
+                $types->select('id')->from('system_event_types');
+                if ($criteria->severities !== []) {
+                    $types->whereIn('severity', $criteria->severities);
+                }
+                if ($criteria->types !== []) {
+                    $types->whereIn('code', $criteria->types);
+                }
+            });
         }
         if ($criteria->cursor !== null) {
             $date = $criteria->cursor->sqlDate();
@@ -85,8 +91,10 @@ final class DatabaseEventLog implements SystemEventLog
 
     private function base(): Builder
     {
+        // LEFT JOIN a propósito (la FK garantiza el tipo): obliga a MySQL a empezar por los eventos, usar el índice de
+        // fecha y detenerse al llenar la tanda, en lugar de ordenar todo en una tabla temporal
         return DB::table('system_events as e')
-            ->join('system_event_types as t', 't.id', '=', 'e.system_event_type_id')
+            ->leftJoin('system_event_types as t', 't.id', '=', 'e.system_event_type_id')
             ->leftJoin('users as u', 'u.id', '=', 'e.status_changed_by')
             ->select([
                 'e.id', 'e.message', 'e.context', 'e.occurrences', 'e.first_seen_at', 'e.last_seen_at', 'e.trace_id',

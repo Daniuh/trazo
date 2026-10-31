@@ -1,8 +1,10 @@
 // Tiempo real con dos personas a la vez: una cambia algo por la API y la otra lo ve sin recargar. En las cuatro
 // vistas, el aviso del listado; en portátil, el detalle que se actualiza solo; en monitor, el aviso "Te asignaron";
-// en tablet, el menú que cambia cuando le conceden un permiso. Documentado en docs/calidad/estrategia-de-pruebas.md
+// en tablet, el menú que cambia cuando le conceden un permiso. En portátil, el formulario de edición que avisa sin
+// borrar lo escrito; en monitor, la pantalla que se cierra sola al desactivar la cuenta.
+// Documentado en docs/calidad/estrategia-de-pruebas.md
 import { expect, test, type Browser, type Page } from '@playwright/test'
-import { authHeaderOf, expectAccessible, signInAs } from './support'
+import { authHeaderOf, expectAccessible, forgetSession, signInAs } from './support'
 
 const SUPERVISOR = 'supervisor@trazo.test'
 const ROOT = 'superadmin@trazo.test'
@@ -125,5 +127,57 @@ test('el menú cambia en vivo cuando le conceden un permiso a la persona', async
   } finally {
     await page.request.put(`/api/v1/users/${id}/permissions`, { headers, data: { permissions: original } })
     await agent.context().close()
+  }
+})
+
+test('el formulario de edición avisa si otra persona cambió el incidente, sin borrar lo escrito', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'portatil', 'Basta una vista')
+  await signInAs(page, SUPERVISOR)
+  await page.goto('/')
+  const incident = await createIncident(page, `Edición en vivo ${Date.now()}`)
+
+  const subscribed = waitForRealtime(page)
+  await page.goto(`/incidentes/${incident.id}/editar`)
+  await expect(page.getByLabel('Título')).toBeVisible()
+  await subscribed
+  await page.getByLabel('Título').fill('Lo que alcancé a escribir')
+
+  const response = await page.request.put(`/api/v1/incidents/${incident.id}/status`, {
+    headers: authHeaderOf(SUPERVISOR),
+    data: { status: 'in_progress', version: incident.version },
+  })
+  expect(response.ok()).toBe(true)
+
+  await expect(page.getByText('Otra persona cambió este incidente')).toBeVisible()
+  await expect(page.getByLabel('Título')).toHaveValue('Lo que alcancé a escribir')
+  await expectAccessible(page)
+})
+
+test('al desactivar una cuenta, su pantalla se cierra al instante', async ({ page, browser }, info) => {
+  test.skip(info.project.name !== 'monitor', 'Basta una vista')
+  const PERSON = 'solicitante2@trazo.test'
+  await signInAs(page, ROOT)
+  await page.goto('/')
+  const person = await openAs(browser, PERSON, '/')
+  await waitForRealtime(person)
+
+  const headers = authHeaderOf(ROOT)
+  const found = (await (await page.request.get('/api/v1/users?search=solicitante2', { headers })).json()) as {
+    data: { id: string }[]
+  }
+  const id = found.data[0]?.id
+  try {
+    expect((await page.request.post(`/api/v1/users/${id}/deactivate`, { headers })).ok()).toBe(true)
+
+    // Sin recargar: el aviso de sesión llega por el canal personal y la app vuelve al login
+    await expect(person).toHaveURL(/\/ingresar/)
+    await expect(person.getByRole('status').filter({ hasText: /sesión/i })).toBeVisible()
+  } finally {
+    await page.request.post(`/api/v1/users/${id}/activate`, { headers })
+    // Su token quedó revocado: la próxima prueba que la use debe volver a ingresar
+    forgetSession(PERSON)
+    await person.context().close()
   }
 })

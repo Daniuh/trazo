@@ -77,5 +77,22 @@ services:
       resources:
         limits: { cpus: "0.25", memory: 128M }
 
+  # Escaneo de seguridad con OWASP ZAP. Perfil opcional: "docker compose up -d" no lo levanta. Se corre a mano, solo
+  # contra el stack local; los reportes quedan en ./zap-reports (fuera de Git). Documentado en docs/seguridad/zap.md
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:2.16.1
+    profiles: [zap]
+    working_dir: /zap/wrk
+    volumes:
+      - ./zap-reports:/zap/wrk:rw
+      - ./docs/api/openapi.json:/zap/openapi.json:ro
+      - ./docker/zap:/zap/config:ro
+    networks: [edge]
+    depends_on:
+      gateway: { condition: service_healthy }
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 2G }
+
 volumes:
   vendor: {}

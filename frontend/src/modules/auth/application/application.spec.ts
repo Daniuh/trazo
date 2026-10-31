@@ -18,6 +18,11 @@ vi.mock('../infrastructure/authApi', () => ({
     forgotPassword: vi.fn(),
     verifyResetCode: vi.fn(),
     resetPassword: vi.fn(),
+    startMfaSetup: vi.fn(),
+    confirmMfaSetup: vi.fn(),
+    regenerateRecoveryCodes: vi.fn(),
+    disableMfa: vi.fn(),
+    changePassword: vi.fn(),
   },
 }))
 
@@ -126,6 +131,47 @@ describe('useSessionStore', () => {
 
     expect(tokenStore.get()).toBeNull()
     expect(useSessionStore().user).toBeNull()
+  })
+})
+
+describe('MFA y contraseña con la sesión abierta', () => {
+  it('configura el MFA con el token del ingreso a medias y abre la sesión', async () => {
+    api.login.mockResolvedValue({ token: 'medio', step: 'mfa_setup', user: null })
+    api.startMfaSetup.mockResolvedValue({ secret: 'ABC', uri: 'otpauth://totp/x' })
+    api.confirmMfaSetup.mockResolvedValue({
+      recoveryCodes: ['a', 'b'],
+      session: { token: 'pleno', step: 'complete', user },
+    })
+    const session = useSessionStore()
+
+    await session.login('a@trazo.test', 'clave')
+    await session.startMfaSetup()
+    expect(api.startMfaSetup).toHaveBeenCalledWith('medio')
+    expect(await session.confirmMfaSetup('123456')).toEqual(['a', 'b'])
+    expect(api.confirmMfaSetup).toHaveBeenCalledWith('123456', 'medio')
+    expect(session.user).toEqual(user)
+    expect(tokenStore.get()).toBe('pleno')
+  })
+
+  it('con la sesión abierta, cada cambio de MFA vuelve a pedir quién es', async () => {
+    api.me.mockResolvedValue({ ...user, mfa: { enabled: true, required: true, recoveryCodesLeft: 8 } })
+    api.startMfaSetup.mockResolvedValue({ secret: 'ABC', uri: 'otpauth://totp/x' })
+    api.confirmMfaSetup.mockResolvedValue({ recoveryCodes: ['a'], session: null })
+    api.regenerateRecoveryCodes.mockResolvedValue(['c'])
+    api.disableMfa.mockResolvedValue(undefined)
+    api.changePassword.mockResolvedValue(undefined)
+    const session = useSessionStore()
+
+    await session.startMfaSetup()
+    expect(api.startMfaSetup).toHaveBeenCalledWith(undefined)
+    await session.confirmMfaSetup('123456')
+    expect(await session.regenerateRecoveryCodes('123456')).toEqual(['c'])
+    await session.disableMfa('123456')
+    await session.changePassword('vieja', 'nueva-segura', 'nueva-segura')
+
+    expect(api.me).toHaveBeenCalledTimes(3)
+    expect(session.user?.mfa.enabled).toBe(true)
+    expect(api.changePassword).toHaveBeenCalledWith('vieja', 'nueva-segura', 'nueva-segura')
   })
 })
 

@@ -29,3 +29,6 @@ test-results/
 
 # Claves del MFA de las cuentas de prueba E2E (solo locales)
 e2e/.auth/
+
+# Reporte de cobertura de Vitest (npm run test:coverage)
+coverage/

@@ -10,6 +10,7 @@ namespace App\Providers;
 use App\Modules\Shared\Application\Ports\AdminLog;
 use App\Modules\Shared\Application\Ports\Clock;
 use App\Modules\Shared\Application\Ports\Transaction;
+use App\Modules\Shared\Infrastructure\Console\ResetLimitsCommand;
 use App\Modules\Shared\Infrastructure\DatabaseAdminLog;
 use App\Modules\Shared\Infrastructure\LaravelSupport;
 use App\Modules\Users\Infrastructure\UserPermissions;
@@ -36,8 +37,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Límite general de la API: por usuario si hay sesión, por IP si no
-        RateLimiter::for('api', fn (Request $request): Limit => Limit::perMinute(120)->by(
+        // Herramienta de desarrollo: en producción el comando ni siquiera se registra
+        if ($this->app->runningInConsole() && $this->app->environment('local', 'testing')) {
+            $this->commands([ResetLimitsCommand::class]);
+        }
+
+        // Límite general de la API: por usuario si hay sesión, por IP si no. Configurable solo para pruebas de carga
+        // o escaneos locales; en producción se queda en 120
+        RateLimiter::for('api', fn (Request $request): Limit => Limit::perMinute((int) config('trazo.api_rate_limit'))->by(
             $request->user()?->getAuthIdentifier() ?? $request->ip(),
         ));
     }

@@ -18,6 +18,10 @@ order: 15
 | Portátil | Expandido, con íconos y nombres | Ancho completo |
 | Monitor | Expandido | Centrado, con ancho máximo de 1280 px |
 
+**"Saltar al contenido"** es lo primero que recibe el foco al usar Tab: está oculto hasta entonces y, al activarlo, lleva el foco al contenido (`main#contenido`) sin recorrer el menú (WCAG 2.4.1). No cambia la URL: el router usa el historial, no el `#`.
+
+**Aviso de mantenimiento:** con el modo activo, quien sigue trabajando ve arriba del contenido "Modo mantenimiento activo", con un enlace a Sistema ([Módulo de sistema](../system.md#aviso-de-mantenimiento)).
+
 El logo del encabezado lleva al inicio. Su nombre accesible es el mismo texto que se ve ("Trazo"), para que quien navega por voz pueda nombrarlo tal como lo ve (WCAG 2.5.3).
 
 La sección activa se marca con fondo neutro y una barra azul a la izquierda: nunca con fondo tintado y texto del mismo color. "Inicio" se marca solo en su ruta exacta (`exact` en `NavItem`), porque todas las demás rutas cuelgan de él.

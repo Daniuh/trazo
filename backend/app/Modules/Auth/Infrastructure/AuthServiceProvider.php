@@ -26,11 +26,11 @@ use App\Modules\Auth\Application\Ports\SessionUserReader;
 use App\Modules\Auth\Application\Ports\UserAccounts;
 use App\Modules\Auth\Domain\LockoutPolicy;
 use App\Modules\Auth\Domain\LoginAttemptStore;
+use App\Modules\Auth\Infrastructure\Console\DevTokenCommand;
 use App\Modules\Shared\Application\Ports\SystemEvents;
 use App\Modules\Shared\Domain\EmailAddress;
 use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Request;
@@ -81,8 +81,9 @@ final class AuthServiceProvider extends ServiceProvider
             (string) config('trazo.dashboard.timezone'),
         ));
 
+        // Junto a los límites de frecuencia, no en la caché de datos: limpiar la caché nunca levanta un bloqueo
         $this->app->bind(LoginAttemptStore::class, fn ($app): LoginAttemptStore => new CacheLoginAttemptStore(
-            $app->make(Repository::class),
+            $app->make('cache')->store((string) config('cache.limiter')),
             (int) config('trazo.auth.failures_ttl_minutes') * 60,
         ));
 
@@ -107,6 +108,11 @@ final class AuthServiceProvider extends ServiceProvider
     {
         // Los tokens solo pertenecen a usuarios; el tipo guardado es 'user' y la tabla lo exige con un CHECK
         Relation::enforceMorphMap(['user' => User::class]);
+
+        // Herramienta de desarrollo para el escaneo de ZAP: en producción el comando ni siquiera se registra
+        if ($this->app->runningInConsole() && $this->app->environment('local', 'testing')) {
+            $this->commands([DevTokenCommand::class]);
+        }
 
         RateLimiter::for('login', fn (Request $request): Limit => Limit::perMinute(5)->by(
             EmailAddress::normalize((string) $request->input('email')).'|'.$request->ip(),

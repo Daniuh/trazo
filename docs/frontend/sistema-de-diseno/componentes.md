@@ -9,7 +9,14 @@ order: 12
 
 # Componentes base
 
-Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las pantallas los usan sin conocer la librería. En desarrollo, la **guía visual** (`/guia-visual`) los muestra todos con sus estados, para revisarlos en las cuatro vistas.
+Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las pantallas los usan sin conocer la librería. En desarrollo, la **guía visual** (`/guia-visual`) los muestra todos con sus estados, para revisarlos en las cuatro vistas:
+
+- **La base:** marca, íconos, botones, etiquetas, campos, mensajes y estados.
+- **Formularios:** casilla, chips, lista de opciones, control segmentado, fecha y hora, rango de fechas y código de 6 dígitos.
+- **Datos:** tabla con orden y selección, paginación, los tres gráficos, ícono de información, menú de opciones, bloque para copiar y QR.
+- **Avisos y capas:** avisos, panel lateral o inferior, panel de filtros, diálogo de formulario y diálogo del código.
+
+La E2E de accesibilidad la revisa con axe en las cuatro vistas.
 
 | Componente | Para qué |
 |---|---|
@@ -64,5 +71,5 @@ Toda ayuda o aclaración que no sea imprescindible va en `AppInfoTip`, para mant
 ## Dónde está en el código
 
 - [`frontend/src/shared/ui/`](../../../frontend/src/shared/ui/)
-- Guía visual: [`frontend/src/app/pages/DesignGuidePage.vue`](../../../frontend/src/app/pages/DesignGuidePage.vue)
+- Guía visual: [`frontend/src/app/pages/DesignGuidePage.vue`](../../../frontend/src/app/pages/DesignGuidePage.vue) y sus secciones en [`design-guide/`](../../../frontend/src/app/pages/design-guide/)
 - Pruebas: [`frontend/src/shared/ui/components.spec.ts`](../../../frontend/src/shared/ui/components.spec.ts)

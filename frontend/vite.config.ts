@@ -47,7 +47,12 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,vue}'],
-      exclude: ['src/**/*.spec.ts', 'src/main.ts'],
+      exclude: ['src/**/*.spec.ts', 'src/main.ts', 'src/shared/testing/**'],
+      // La meta aprobada (90 %) aplica a dominio y aplicación de cada módulo. Las pantallas (.vue) se prueban con la
+      // E2E en las cuatro vistas, que Vitest no mide. Documentado en docs/calidad/estrategia-de-pruebas.md
+      thresholds: {
+        'src/modules/*/{domain,application}/**': { statements: 90, lines: 90 },
+      },
     },
   },
 })

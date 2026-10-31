@@ -21,3 +21,6 @@ Thumbs.db
 # Logs y temporales
 *.log
 tmp/
+
+# Reportes de OWASP ZAP (se generan en local)
+zap-reports/

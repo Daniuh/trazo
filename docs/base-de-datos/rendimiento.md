@@ -133,6 +133,41 @@ Ese día la máquina estaba más cargada que en la primera medición del listado
 
 Quedan anotados como puntos a vigilar.
 
+## Revisión general (25 de octubre de 2026)
+
+En la pasada de calidad ([ADR-0060](../decisiones/0060-pasada-de-calidad.md)) se revisó todo lo construido después de estas mediciones.
+
+**Slow query log** (más de 1 s), después de las corridas E2E y del escaneo activo de ZAP: **ninguna consulta de la app**. Las 32 anotadas son de las pruebas: borrar y truncar las tablas de `trazo_test` al empezar cada suite, y la inserción de 100.000 incidentes para medir la exportación.
+
+**Lista de eventos del sistema** con 50.000 eventos (mejor de 3 intentos):
+
+| Consulta | Antes | Después |
+|---|---|---|
+| Pendientes (por defecto) | 97 ms | 38 ms |
+| Todos | 105 ms | 34 ms |
+| Críticos pendientes | 25 ms | 30 ms |
+| Por tipo | 1 ms | 1 ms |
+
+El `EXPLAIN` mostraba que MySQL empezaba por la tabla de tipos y ordenaba todo en una tabla temporal. Se cambió a `LEFT JOIN` (la clave foránea garantiza el tipo) y los filtros del tipo a una subconsulta: ahora empieza por los eventos. Sigue ordenando en memoria, pero con un volumen real mucho menor, porque los eventos se agrupan por huella y 50.000 serían 50.000 fallas distintas.
+
+**Exportación:** 50.000 filas en 2,1 s con la memoria estable ([Incidents](../backend/incidents.md#exportación)).
+
+**Sin N+1** en ningún listado: incidentes, auditoría, dashboard, personas, roles y eventos del sistema tienen su prueba que compara las consultas con pocos y con muchos registros.
+
+**Front, sobre el build de producción:**
+
+| Pantalla | Celular lento (CPU ×4, red 4G): listo / LCP | Portátil: listo / LCP | CLS |
+|---|---|---|---|
+| Ingreso | 1,7 s / 1,6 s | 1,1 s / 1,1 s | 0 |
+| Inicio (dashboard) | 2,2 s / 2,1 s | 1,1 s / 1,1 s | 0 |
+| Incidentes | 3,3 s / 3,0 s | 1,5 s / 1,2 s | 0 |
+
+- **Carga inicial:** unos 175 kB comprimidos.
+  - JavaScript principal: 50 kB. Vue y Quasar: 27 kB. Estructura de la app: 38 kB. Mensajes y cliente HTTP: 22 kB.
+  - CSS: 38 kB, casi todo de Quasar.
+- **Cada pantalla se descarga al entrar** (entre 5 y 25 kB); el editor del dashboard (44 kB), solo al personalizar.
+- Los tiempos del listado en celular incluyen la latencia del Docker local en Windows, de alrededor de 1 s por petición.
+
 ## Dónde está en el código
 
 - Consulta: [`EloquentIncidentList.php`](../../backend/app/Modules/Incidents/Infrastructure/EloquentIncidentList.php) y [`IncidentFilters.php`](../../backend/app/Modules/Incidents/Infrastructure/IncidentFilters.php)

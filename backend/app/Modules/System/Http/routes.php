@@ -6,8 +6,12 @@ declare(strict_types=1);
 // Documentado en docs/backend/system.md
 
 use App\Modules\System\Domain\SystemAction;
+use App\Modules\System\Http\ApiDocsController;
 use App\Modules\System\Http\SystemController;
 use Illuminate\Support\Facades\Route;
+
+// Contrato OpenAPI (/api/v1/docs), con el permiso de salud del sistema
+Route::middleware('auth:sanctum')->get('docs', ApiDocsController::class);
 
 Route::middleware('auth:sanctum')->prefix('system')->controller(SystemController::class)->group(function (): void {
     Route::get('health', 'health');

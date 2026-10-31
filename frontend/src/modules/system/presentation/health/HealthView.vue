@@ -71,17 +71,21 @@ const maintenanceDetail = computed(() => {
     : ['Todas las personas pueden usar Trazo.']
 })
 
-// Ejecuta una acción con su código; si la persona cierra el diálogo, no pasa nada
+// Ejecuta una acción con su código; si la persona cierra el diálogo, no pasa nada. Los botones se bloquean solo
+// mientras va la petición: si quedaran bloqueados con el diálogo abierto, el foco no podría volver al que lo abrió
 async function act(attempt: (code?: string) => Promise<unknown>, texts: ReauthTexts, done: string): Promise<void> {
-  busy.value = true
-  try {
-    if (await run(attempt, texts, true)) {
-      notify(done)
-      void load()
-      if (jobsOpen.value) void failed.load()
+  const tracked = async (code?: string) => {
+    busy.value = true
+    try {
+      await attempt(code)
+    } finally {
+      busy.value = false
     }
-  } finally {
-    busy.value = false
+  }
+  if (await run(tracked, texts, true)) {
+    notify(done)
+    void load()
+    if (jobsOpen.value) void failed.load()
   }
 }
 
