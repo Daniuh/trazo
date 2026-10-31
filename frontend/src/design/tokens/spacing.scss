@@ -25,6 +25,8 @@ $preview-width: 26rem; // vista previa del listado en monitor
 $datetime-calendar-width: 18rem; // calendario del selector de fecha en el menú de portátil y monitor
 $datetime-slots-height: 16rem; // lista de horas del selector de fecha: igual de alta que el calendario
 $auth-card-width: 25rem; // 400 px: tarjeta de las pantallas sin sesión (login)
+$qr-size: 11rem; // código QR para la aplicación de autenticación (176 px, se escanea bien en cualquier teléfono)
+$code-column-min-width: 8.5rem; // columna de cada código de recuperación (caben 10 caracteres y el guion)
 
 // Dashboard y gráficos
 $dashboard-row-height: 4.5rem; // alto de una fila de la grilla de 12 columnas (portátil y monitor)

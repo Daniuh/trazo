@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Auth\Application;
 
+use App\Modules\Auth\Application\Mfa\MfaStatus;
+
 final readonly class SessionUser
 {
     /**
@@ -19,5 +21,6 @@ final readonly class SessionUser
         public string $email,
         public array $roles,
         public array $permissions,
+        public MfaStatus $mfa,
     ) {}
 }

@@ -26,6 +26,17 @@ return [
 
         // El contador de fallos vuelve a cero con un ingreso correcto o pasado este tiempo desde el primer fallo
         'failures_ttl_minutes' => 1440,
+
+        // MFA. Documentado en docs/backend/auth.md
+        'mfa' => [
+            // Nombre que muestra la aplicación de autenticación junto al correo
+            'issuer' => 'Trazo',
+            // Vida del token de un ingreso a medias (contraseña correcta, código pendiente)
+            'challenge_minutes' => 5,
+            // Códigos fallidos en un mismo ingreso antes de cortarlo
+            'max_attempts' => 5,
+            'recovery_codes' => 8,
+        ],
     ],
 
     // Documentado en docs/backend/dashboard.md

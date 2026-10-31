@@ -26,3 +26,6 @@ dist-ssr
 # Resultados de Playwright
 playwright-report/
 test-results/
+
+# Claves del MFA de las cuentas de prueba E2E (solo locales)
+e2e/.auth/

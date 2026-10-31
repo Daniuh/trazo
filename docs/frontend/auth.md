@@ -9,7 +9,7 @@ order: 3
 
 # Módulo de sesión (frontend)
 
-Se encarga del inicio y cierre de sesión en la SPA. **La seguridad real está en la API**: el front solo decide qué mostrar y a dónde llevar a la persona. Las reglas del backend están en [Módulo Auth](../backend/auth.md).
+Se encarga del inicio y cierre de sesión en la SPA, de la verificación en dos pasos (MFA) y de Mi cuenta. **La seguridad real está en la API**: el front solo decide qué mostrar y a dónde llevar a la persona. Las reglas del backend están en [Módulo Auth](../backend/auth.md).
 
 ## Flujo
 
@@ -54,7 +54,30 @@ flowchart TD
 | `INVALID_CREDENTIALS` | El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo. |
 | `ACCOUNT_LOCKED` | Por seguridad, pausamos el ingreso con este correo después de varios intentos fallidos. Vuelve a intentarlo en {espera}. |
 | `TOO_MANY_REQUESTS` | Hiciste demasiados intentos seguidos. Espera {espera} y vuelve a intentarlo. |
+| Errores del MFA | Ver [Catálogo de errores](../soporte/catalogo-de-errores.md#verificación-en-dos-pasos) |
 | Llegada por sesión vencida | Tu sesión terminó. Inicia sesión de nuevo para continuar. |
+
+## Verificación en dos pasos
+
+Después de la contraseña, la API dice qué sigue (`status`):
+
+| Paso | Pantalla |
+|---|---|
+| `complete` | Entra a la página pedida |
+| `setup_suggested` | `/configurar-mfa?sugerido=1`, con "Configurar más tarde" |
+| `mfa_verify` | `/ingresar/verificar` |
+| `mfa_setup` | `/configurar-mfa`, sin poder posponerlo |
+
+- **El token de un ingreso a medias vive solo en memoria** (`pending` en el store), nunca en `sessionStorage`, y viaja solo en los pedidos del segundo paso. Si se recarga la página, se vuelve a ingresar.
+- **`/ingresar/verificar`:** un campo para el código (`AppCodeField`: teclado numérico, autocompletado del teléfono y pegar "123 456" funciona). "¿No tienes tu teléfono? Usa un código de recuperación" cambia a un campo de texto. Un código incorrecto dice cuántos intentos quedan; al quinto, o si pasaron los 5 minutos, solo queda "Volver a ingresar".
+- **`/configurar-mfa`:** dentro del mismo marco del login. 1) QR (`AppQrCode`) y la clave en grupos de 4 con "Copiar" (`AppCopyBlock`); qué aplicaciones sirven va en el ícono de información. 2) El primer código y "Activar". 3) Los 8 códigos de recuperación (`RecoveryCodesPanel`) con "Copiar todos" y "Descargar .txt" (se arma en el navegador), y "Continuar" solo después de marcar "Ya guardé mis códigos". Llega de tres formas: obligatoria (con "Volver a ingresar"), sugerida (con "Configurar más tarde") o desde Mi cuenta (con "Cancelar").
+
+## Mi cuenta
+
+`/mi-cuenta`, desde el menú de la persona. Una columna en celular y tablet; dos en portátil y monitor.
+
+- **Tus datos:** nombre, correo y rol.
+- **Verificación en dos pasos:** si está activa, cuántos códigos de recuperación quedan (con un aviso cuando quedan 2 o menos), "Generar códigos nuevos" y, si el rol no la exige, "Desactivar". Las dos acciones piden el código actual en un diálogo (`MfaCodeDialog`) que muestra el error sin cerrarse. Si no está activa, "Configurar".
 
 ## Redirección segura
 
@@ -68,14 +91,16 @@ Después del login se vuelve a la página indicada en `?volver=`, solo si es una
 
 | Capa | Pieza | Qué hace |
 |---|---|---|
-| domain | `session.ts`, `safeRedirect.ts` | Tipos del usuario, consulta de permisos y redirección segura |
+| domain | `session.ts`, `safeRedirect.ts` | Tipos del usuario (con su estado del MFA), pasos del ingreso, consulta de permisos y redirección segura |
 | infrastructure | `authApi.ts` | Llamadas a `/auth` y traducción de la respuesta |
-| application | `useSessionStore.ts` | Estado de la sesión (Pinia): ingresar, recuperar, cerrar |
+| application | `useSessionStore.ts` | Estado de la sesión (Pinia): ingresar, ingreso a medias, verificar y configurar el MFA, regenerar códigos, desactivar, recuperar, cerrar |
 | application | `authGuard.ts` | Guarda de rutas y reacción a la sesión vencida |
 | presentation | `LoginPage.vue` | Pantalla de login |
 | presentation | `ConnectionErrorPage.vue` | Aviso de sin conexión con "Reintentar" |
 | presentation | `AuthPanel.vue` | Marco común de las pantallas sin sesión: logo, título y tarjeta centrada desde tablet |
-| — | `errors.ts`, `routes.ts` | Mensajes del módulo y rutas públicas `/ingresar` y `/sin-conexion` |
+| presentation | `mfa/MfaVerifyPage`, `MfaSetupPage`, `RecoveryCodesPanel` | Segundo paso del ingreso, configuración del MFA y códigos de recuperación |
+| presentation | `account/AccountPage`, `MfaCodeDialog` | Mi cuenta y el diálogo que pide el código actual |
+| — | `errors.ts`, `routes.ts` | Mensajes del módulo; rutas públicas `/ingresar`, `/ingresar/verificar`, `/configurar-mfa` y `/sin-conexion`, y `/mi-cuenta` dentro del layout |
 
 ## Dónde está en el código
 
@@ -84,4 +109,4 @@ Después del login se vuelve a la página indicada en `?volver=`, solo si es una
 - [`frontend/src/app/navigation.ts`](../../frontend/src/app/navigation.ts): filtrado del menú por permisos.
 - [`frontend/src/app/router/index.ts`](../../frontend/src/app/router/index.ts) y [`frontend/src/app/bootstrap.ts`](../../frontend/src/app/bootstrap.ts): guarda de rutas y registro de mensajes.
 - Pruebas: archivos `*.spec.ts` dentro del módulo.
-- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md), [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md) y [ADR-0049](../decisiones/0049-sesion-sin-conexion.md)
+- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md), [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md), [ADR-0049](../decisiones/0049-sesion-sin-conexion.md) y [ADR-0051](../decisiones/0051-mfa-en-la-practica.md)

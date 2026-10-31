@@ -26,6 +26,9 @@ erDiagram
   permissions |o--o{ dashboard_widgets : "exige"
   users ||--o{ user_dashboard_widgets : "diseño"
   dashboard_widgets ||--o{ user_dashboard_widgets : "lugar"
+  roles ||--o| mfa_policies : "exige MFA"
+  users ||--o| user_mfa_factors : "segundo factor"
+  users ||--o{ user_recovery_codes : "recuperación"
 ```
 
 Las tablas de las funcionalidades adicionales (MFA, recuperación de contraseña, logs del sistema, dashboard personalizable y tokens de sesión) se agregan con migraciones nuevas en la fase de cada funcionalidad, sin modificar las existentes.
@@ -65,6 +68,7 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | `incident_activities` | [incident_activities](diccionario/incident-activities.md) |
 | `personal_access_tokens` | [personal_access_tokens](diccionario/personal-access-tokens.md) |
 | `dashboard_widgets`, `user_dashboard_widgets` | [Dashboard](diccionario/dashboard.md) |
+| `mfa_policies`, `user_mfa_factors`, `user_recovery_codes` | [MFA](diccionario/mfa.md) |
 | `failed_jobs` | Tabla estándar de Laravel para trabajos de cola fallidos |
 
 Datos iniciales: [Seeders](seeders.md).

@@ -42,8 +42,9 @@ export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance
   })
 
   client.interceptors.request.use((config) => {
+    // Un pedido puede traer su propio token (el del segundo paso del ingreso); si no, va el de la sesión
     const token = tokens.get()
-    if (token) config.headers.Authorization = `Bearer ${token}`
+    if (token && !config.headers.Authorization) config.headers.Authorization = `Bearer ${token}`
     // Permite cruzar un error del navegador con los logs del servidor
     config.headers['X-Request-Id'] ??= crypto.randomUUID()
     return config

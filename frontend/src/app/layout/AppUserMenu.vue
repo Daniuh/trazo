@@ -1,7 +1,7 @@
-<!-- Menú de la persona conectada, a la derecha del encabezado: quién es, su rol y cerrar sesión. -->
+<!-- Menú de la persona conectada, a la derecha del encabezado: quién es, su rol, Mi cuenta y cerrar sesión. -->
 <!-- En celular y tablet solo se ve el ícono; desde portátil, también el nombre. Documentado en docs/frontend/sistema-de-diseno/layout.md -->
 <script setup lang="ts">
-import { QMenu } from 'quasar'
+import { ClosePopup, QMenu } from 'quasar'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { LOGIN_ROUTE } from '@/modules/auth/application/authGuard'
@@ -13,6 +13,7 @@ const session = useSessionStore()
 const router = useRouter()
 const { isLaptopUp } = useViewport()
 const leaving = ref(false)
+const vClosePopup = ClosePopup
 
 const roles = computed(() => session.user?.roles.map((role) => role.name).join(', ') ?? '')
 
@@ -36,6 +37,10 @@ async function logout(): Promise<void> {
           <p class="user-menu__identity-detail">{{ session.user.email }}</p>
           <p class="user-menu__identity-detail">{{ roles }}</p>
         </div>
+        <RouterLink v-close-popup class="user-menu__action" :to="{ name: 'account' }">
+          <AppIcon name="user" />
+          Mi cuenta
+        </RouterLink>
         <button class="user-menu__action" type="button" :disabled="leaving" @click="logout">
           <AppIcon name="logout" />
           Cerrar sesión
@@ -93,6 +98,7 @@ async function logout(): Promise<void> {
 
 .user-menu__action {
   display: flex;
+  box-sizing: border-box;
   align-items: center;
   gap: $space-2;
   width: 100%;
@@ -103,6 +109,7 @@ async function logout(): Promise<void> {
   color: $color-text;
   font: inherit;
   font-size: $font-size-sm;
+  text-decoration: none;
   cursor: pointer;
 
   &:hover:not(:disabled) {

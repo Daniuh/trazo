@@ -46,6 +46,15 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+const signedIn = {
+  id: '1',
+  name: 'A',
+  email: 'a',
+  roles: [],
+  permissions: [],
+  mfa: { enabled: false, required: false, recoveryCodesLeft: 0 },
+}
+
 describe('LoginPage', () => {
   it('marca los campos vacíos sin llamar a la API', async () => {
     const { page, fill } = await render()
@@ -76,7 +85,7 @@ describe('LoginPage', () => {
   })
 
   it('al ingresar vuelve a la página que se estaba visitando', async () => {
-    api.login.mockResolvedValue({ token: 'T1', user: { id: '1', name: 'A', email: 'a', roles: [], permissions: [] } })
+    api.login.mockResolvedValue({ step: 'complete', token: 'T1', user: signedIn })
     const { router, fill } = await render({ volver: '/incidentes' })
 
     await fill('a@trazo.test', 'buena')
@@ -85,7 +94,7 @@ describe('LoginPage', () => {
   })
 
   it('ignora un destino externo después de ingresar', async () => {
-    api.login.mockResolvedValue({ token: 'T1', user: { id: '1', name: 'A', email: 'a', roles: [], permissions: [] } })
+    api.login.mockResolvedValue({ step: 'complete', token: 'T1', user: signedIn })
     const { router, fill } = await render({ volver: '//sitio-falso.com' })
 
     await fill('a@trazo.test', 'buena')

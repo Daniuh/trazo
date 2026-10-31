@@ -27,6 +27,7 @@ export default defineConfig({
       'axios',
       'grid-layout-plus/es/components/grid-layout.vue.mjs',
       'grid-layout-plus/es/components/grid-item.vue.mjs',
+      'qrcode',
     ],
   },
   server: {

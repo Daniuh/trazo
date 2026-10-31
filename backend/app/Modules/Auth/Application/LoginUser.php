@@ -2,17 +2,22 @@
 
 declare(strict_types=1);
 
-// Caso de uso: iniciar sesión con correo y contraseña, aplicando el bloqueo progresivo.
+// Caso de uso: iniciar sesión con correo y contraseña, aplicando el bloqueo progresivo. Si corresponde el MFA,
+// entrega un token que solo sirve para el segundo paso (verificar o configurar).
 // Documentado en docs/backend/auth.md
 
 namespace App\Modules\Auth\Application;
 
 use App\Modules\Auth\Application\Ports\CredentialVerifier;
+use App\Modules\Auth\Application\Ports\MfaPolicies;
+use App\Modules\Auth\Application\Ports\MfaStore;
 use App\Modules\Auth\Application\Ports\SessionTokens;
 use App\Modules\Auth\Domain\Exceptions\AccountLockedException;
 use App\Modules\Auth\Domain\Exceptions\InvalidCredentialsException;
 use App\Modules\Auth\Domain\LockoutPolicy;
 use App\Modules\Auth\Domain\LoginAttemptStore;
+use App\Modules\Auth\Domain\Mfa\LoginStep;
+use App\Modules\Auth\Domain\Mfa\MfaGate;
 use App\Modules\Shared\Domain\EmailAddress;
 use Psr\Log\LoggerInterface;
 
@@ -23,6 +28,8 @@ final readonly class LoginUser
         private LockoutPolicy $policy,
         private CredentialVerifier $credentials,
         private SessionTokens $tokens,
+        private MfaStore $mfa,
+        private MfaPolicies $policies,
         private LoggerInterface $logger,
     ) {}
 
@@ -47,7 +54,25 @@ final readonly class LoginUser
 
         $this->attempts->clear($key);
 
-        return $this->tokens->issue($userId);
+        return $this->startSession($userId);
+    }
+
+    // Con MFA activo, o si su política lo exige y ya no le queda gracia, el token solo sirve para el segundo paso
+    private function startSession(int $userId): IssuedSession
+    {
+        $step = MfaGate::next(
+            $this->mfa->find($userId)?->confirmed === true,
+            $this->policies->requirementFor($userId),
+            $this->policies->graceUsed($userId),
+        );
+
+        if ($step === LoginStep::SetupSuggested) {
+            $this->policies->useGrace($userId);
+        }
+
+        return $step->grantsSession()
+            ? $this->tokens->issue($userId, $step)
+            : $this->tokens->issueChallenge($userId, $step);
     }
 
     /**

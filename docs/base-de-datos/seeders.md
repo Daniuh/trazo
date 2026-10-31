@@ -19,6 +19,7 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 |---|---|---|
 | `IncidentCatalogSeeder` | Prioridades, estados, transiciones y tipos de actividad | Todos |
 | `AccessControlSeeder` | Roles, permisos y la matriz inicial | Todos |
+| `MfaPolicySeeder` | Política de MFA por rol: obligatorio, con un ingreso de gracia | Todos |
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
 | `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
 

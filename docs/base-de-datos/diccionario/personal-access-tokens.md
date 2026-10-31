@@ -16,11 +16,11 @@ Una fila por sesión abierta. La usa Sanctum para validar el token Bearer de cad
 | `id` | BIGINT UNSIGNED | PK | Va al inicio del token (`12\|trazo_…`) para encontrarlo rápido |
 | `tokenable_type` | VARCHAR(20) | NOT NULL, CHECK `= 'user'` | Lo exige Sanctum; fijado a `user` para que la FK no sea ambigua |
 | `tokenable_id` | BIGINT UNSIGNED | FK → `users.id`, CASCADE | Dueño de la sesión |
-| `name` | VARCHAR(100) | NOT NULL | Tipo de token (hoy siempre `session`) |
+| `name` | VARCHAR(100) | NOT NULL | Tipo de token: `session` o `mfa` (ingreso a medias) |
 | `token` | CHAR(64) | UNIQUE, NOT NULL | SHA-256 del token; el valor en claro nunca se guarda |
-| `abilities` | TEXT | NULL | Qué puede hacer el token (con el MFA, uno pendiente solo podrá verificar el código) |
+| `abilities` | TEXT | NULL | `["session"]` en una sesión completa; `["mfa"]` en un ingreso a medias, que solo sirve para el segundo paso |
 | `last_used_at` | DATETIME | NULL | Última petición; sirve para cerrar la sesión por inactividad |
-| `expires_at` | DATETIME | NULL | Vencimiento máximo (8 horas desde el ingreso) |
+| `expires_at` | DATETIME | NULL | Vencimiento máximo: 8 horas en una sesión completa y 5 minutos en un ingreso a medias |
 | `created_at`, `updated_at` | TIMESTAMP | | |
 
 ## Por qué la FK es real

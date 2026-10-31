@@ -9,7 +9,7 @@ import { CONNECTION_ROUTE, installAuthGuard, LOGIN_ROUTE, SESSION_EXPIRED_REASON
 import { useSessionStore } from './useSessionStore'
 
 vi.mock('../infrastructure/authApi', () => ({
-  authApi: { login: vi.fn(), logout: vi.fn(), me: vi.fn() },
+  authApi: { login: vi.fn(), logout: vi.fn(), me: vi.fn(), verifyMfa: vi.fn() },
 }))
 
 const api = vi.mocked(authApi)
@@ -19,6 +19,7 @@ const user: SessionUser = {
   email: 'a@trazo.test',
   roles: [],
   permissions: ['incidents.create'],
+  mfa: { enabled: false, required: false, recoveryCodesLeft: 0 },
 }
 const Blank = { template: '<div />' }
 
@@ -44,12 +45,36 @@ beforeEach(() => {
 
 describe('useSessionStore', () => {
   it('al ingresar guarda el token y el usuario', async () => {
-    api.login.mockResolvedValue({ token: 'T1', user })
+    api.login.mockResolvedValue({ step: 'complete', token: 'T1', user })
 
     await useSessionStore().login('a@trazo.test', 'clave')
 
     expect(tokenStore.get()).toBe('T1')
     expect(useSessionStore().can('incidents.create')).toBe(true)
+  })
+
+  it('con MFA pendiente guarda el token solo en memoria, sin abrir la sesión', async () => {
+    api.login.mockResolvedValue({ step: 'mfa_verify', token: 'C1', user: null })
+    const session = useSessionStore()
+
+    expect(await session.login('a@trazo.test', 'clave')).toBe('mfa_verify')
+    expect(tokenStore.get()).toBeNull()
+    expect(session.isAuthenticated).toBe(false)
+    expect(session.pending).toEqual({ token: 'C1', step: 'mfa_verify' })
+  })
+
+  it('al verificar el código cambia el ingreso a medias por la sesión completa', async () => {
+    api.login.mockResolvedValue({ step: 'mfa_verify', token: 'C1', user: null })
+    api.verifyMfa.mockResolvedValue({ step: 'complete', token: 'T2', user })
+    const session = useSessionStore()
+
+    await session.login('a@trazo.test', 'clave')
+    await session.verifyMfa({ code: '123456' })
+
+    expect(api.verifyMfa).toHaveBeenCalledWith('C1', { code: '123456' })
+    expect(tokenStore.get()).toBe('T2')
+    expect(session.pending).toBeNull()
+    expect(session.isAuthenticated).toBe(true)
   })
 
   it('no guarda nada si el ingreso falla', async () => {

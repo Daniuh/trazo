@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             IncidentCatalogSeeder::class,
             AccessControlSeeder::class,
+            MfaPolicySeeder::class,
             DashboardWidgetSeeder::class,
             DemoUserSeeder::class,
             IncidentVolumeSeeder::class,
