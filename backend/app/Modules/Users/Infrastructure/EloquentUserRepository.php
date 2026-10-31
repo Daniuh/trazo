@@ -9,6 +9,7 @@ namespace App\Modules\Users\Infrastructure;
 use App\Modules\Users\Application\Data\NewUser;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\UserRepository;
+use App\Modules\Users\Domain\PersonName;
 use App\Modules\Users\Domain\RoleLevel;
 use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +37,8 @@ final readonly class EloquentUserRepository implements UserRepository
     public function create(NewUser $user, int $roleId): UserRecord
     {
         $model = User::query()->create([
-            'name' => $user->name,
+            'given_names' => $user->name->givenNames,
+            'family_names' => $user->name->familyNames,
             'email' => $user->email,
             'password' => $this->unusablePassword(),
             'is_active' => true,
@@ -46,9 +48,13 @@ final readonly class EloquentUserRepository implements UserRepository
         return $this->findById($model->id) ?? throw new LogicException('La cuenta recién creada no se encontró');
     }
 
-    public function updateProfile(int $id, string $name, string $email): void
+    public function updateProfile(int $id, PersonName $name, string $email): void
     {
-        User::query()->whereKey($id)->firstOrFail()->update(['name' => $name, 'email' => $email]);
+        User::query()->whereKey($id)->firstOrFail()->update([
+            'given_names' => $name->givenNames,
+            'family_names' => $name->familyNames,
+            'email' => $email,
+        ]);
     }
 
     public function setActive(int $id, bool $active): void

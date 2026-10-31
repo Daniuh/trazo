@@ -1,11 +1,11 @@
 // Ayudas compartidas de las pruebas E2E: abrir sesión sin pasar por el formulario (completando el MFA como lo haría
-// una persona con su teléfono), terminar el MFA en la interfaz y revisar la accesibilidad con axe.
+// una persona con su teléfono), terminar el MFA en la interfaz, revisar la accesibilidad con axe y abrir una ruta ya suscrita al tiempo real.
 // Documentado en docs/calidad/estrategia-de-pruebas.md
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type APIRequestContext, type Page } from '@playwright/test'
 import { freshCode, saveSecret } from './mfa'
 
-export const DEMO_PASSWORD = 'Trazo.Demo.2026'
+export const DEMO_PASSWORD = 'Cometa.Demo.2026'
 
 // Mismas claves que usa la app (shared/http/tokenStore.ts)
 const SESSION_KEY = 'trazo.session'
@@ -146,4 +146,29 @@ export async function expectAccessible(page: Page): Promise<void> {
   }
 
   expect(summary, 'Problemas de accesibilidad').toEqual([])
+}
+
+// Abre la ruta y espera a que Reverb confirme la suscripción al canal (o a uno que empiece así). Solo cuenta el
+// WebSocket que abre esa ruta: goto recarga la app, y la confirmación de la pantalla anterior llegaba antes que la
+// nueva conexión, que arranca un momento después. La respuesta de /broadcasting/auth tampoco basta: el canal
+// personal suele confirmarse primero
+export async function gotoSubscribed(page: Page, path: string, channel: string): Promise<void> {
+  const confirmation = `"channel":"private-${channel}`
+  const ready = new Promise<void>((resolve) => {
+    page.on('websocket', (socket) => {
+      // La ruta sin la consulta (?agrupar=…): la URL de la página puede traerla en otro orden
+      if (new URL(page.url()).pathname !== path.split('?')[0]) return
+      socket.on('framereceived', ({ payload }) => {
+        if (
+          typeof payload === 'string' &&
+          payload.includes('subscription_succeeded') &&
+          payload.includes(confirmation)
+        ) {
+          resolve()
+        }
+      })
+    })
+  })
+  await page.goto(path)
+  await ready
 }

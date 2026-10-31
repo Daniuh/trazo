@@ -34,6 +34,12 @@ const messages: MessageCatalog = {
     'Pasó demasiado tiempo o el código ya se usó. Pide un código nuevo para cambiar tu contraseña.',
   PASSWORD_BREACHED:
     'Esta contraseña aparece en filtraciones conocidas o es de las más usadas. Elige una distinta, por ejemplo varias palabras que solo tú relaciones.',
+  PASSWORD_REPETITIVE:
+    'Tu contraseña repite demasiado los mismos caracteres. Usa una frase o mezcla palabras distintas.',
+  PASSWORD_SEQUENTIAL:
+    'Tu contraseña es casi toda una secuencia (como "abcd", "1234" o "qwerty"). Usa palabras que no vayan seguidas.',
+  PASSWORD_PERSONAL:
+    'Tu contraseña contiene tu nombre, tu correo o el nombre de la aplicación. Elige palabras que no se relacionen con tu cuenta.',
   CURRENT_PASSWORD_INVALID: 'La contraseña actual no es correcta.',
   PASSWORD_SAME_AS_CURRENT: 'La contraseña nueva debe ser distinta de la actual.',
   [MFA_CHALLENGE_EXPIRED]:

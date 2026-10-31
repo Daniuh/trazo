@@ -49,11 +49,21 @@ export const icons = {
     path('M4 17v1.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V17'),
   ],
   calendar: [rect(4, 5, 16, 15, 2), path('M4 10h16M8.5 3v4M15.5 3v4')],
+  // Tablero: tres columnas
+  board: [rect(4, 4, 16, 16, 2), path('M9.5 4v16M14.5 4v16')],
   clock: [circle(12, 12, 8.5), path('M12 7.5V12l3 2')],
   info: [circle(12, 12, 8.5), path('M12 11v5'), dot(12, 7.8)],
   alert: [path('M12 4L21 19.5H3z'), path('M12 10v4'), dot(12, 16.8)],
   check: [path('M5 12.5l4.5 4.5L19 7.5')],
   close: [path('M6 6l12 12M18 6L6 18')],
+  chat: [
+    path(
+      'M6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4 3.5V17A2.5 2.5 0 0 1 4 14.5v-8A2.5 2.5 0 0 1 6.5 4z',
+    ),
+    path('M8 9h8M8 12.5h5'),
+  ],
+  send: [path('M4 12l16-8-6 16-2.5-6.5z'), path('M11.5 13.5L20 4')],
+  bell: [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z'), path('M10 20.5a2.2 2.2 0 0 0 4 0')],
   menu: [path('M4 7h16M4 12h16M4 17h16')],
   more: [dot(6, 12), dot(12, 12), dot(18, 12)],
   copy: [rect(8, 8, 12, 12, 2), path('M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8')],

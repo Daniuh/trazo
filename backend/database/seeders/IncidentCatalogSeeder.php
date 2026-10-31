@@ -24,12 +24,12 @@ class IncidentCatalogSeeder extends Seeder
     ];
 
     private const STATUSES = [
-        ['code' => 'open', 'name' => 'Abierto', 'sort_order' => 1, 'is_initial' => true, 'is_pending' => true, 'is_final' => false],
-        ['code' => 'in_progress', 'name' => 'En progreso', 'sort_order' => 2, 'is_initial' => false, 'is_pending' => true, 'is_final' => false],
-        ['code' => 'on_hold', 'name' => 'En espera', 'sort_order' => 3, 'is_initial' => false, 'is_pending' => true, 'is_final' => false],
-        ['code' => 'resolved', 'name' => 'Resuelto', 'sort_order' => 4, 'is_initial' => false, 'is_pending' => false, 'is_final' => false],
-        ['code' => 'closed', 'name' => 'Cerrado', 'sort_order' => 5, 'is_initial' => false, 'is_pending' => false, 'is_final' => true],
-        ['code' => 'cancelled', 'name' => 'Cancelado', 'sort_order' => 6, 'is_initial' => false, 'is_pending' => false, 'is_final' => true],
+        ['code' => 'open', 'name' => 'Abierto', 'sort_order' => 1, 'is_initial' => true, 'is_pending' => true, 'is_final' => false, 'requires_note' => false],
+        ['code' => 'in_progress', 'name' => 'En progreso', 'sort_order' => 2, 'is_initial' => false, 'is_pending' => true, 'is_final' => false, 'requires_note' => false],
+        ['code' => 'on_hold', 'name' => 'En espera', 'sort_order' => 3, 'is_initial' => false, 'is_pending' => true, 'is_final' => false, 'requires_note' => false],
+        ['code' => 'resolved', 'name' => 'Resuelto', 'sort_order' => 4, 'is_initial' => false, 'is_pending' => false, 'is_final' => false, 'requires_note' => true],
+        ['code' => 'closed', 'name' => 'Cerrado', 'sort_order' => 5, 'is_initial' => false, 'is_pending' => false, 'is_final' => true, 'requires_note' => false],
+        ['code' => 'cancelled', 'name' => 'Cancelado', 'sort_order' => 6, 'is_initial' => false, 'is_pending' => false, 'is_final' => true, 'requires_note' => true],
     ];
 
     private const TRANSITIONS = [
@@ -47,6 +47,9 @@ class IncidentCatalogSeeder extends Seeder
         ['code' => 'unassigned', 'name' => 'Sin asignar'],
         ['code' => 'deleted', 'name' => 'Eliminado'],
         ['code' => 'restored', 'name' => 'Restaurado'],
+        ['code' => 'reopen_requested', 'name' => 'Reapertura solicitada'],
+        ['code' => 'reopen_rejected', 'name' => 'Reapertura rechazada'],
+        ['code' => 'reopened', 'name' => 'Reabierto'],
     ];
 
     public function run(): void

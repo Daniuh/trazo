@@ -27,11 +27,16 @@ final readonly class WidgetMetrics
         private MetricSources $sources,
         private IncidentCatalog $catalog,
         private IncidentRules $rules,
+        private RiskMetrics $risk,
     ) {}
 
     public function build(WidgetCode $code, MetricsContext $context, int $trendDays): CachedMetric
     {
         return match ($code) {
+            WidgetCode::OperationPulse => $this->risk->pulse($context),
+            WidgetCode::RiskMap => $this->risk->riskMap($context),
+            WidgetCode::StatusFlow => $this->risk->flow($context),
+            WidgetCode::BacklogBalance => $this->risk->backlog($context, $trendDays),
             WidgetCode::TotalIncidents => $this->fromCounts($context, fn (array $counts): array => [
                 'value' => $this->total($counts),
                 'filter' => new stdClass,
@@ -218,12 +223,7 @@ final readonly class WidgetMetrics
      */
     private function pendingTotal(array $counts): int
     {
-        $sum = 0;
-        foreach ($this->sources->pendingStatusIds() as $statusId) {
-            $sum += array_sum($counts[$statusId] ?? []);
-        }
-
-        return $sum;
+        return $this->sources->pendingTotal($counts);
     }
 
     /**
@@ -231,7 +231,7 @@ final readonly class WidgetMetrics
      */
     private function pendingCodes(): array
     {
-        return array_map(fn (StatusFlags $status): string => $status->code, $this->sources->pendingStatuses());
+        return $this->sources->pendingCodes();
     }
 
     /**

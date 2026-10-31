@@ -45,16 +45,18 @@ El menú muestra "Usuarios" solo con `users.view` y "Roles" solo con `roles.mana
 
 ### Ficha
 
-Portátil y monitor: dos columnas iguales, con Datos, Rol y Acceso a la izquierda y Permisos a la derecha. Celular y tablet: una columna.
+Arriba, "‹ Usuarios" (`AppBackLink`) vuelve al listado. Debajo, el nombre y las etiquetas de estado y rol (el correo va en la tarjeta Datos); a la derecha (desde tablet) o debajo a todo el ancho (celular), el botón "Ver su actividad".
+
+Portátil y monitor: dos columnas iguales, con Datos, Rol y Acceso a la izquierda y Permisos a la derecha, que se estira hasta el final de Acceso para que las dos columnas terminen parejas. Celular y tablet: una columna.
 
 | Tarjeta | Qué muestra | Acciones |
 |---|---|---|
-| Datos | Nombre y correo | "Editar" abre `ProfileDialog`. Si el correo cambió, el aviso dice que se avisó a la dirección anterior |
-| Rol | Rol actual y qué hace | "Cambiar rol" abre `RoleDialog` (`AppRadioList`) |
+| Datos | Nombres, apellidos y correo (dos campos aparte, [ADR-0086](../decisiones/0086-nombres-y-apellidos.md)) | "Editar" abre `ProfileDialog`. Si el correo cambió, el aviso dice que se avisó a la dirección anterior |
+| Rol | Rol actual y qué hace | "Cambiar rol" abre `RoleDialog` (`AppRadioList`). Si la persona tiene permisos personalizados, avisa cuántos se quitan: con el rol nuevo queda con sus permisos exactos ([ADR-0069](../decisiones/0069-cambio-de-rol-con-permisos-exactos.md)) |
 | Acceso | Estado, verificación en dos pasos, último ingreso, fecha de creación e incidentes pendientes asignados (con "Ver sus incidentes" si quien administra puede ver todos) | Activar o desactivar, restablecer la verificación en dos pasos y restablecer el acceso |
-| Permisos | Resumen ("Permisos de Agente con 1 cambio") y los permisos agrupados por módulo; los que difieren del rol llevan "Adicional" o "Quitado del rol" | "Editar permisos": una casilla por permiso, "Volver a los del rol", Cancelar y Guardar |
+| Permisos | Resumen ("Permisos de Agente con 1 cambio") y las diferencias con el rol ("Adicional" o "Quitado del rol"): en portátil y monitor, todas las que quepan en el alto de la tarjeta (que termina con Acceso), medidas con `useFitCount`; en celular y tablet, hasta cinco. Si quedan más, "Y N cambios más". La tarjeta no crece con los permisos | "Ver todos los permisos (N)" abre un panel (`AppSheet`) con la lista completa por módulo. "Editar permisos" abre el mismo panel con una casilla por permiso y, fijos abajo, "Volver a los del rol", Cancelar y Guardar |
 
-- **"Ver su actividad"** (bajo el nombre, con permiso de auditoría): lleva a la auditoría filtrada por esa persona, en la pestaña de administración o, si solo se tiene la de incidentes, en esa ([Módulo de auditoría](audit.md)).
+- **"Ver su actividad"** (botón con el ícono de Auditoría, con permiso de auditoría): lleva a la auditoría filtrada por esa persona, en la pestaña de administración o, si solo se tiene la de incidentes, en esa ([Módulo de auditoría](audit.md)).
 - **La cuenta propia:** un aviso explica que solo puede corregir sus datos. El resto lo cambia otra persona.
 - **Desactivar** pide confirmación. Si la persona tiene incidentes pendientes asignados, la confirmación lo dice: no se reasignan solos.
 - **En el editor de permisos**, un permiso que quien administra no tiene, y que la persona tampoco tiene, queda deshabilitado. El ícono de información explica por qué. Quitarlo sí se puede.
@@ -65,10 +67,15 @@ Portátil y monitor: dos columnas iguales, con Datos, Rol y Acceso a la izquierd
   - Portátil y monitor: tabla (`AppDataTable`).
   - Tablet y celular: tarjetas.
 - **Crear y editar** comparten la pantalla (`RoleFormPage`).
-  - Portátil y monitor: Datos y Verificación en dos pasos a la izquierda, Permisos a la derecha. Celular y tablet: una columna.
+  - Portátil y monitor: Datos y Verificación en dos pasos lado a lado, y Permisos debajo, a lo ancho. Celular y tablet: una columna.
   - **Datos** (`RoleFields`): código (solo al crear; después no cambia), nombre y nivel, con la regla de cada uno en el ícono de información. El nivel usa el teclado numérico en el celular.
   - **Verificación en dos pasos:** casilla "Obligatoria para este rol" y, si lo es, los ingresos en que se puede posponer.
-  - **Permisos:** `PermissionChecklist` con casillas. Al crear, "Copiar permisos de" otro rol llena la lista para no empezar desde cero.
+  - **Permisos:** `PermissionChecklist` con casillas, en modo `columns` para que la página no se alargue:
+    - Portátil y monitor: los módulos se reparten en tres columnas; tablet, en dos. Cada módulo muestra cuántos van marcados ("5 de 14").
+    - Celular: cada módulo es una fila plegable con el conteo a la vista. Arranca abierto el que trae un permiso que quien edita no puede conceder.
+    - Cada módulo tiene la casilla "Todos" (a medias si solo hay una parte marcada). Al marcarla suma solo los permisos que quien edita puede conceder; al desmarcarla quita todo el módulo. Las reglas están en `moduleSelection` y `toggleModule` (`domain/permissions.ts`).
+    - Al crear, "Copiar permisos de" otro rol llena la lista para no empezar desde cero.
+    - El panel de permisos de una persona usa la lista en una sola columna, porque es angosto y se desplaza por dentro.
 - **Guardar un rol que tiene personas** pide confirmación indicando a cuántas afecta. Si la API pide el código, se abre el diálogo del código.
 - **"Eliminar rol"** solo aparece si la API lo permite (un rol creado que nadie tiene) y pide confirmación.
 - **Si el rol no se puede editar** (el Super admin, o uno en el nivel de quien administra o por encima), se muestra sin campos y con un aviso que dice por qué.
@@ -88,7 +95,7 @@ Restablecer el MFA o el acceso siempre lo pide, así que el diálogo del código
 | domain | `listing.ts`, `permissions.ts` | Criterios del listado; agrupar permisos por módulo y marcar lo que difiere del rol (lógica pura) |
 | infrastructure | `usersApi.ts`, `rolesApi.ts` | Llamadas a `/users`, `/roles` y `/permissions`, y traducción de la respuesta. El código de quien administra viaja como `mfa_code` |
 | application | `useUserList`, `listQuery` | Listado ligado a la URL |
-| application | `useUserDetail`, `useUserCreate`, `profileRules` | Ficha y sus cambios; crear con idempotencia; revisión visual de nombre y correo |
+| application | `useUserDetail`, `useUserCreate`, `profileRules` | Ficha y sus cambios; crear con idempotencia; revisión visual de nombres, apellidos y correo |
 | application | `useRoles` (`useRoleList`, `useRoleForm`) | Listado de roles y formulario (crear, editar y eliminar) |
 | application | `useAccessCatalogStore` | Roles y permisos para los formularios (Pinia), una vez por persona con sesión; se invalida al cambiar un rol |
 | presentation | `UserListPage`, `list/UserToolbar`, `list/UserFilterFields`, `list/UserTable`, `list/UserCards` | Listado de usuarios |

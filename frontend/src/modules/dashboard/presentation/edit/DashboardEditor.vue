@@ -1,5 +1,5 @@
 <!-- Grilla editable del modo Personalizar (portátil y monitor): arrastrar para mover, la manija de la esquina para
-     cambiar el tamaño dentro de los topes y el menú ⋯ para hacer lo mismo con el teclado. Es el único lugar que usa
+     cambiar el ancho dentro de los topes y el menú ⋯ para hacer lo mismo con el teclado. Es el único lugar que usa
      grid-layout-plus; sus estilos van aquí con tokens, porque se carga sin los que la librería inyecta (ver ADR-0050).
      Documentado en docs/frontend/dashboard.md -->
 <script setup lang="ts">
@@ -31,8 +31,9 @@ watchEffect(() => {
       h: widget.h,
       minW: widget.limits.minW,
       maxW: Math.min(widget.limits.maxW, props.editor.columns.value),
-      minH: widget.limits.minH,
-      maxH: widget.limits.maxH,
+      // El alto lo pone el contenido fuera de Personalizar: aquí solo se cambia el ancho
+      minH: widget.h,
+      maxH: widget.h,
     },
   }))
 })
@@ -47,8 +48,6 @@ const MOVES: [Direction, string][] = [
 const SIZES: [Dimension, 1 | -1, string][] = [
   ['w', 1, 'Más ancho'],
   ['w', -1, 'Más angosto'],
-  ['h', 1, 'Más alto'],
-  ['h', -1, 'Más bajo'],
 ]
 
 function actionsFor(code: WidgetCode): MenuItem[] {

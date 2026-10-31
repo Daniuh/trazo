@@ -11,20 +11,24 @@ export interface RoutePage<T> {
   lastPage: number
 }
 
-export interface RouteListOptions<C extends { page: number }, T> {
+export interface RouteListOptions<C extends { page: number }, T, P extends RoutePage<T> = RoutePage<T>> {
   fromQuery: (query: LocationQuery) => C
   toQuery: (criteria: C) => LocationQueryRaw
-  fetch: (criteria: C, signal: AbortSignal) => Promise<RoutePage<T>>
+  // Puede traer más que la página (p. ej. totales por grupo): queda entero en `response`
+  fetch: (criteria: C, signal: AbortSignal) => Promise<P>
   // Criterios que todavía no se deben consultar (p. ej. una búsqueda incompleta)
   ready?: (criteria: C) => boolean
 }
 
-export function useRouteList<C extends { page: number }, T>(options: RouteListOptions<C, T>) {
+export function useRouteList<C extends { page: number }, T, P extends RoutePage<T> = RoutePage<T>>(
+  options: RouteListOptions<C, T, P>,
+) {
   const route = useRoute()
   const router = useRouter()
 
   const criteria: ComputedRef<C> = computed(() => options.fromQuery(route.query))
   const items = shallowRef<T[]>([])
+  const response = shallowRef<P | null>(null)
   const total = ref(0)
   const lastPage = ref(1)
   const loading = ref(false)
@@ -40,6 +44,7 @@ export function useRouteList<C extends { page: number }, T>(options: RouteListOp
     error.value = null
     try {
       const page = await options.fetch(criteria.value, controller.signal)
+      response.value = page
       items.value = page.items
       total.value = page.total
       lastPage.value = page.lastPage
@@ -60,5 +65,5 @@ export function useRouteList<C extends { page: number }, T>(options: RouteListOp
 
   watch(() => route.fullPath, load, { immediate: true })
 
-  return { criteria, items, total, lastPage, loading, error, load, update }
+  return { criteria, items, response, total, lastPage, loading, error, load, update }
 }

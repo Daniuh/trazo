@@ -9,6 +9,7 @@ KEY_FILE=/run/backup-key/key
 AT="${BACKUP_AT:-03:00}"
 DAYS="${BACKUP_RETENTION_DAYS:-7}"
 MAX_AGE_HOURS="${BACKUP_MAX_AGE_HOURS:-26}"
+CHECK_SECONDS="${BACKUP_CHECK_SECONDS:-300}"
 export TZ="${BACKUP_TIMEZONE:-America/Bogota}"
 
 log() { echo "[respaldo] $(date '+%F %T %Z') $*"; }
@@ -68,20 +69,29 @@ run() {
   find "$DIR" -maxdepth 1 \( -name '*.sql.gz.enc' -o -name '*.hmac' -o -name '.*.part' \) -mmin "+$((DAYS * 1440))" -delete
 }
 
-# Espera hasta la hora configurada cada día. Si al arrancar no hay respaldo de las últimas 24 h, hace uno ya
+# Momento (epoch) del respaldo más nuevo; 0 si no hay ninguno
+newest() {
+  find "$DIR" -maxdepth 1 -name '*.sql.gz.enc' -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1 | grep . || echo 0
+}
+
+# Toca respaldar si ya pasó la hora del día y el último es anterior, o si no hay ninguno de las últimas 24 h
+due() {
+  local today_at
+  today_at=$(date -d "today $AT" +%s)
+  if [ "$(date +%s)" -ge "$today_at" ] && [ "$(newest)" -lt "$today_at" ]; then return 0; fi
+  ! fresh 24
+}
+
+# Revisa cada 5 minutos en vez de dormir hasta la hora: si MySQL aún no acepta conexiones al arrancar, o el equipo
+# estuvo suspendido a la hora del respaldo, se reintenta solo en la siguiente vuelta
 schedule() {
   trap 'exit 0' TERM INT
-  fresh 24 || ( run ) || log "falló el respaldo inicial"
+  log "respaldo diario a las $AT; revisión cada $CHECK_SECONDS s"
   while true; do
-    local now next
-    now=$(date +%s)
-    next=$(date -d "today $AT" +%s)
-    [ "$next" -gt "$now" ] || next=$(date -d "tomorrow $AT" +%s)
-    log "próximo respaldo: $(date -d "@$next" '+%F %T %Z')"
-    sleep $((next - now)) &
-    wait $!
     # Cada respaldo en su propio proceso: una falla no detiene el ciclo y el healthcheck la delata
-    ( run ) || log "falló el respaldo"
+    if due; then ( run ) || log "falló el respaldo; se reintenta en la próxima revisión"; fi
+    sleep "$CHECK_SECONDS" &
+    wait $!
   done
 }
 

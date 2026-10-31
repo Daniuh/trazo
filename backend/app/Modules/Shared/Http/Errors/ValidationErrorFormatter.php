@@ -55,8 +55,9 @@ final class ValidationErrorFormatter
         $errors = [];
 
         foreach ($validator->failed() as $field => $rules) {
+            $messages = array_filter($validator->errors()->get((string) $field), is_string(...));
             foreach ($rules as $rule => $values) {
-                $errors[$field][] = $this->describe((string) $rule, $values);
+                $errors[$field][] = $this->describe((string) $rule, $values, $messages);
             }
         }
 
@@ -65,13 +66,22 @@ final class ValidationErrorFormatter
 
     /**
      * @param  array<int, scalar>  $values
+     * @param  array<int, string>  $messages
      * @return array{code: string, params?: array<string, scalar>}
      */
-    private function describe(string $rule, array $values): array
+    private function describe(string $rule, array $values, array $messages): array
     {
         // Reglas propias: si saben su código, se usa tal cual
         if (is_a($rule, HasErrorCode::class, true)) {
             return ['code' => app($rule)->errorCode()];
+        }
+
+        // Reglas con varios códigos: el mensaje con el que fallaron es uno de los que declaran
+        if (is_a($rule, HasErrorCodes::class, true)) {
+            $code = array_values(array_intersect($messages, $rule::errorCodes()))[0] ?? null;
+            if ($code !== null) {
+                return ['code' => $code];
+            }
         }
 
         [$code, $names] = self::RULES[$rule]

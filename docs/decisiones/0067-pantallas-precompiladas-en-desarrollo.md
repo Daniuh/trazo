@@ -9,7 +9,7 @@ order: 77
 # ADR-0067: Pantallas precompiladas en desarrollo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 En desarrollo, Vite compila cada archivo la primera vez que el navegador lo pide. Con Docker sobre Windows y los archivos montados, la primera visita a una pantalla podía tardar más de 20 segundos: el `.vue`, sus componentes y todo el SCSS de los tokens. Las pruebas E2E que llegaban primero a una pantalla fallaban a ratos por tiempo, sin que hubiera un error real.

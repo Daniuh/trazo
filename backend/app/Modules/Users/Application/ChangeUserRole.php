@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 // Caso de uso: cambiar el rol de una persona. Solo a un rol por debajo de quien lo cambia; si el rol anterior o el
-// nuevo traen permisos sensibles, exige su código. Las excepciones de permisos que el rol nuevo vuelve innecesarias
-// se quitan, y la cima de la jerarquía no lleva ninguna. Documentado en docs/backend/users.md
+// nuevo traen permisos sensibles, exige su código. La persona queda con los permisos exactos del rol nuevo: sus
+// excepciones (concedidos y quitados) se borran y el registro guarda cuáles eran. Documentado en docs/backend/users.md
 
 namespace App\Modules\Users\Application;
 
@@ -13,7 +13,6 @@ use App\Modules\Shared\Application\Data\RequestContext;
 use App\Modules\Shared\Application\Ports\AdminLog;
 use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
-use App\Modules\Users\Application\Data\RoleInfo;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
 use App\Modules\Users\Application\Ports\AccountSecurity;
@@ -62,15 +61,16 @@ final readonly class ChangeUserRole
             $this->security->confirmIdentity($admin->id, $code);
         }
 
-        $this->transaction->run(function () use ($admin, $user, $role, $next, $context): void {
+        $this->transaction->run(function () use ($admin, $user, $role, $context): void {
             if ($role->level < RoleLevel::ROOT) {
                 $this->roots->ensureAnotherRemains($user);
             }
 
             $this->users->setRole($user->id, $role->id);
-            $this->pruneOverrides($admin, $user, $role, $next);
+            $cleared = $this->clearOverrides($admin, $user);
             $this->log->record(AdminActionType::UserRoleChanged, $admin->id, $user->id, [
                 'role' => ['from' => $user->role()?->code, 'to' => $role->code],
+                ...($cleared === null ? [] : ['cleared' => $cleared]),
             ], $context);
         });
 
@@ -82,20 +82,19 @@ final readonly class ChangeUserRole
     }
 
     /**
-     * Un concedido que el rol nuevo ya trae, o un quitado que ya no trae, dejan de tener sentido.
+     * Quita todas las excepciones: nadie arrastra permisos del rol anterior. Devuelve las que había (null si ninguna).
      *
-     * @param  list<string>  $rolePermissions
+     * @return array{granted: list<string>, denied: list<string>}|null
      */
-    private function pruneOverrides(Administrator $admin, UserRecord $user, RoleInfo $role, array $rolePermissions): void
+    private function clearOverrides(Administrator $admin, UserRecord $user): ?array
     {
         $overrides = $this->users->overrides($user->id);
-        $root = $role->level >= RoleLevel::ROOT;
+        if ($overrides['grants'] === [] && $overrides['denies'] === []) {
+            return null;
+        }
 
-        $this->users->replaceOverrides(
-            $user->id,
-            $root ? [] : array_values(array_diff($overrides['grants'], $rolePermissions)),
-            $root ? [] : array_values(array_intersect($overrides['denies'], $rolePermissions)),
-            $admin->id,
-        );
+        $this->users->replaceOverrides($user->id, [], [], $admin->id);
+
+        return ['granted' => $overrides['grants'], 'denied' => $overrides['denies']];
     }
 }

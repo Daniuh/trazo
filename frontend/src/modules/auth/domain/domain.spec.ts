@@ -43,12 +43,12 @@ describe('safeRedirect', () => {
 })
 
 describe('passwordRequirements', () => {
-  it('marca el largo y la coincidencia mientras se escribe, y deja la filtración para la API', () => {
+  it('marca el largo y la coincidencia mientras se escribe, y deja los patrones y la filtración para la API', () => {
     const empty = passwordRequirements('', '')
     const ready = passwordRequirements('Cielo-Naranja-42', 'Cielo-Naranja-42')
 
-    expect(empty.map((item) => item.met)).toEqual([false, false, null])
-    expect(ready.map((item) => item.met)).toEqual([true, true, null])
+    expect(empty.map((item) => item.met)).toEqual([false, false, null, null])
+    expect(ready.map((item) => item.met)).toEqual([true, true, null, null])
     expect(passwordRequirements('corta', 'corta')[0]?.met).toBe(false)
     expect(passwordRequirements('Cielo-Naranja-42', 'otra')[1]?.met).toBe(false)
   })

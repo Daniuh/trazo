@@ -9,7 +9,7 @@ order: 73
 # ADR-0063: Pantalla que no se descarga
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Cada pantalla de la SPA se descarga al abrirla por primera vez (rutas con carga diferida). Si esa descarga falla, la navegación falla. Pasa sobre todo después de publicar una versión nueva: quien tenía Trazo abierto pide archivos de la versión anterior, que ya no existen. También pasa si la conexión se corta justo al cambiar de pantalla.

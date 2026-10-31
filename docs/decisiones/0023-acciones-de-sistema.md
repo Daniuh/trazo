@@ -9,7 +9,7 @@ order: 33
 # ADR-0023: Acciones de sistema dentro del alcance de la aplicación
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El super admin necesita resolver desde la interfaz problemas operativos comunes, como workers detenidos, una caché desactualizada o jobs fallidos.

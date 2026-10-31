@@ -26,6 +26,8 @@ final readonly class UserResource
         return [
             'id' => $user->ulid,
             'name' => $user->name,
+            'given_names' => $user->givenNames,
+            'family_names' => $user->familyNames,
             'email' => $user->email,
             'is_active' => $user->isActive,
             'role' => $this->role($user->role()),

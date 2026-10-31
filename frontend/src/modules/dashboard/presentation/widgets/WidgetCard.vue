@@ -48,8 +48,16 @@ defineProps<{ title: string; description: string; ready: boolean }>()
 }
 
 .widget-card__body {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-height: 0;
   overflow: auto;
+}
+
+// El contenido ocupa todo el alto de la tarjeta: si su vecina de fila es más alta, el gráfico o la lista se reparten
+// ese alto en lugar de dejar un hueco abajo
+.widget-card__body > :slotted(*) {
+  flex: 1 1 auto;
 }
 </style>

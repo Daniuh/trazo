@@ -1,7 +1,8 @@
 <!-- Aro de Trazo: tres trazos (azul, verde y naranja) que representan el ciclo de vida de un incidente. -->
 <!-- Documentado en docs/frontend/sistema-de-diseno/marca.md -->
 <script setup lang="ts">
-withDefaults(defineProps<{ spinning?: boolean }>(), { spinning: false })
+// "hairline": trazo fino, para usar el aro como decoración grande (fondo de las pantallas sin sesión)
+withDefaults(defineProps<{ spinning?: boolean; weight?: 'bold' | 'hairline' }>(), { spinning: false, weight: 'bold' })
 
 // Cada trazo ocupa un tercio del aro menos el espacio que los separa
 const segments = [
@@ -12,7 +13,12 @@ const segments = [
 </script>
 
 <template>
-  <svg class="logo-mark" :class="{ 'logo-mark--spinning': spinning }" viewBox="0 0 32 32" aria-hidden="true">
+  <svg
+    class="logo-mark"
+    :class="[`logo-mark--${weight}`, { 'logo-mark--spinning': spinning }]"
+    viewBox="0 0 32 32"
+    aria-hidden="true"
+  >
     <g class="logo-mark__ring">
       <circle
         v-for="segment in segments"
@@ -41,6 +47,12 @@ const segments = [
   stroke-width: 5;
   stroke-linecap: round;
   stroke-dasharray: 19.1 56.3;
+}
+
+// Trazo fino: sin las puntas redondas del grueso, cada tramo se alarga para conservar la misma separación
+.logo-mark--hairline .logo-mark__segment {
+  stroke-width: 0.3;
+  stroke-dasharray: 23.8 51.6;
 }
 
 .logo-mark__segment--blue {

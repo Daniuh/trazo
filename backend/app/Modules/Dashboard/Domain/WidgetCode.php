@@ -9,6 +9,11 @@ namespace App\Modules\Dashboard\Domain;
 
 enum WidgetCode: string
 {
+    // Diseño centrado en el riesgo (ADR-0081)
+    case OperationPulse = 'operation_pulse';
+    case RiskMap = 'risk_map';
+    case StatusFlow = 'status_flow';
+    case BacklogBalance = 'backlog_balance';
     case TotalIncidents = 'total_incidents';
     case PendingIncidents = 'pending_incidents';
     case OverdueIncidents = 'overdue_incidents';

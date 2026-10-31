@@ -5,7 +5,6 @@ declare(strict_types=1);
 // Ciclo de vida por la API: ver, editar, cambiar estado, asignar, eliminar y restaurar, con sus reglas.
 // Documentado en docs/backend/incidents.md
 
-use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
@@ -20,14 +19,12 @@ function reported(): array
     return test()->postJson('/api/v1/incidents', ['title' => 'Impresora sin conexión', 'description' => 'No imprime desde ayer.', 'priority' => 'medium'])->json('data');
 }
 
-function moveTo(array $incident, string $status): TestResponse
+function moveTo(array $incident, string $status, ?string $note = null): TestResponse
 {
-    return test()->putJson("/api/v1/incidents/{$incident['id']}/status", ['status' => $status, 'version' => $incident['version']]);
-}
+    // Resuelto y Cancelado piden nota; si la prueba no la da, va una de ejemplo
+    $note ??= in_array($status, ['resolved', 'cancelled'], true) ? 'Nota de la prueba' : null;
 
-function ulidOf(string $email): string
-{
-    return User::query()->where('email', $email)->value('ulid');
+    return test()->putJson("/api/v1/incidents/{$incident['id']}/status", ['status' => $status, 'version' => $incident['version'], 'note' => $note]);
 }
 
 it('cada quien ve solo lo que le corresponde, y lo ajeno responde 404', function (): void {
@@ -57,7 +54,7 @@ it('rechaza guardar sobre una versión vieja', function (): void {
     $edit = ['title' => 'Nuevo título', 'description' => 'x', 'priority' => 'low', 'version' => 1];
 
     $this->putJson("/api/v1/incidents/{$incident['id']}", $edit)->assertOk();
-    $this->putJson("/api/v1/incidents/{$incident['id']}", [...$edit, 'title' => 'Otro'])
+    $this->putJson("/api/v1/incidents/{$incident['id']}", [...$edit, 'title' => 'Otro título'])
         ->assertConflict()
         ->assertJsonPath('code', 'VERSION_CONFLICT');
 });
@@ -66,7 +63,7 @@ it('el agente toma el incidente y lo trabaja; el solicitante ya no puede editarl
     $incident = reported();
 
     actingAsDemo('agente1@trazo.test');
-    $taken = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => ulidOf('agente1@trazo.test'), 'version' => 1])
+    $taken = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => demoUlid('agente1@trazo.test'), 'version' => 1])
         ->assertOk()->assertJsonPath('data.assignee.name', 'Laura Gómez')->json('data');
     $working = moveTo($taken, 'in_progress')->assertOk()->json('data');
     $resolved = moveTo($working, 'resolved')->assertOk()->json('data');
@@ -74,9 +71,29 @@ it('el agente toma el incidente y lo trabaja; el solicitante ya no puede editarl
         ->and(array_column($resolved['next_statuses'], 'code'))->toBe(['in_progress', 'closed']);
 
     actingAsDemo('solicitante1@trazo.test');
-    $this->putJson("/api/v1/incidents/{$incident['id']}", ['title' => 'x', 'description' => 'y', 'priority' => 'low', 'version' => $resolved['version']])
+    $this->putJson("/api/v1/incidents/{$incident['id']}", ['title' => 'Título nuevo', 'description' => 'y', 'priority' => 'low', 'version' => $resolved['version']])
         ->assertConflict()
         ->assertJsonPath('code', 'INCIDENT_EDIT_LOCKED');
+});
+
+it('exige la nota al resolver o cancelar y la guarda en el historial', function (): void {
+    $incident = reported();
+    actingAsDemo('supervisor@trazo.test');
+
+    $this->putJson("/api/v1/incidents/{$incident['id']}/status", ['status' => 'cancelled', 'version' => 1, 'note' => '   '])
+        ->assertUnprocessable()
+        ->assertJsonPath('code', 'STATUS_NOTE_REQUIRED')
+        ->assertJsonPath('params.status', 'cancelled');
+    $this->putJson("/api/v1/incidents/{$incident['id']}/status", ['status' => 'cancelled', 'version' => 1, 'note' => str_repeat('a', 1001)])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.note.0.code', 'TOO_LONG');
+
+    // En los demás cambios la nota es opcional
+    $working = moveTo($incident, 'in_progress', 'Empiezo por revisar el cable de red')->assertOk()->json('data');
+    moveTo($working, 'cancelled', 'Se reportó dos veces')->assertOk();
+
+    $notes = collect($this->getJson("/api/v1/incidents/{$incident['id']}/activities")->json('data'))->pluck('note')->all();
+    expect($notes)->toBe(['Se reportó dos veces', 'Empiezo por revisar el cable de red', null]);
 });
 
 it('solo permite las transiciones del catálogo', function (): void {
@@ -105,7 +122,7 @@ it('el agente no asigna a otros ni trabaja lo que no es suyo', function (): void
     $incident = reported();
     actingAsDemo('agente1@trazo.test');
 
-    $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => ulidOf('agente2@trazo.test'), 'version' => 1])->assertForbidden();
+    $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => demoUlid('agente2@trazo.test'), 'version' => 1])->assertForbidden();
     moveTo($incident, 'in_progress')->assertForbidden();
 });
 
@@ -113,7 +130,7 @@ it('el supervisor asigna y quita la asignación, y cada cambio queda registrado'
     $incident = reported();
     actingAsDemo('supervisor@trazo.test');
 
-    $assigned = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => ulidOf('agente2@trazo.test'), 'version' => 1])->json('data');
+    $assigned = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => demoUlid('agente2@trazo.test'), 'version' => 1])->json('data');
     $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => null, 'version' => $assigned['version']])
         ->assertOk()->assertJsonPath('data.assignee', null);
 
@@ -148,7 +165,7 @@ it('el detalle y el historial hacen las mismas consultas con poco o mucho histor
 
     $version = $incident['version'];
     foreach (['agente1@trazo.test', 'agente2@trazo.test', 'agente3@trazo.test', 'agente1@trazo.test'] as $agent) {
-        $version = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => ulidOf($agent), 'version' => $version])->json('data.version');
+        $version = $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => demoUlid($agent), 'version' => $version])->json('data.version');
     }
 
     expect($queries())->toBe($before);

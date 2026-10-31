@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-// Validación del listado: página, tamaño (máximo 100), orden de una lista blanca, búsqueda y filtros.
+// Validación del listado: página, tamaño (máximo 100), orden y grupo de una lista blanca, búsqueda y filtros.
 // Los filtros de varios valores llegan separados por comas: filter[status]=open,in_progress. Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http\Requests;
 
 use App\Modules\Incidents\Application\Data\IncidentListCriteria;
+use App\Modules\Incidents\Domain\IncidentGroup;
 use App\Modules\Incidents\Domain\IncidentSort;
 use App\Modules\Incidents\Http\Rules\SearchText;
 use DateTimeImmutable;
@@ -45,6 +46,7 @@ final class ListIncidentsRequest extends FormRequest
             'per_page' => ['sometimes', 'integer', 'between:1,100'],
             'sort' => ['sometimes', 'string', Rule::in([...$sorts, ...array_map(fn (string $sort): string => "-{$sort}", $sorts)])],
             'search' => ['sometimes', 'string', 'max:100', new SearchText],
+            'group_by' => ['sometimes', 'string', Rule::in(array_column(IncidentGroup::cases(), 'value'))],
             'filter' => ['sometimes', 'array'],
             'filter.status' => ['sometimes', 'array', 'max:20'],
             'filter.status.*' => ['string', Rule::exists('statuses', 'code')],
@@ -59,6 +61,7 @@ final class ListIncidentsRequest extends FormRequest
             'filter.due_to' => ['sometimes', 'date'],
             'filter.overdue' => ['sometimes', 'boolean'],
             'filter.deleted' => ['sometimes', 'boolean'],
+            'filter.reopen_requested' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -84,6 +87,8 @@ final class ListIncidentsRequest extends FormRequest
             dueTo: $this->utcDate('filter.due_to'),
             overdue: $this->boolean('filter.overdue'),
             deleted: $this->boolean('filter.deleted'),
+            reopenRequested: $this->boolean('filter.reopen_requested'),
+            group: $this->filled('group_by') ? IncidentGroup::from($this->string('group_by')->toString()) : null,
         );
     }
 

@@ -29,6 +29,7 @@ Las pantallas escuchan el bus con `useRealtime(evento, función)`, que deja de e
 
 | Pantalla | `incident` | `reconnected` |
 |---|---|---|
+| Detalle (conversación) | Con `comment`: si la conversación ya se cargó, vuelve a pedir lo más reciente y lo une; si no, ajusta el número del botón | Vuelve a pedir la conversación si se había cargado |
 | Listado de incidentes | Aviso "Hay N incidentes con cambios de otras personas · Actualizar" (cuenta incidentes, no avisos); no mueve las filas | Vuelve a consultar |
 | Detalle y vista previa | Si es el mismo incidente y no hay una acción en curso, se vuelven a leer los datos y el historial | Vuelve a consultar (detalle) |
 | Formulario de edición | Si es el mismo incidente: aviso "Otra persona cambió este incidente…" con "Recargar"; no toca lo que se escribió | — |
@@ -36,7 +37,8 @@ Las pantallas escuchan el bus con `useRealtime(evento, función)`, que deja de e
 
 Por el canal personal (`useRealtimeNotices`):
 
-- **`assigned`:** pide el incidente a la API y muestra "Te asignaron INC-000123: título" con "Abrir". Es la opción `action` de `notify` en `useFeedback`, que deja el aviso 8 s en lugar de 4.
+- **`assigned`:** pide el incidente a la API y muestra "Te asignaron TZ-26-0142: título" con "Abrir". Es la opción `action` de `notify` en `useFeedback`, que deja el aviso 8 s en lugar de 4.
+- **`notifications`:** lo escucha el [centro de notificaciones](notifications.md), que vuelve a pedir las sin leer y, si el panel está abierto, la pestaña que se ve.
 - **`session`:** vuelve a pedir la sesión (`session.refresh()`).
   - Si la sesión ya no vale, la API responde `UNAUTHENTICATED` y el cliente HTTP lleva al login con "Tu sesión terminó".
   - Si cambiaron los permisos, el menú y los botones se ajustan y los canales se actualizan.

@@ -9,7 +9,7 @@ order: 62
 # ADR-0052: Recuperación y cambio de contraseña: pase de un solo uso, HMAC, Have I Been Pwned y segundo factor
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0018](0018-recuperacion-contrasena.md) definió la recuperación con un código de 6 dígitos por correo, más el TOTP si la cuenta tiene MFA. [ADR-0016](0016-contrasenas.md) definió la política: mínimo 12 caracteres y rechazar las contraseñas filtradas. Al construirlas había que decidir:

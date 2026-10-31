@@ -21,7 +21,7 @@ use Illuminate\Testing\TestResponse;
 uses(RefreshDatabase::class);
 
 const RESET_EMAIL = 'agente2@trazo.test';
-const OLD_PASSWORD = 'Trazo.Demo.2026';
+const OLD_PASSWORD = 'Cometa.Demo.2026';
 const NEW_PASSWORD = 'Cielo-Naranja-Tranvia-42';
 
 beforeEach(function (): void {
@@ -187,6 +187,26 @@ it('aplica la política: largo mínimo, confirmación y contraseñas filtradas',
     pwnedRanges([substr($hash, 0, 5) => substr($hash, 5).":42\r\nAAAA:0"]);
     resetPassword($ticket, 'Filtrada-Hace-Tiempo-1')->assertJsonPath('errors.password.0.code', 'PASSWORD_BREACHED');
     Http::assertSent(fn ($request): bool => ! str_contains($request->url(), substr($hash, 5)) && $request->hasHeader('Add-Padding'));
+});
+
+it('rechaza las contraseñas largas pero predecibles, cada una con su motivo, sin consultar Have I Been Pwned', function (): void {
+    pwnedRanges(null);
+    $ticket = verifyResetCode(requestResetCode())->json('data.ticket');
+
+    resetPassword($ticket, 'ddddddddddddddddd')->assertJsonPath('errors.password.0.code', 'PASSWORD_REPETITIVE');
+    resetPassword($ticket, '123456789012')->assertJsonPath('errors.password.0.code', 'PASSWORD_SEQUENTIAL');
+    // Al recuperar solo se conoce el correo que trae la petición
+    resetPassword($ticket, 'soy-el-agente2-de-hoy')->assertJsonPath('errors.password.0.code', 'PASSWORD_PERSONAL');
+    resetPassword($ticket, 'Trazo.Demo.2026')->assertJsonPath('errors.password.0.code', 'PASSWORD_PERSONAL');
+    Http::assertNothingSent();
+});
+
+it('al cambiarla desde Mi cuenta tampoco puede llevar el nombre de la persona', function (): void {
+    $token = loginWith(OLD_PASSWORD)->json('data.token');
+
+    $this->withToken($token)->putJson('/api/v1/auth/password', [
+        'current_password' => OLD_PASSWORD, 'password' => 'Andres de la casa 7', 'password_confirmation' => 'Andres de la casa 7',
+    ])->assertUnprocessable()->assertJsonPath('errors.password.0.code', 'PASSWORD_PERSONAL');
 });
 
 it('si Have I Been Pwned no responde, igual rechaza las contraseñas más comunes y deja pasar las demás', function (): void {

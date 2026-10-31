@@ -35,7 +35,7 @@ final readonly class DatabaseAuditCatalog implements AuditCatalogQuery
 
     public function people(): array
     {
-        return array_values(DB::table('users')->orderBy('name')->orderBy('id')->get(['ulid', 'name'])
+        return array_values(DB::table('users')->orderBy('family_names')->orderBy('given_names')->orderBy('id')->get(['ulid', 'name'])
             ->map(fn (object $user): PersonRef => new PersonRef((string) $user->ulid, (string) $user->name))
             ->all());
     }

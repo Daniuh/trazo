@@ -16,19 +16,16 @@ use App\Modules\Incidents\Domain\Exceptions\IncidentExceptions;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 final readonly class EloquentIncidentRepository implements IncidentRepository
 {
-    private const CODE_FORMAT = 'INC-%06d';
-
-    public function __construct(private IncidentMapper $mapper) {}
+    public function __construct(private IncidentMapper $mapper, private IncidentCodes $codes) {}
 
     public function find(string $ulid, bool $withDeleted = false): ?IncidentRecord
     {
         $incident = Incident::query()
             ->withTrashed($withDeleted)
-            ->with(['priority', 'status', 'creator:id,ulid,name', 'assignee:id,ulid,name'])
+            ->with(IncidentMapper::RELATIONS)
             ->where('ulid', $ulid)
             ->first();
 
@@ -45,8 +42,7 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
         DateTimeImmutable $dueDate,
     ): string {
         $incident = Incident::query()->create([
-            // Código provisional y único: el definitivo sale del id, que solo existe después de insertar
-            'code' => 'NEW-'.Str::lower(Str::random(16)),
+            'code' => $this->codes->next(now()->toDateTimeImmutable()),
             'title' => $title,
             'description' => $description,
             'priority_id' => $priorityId,
@@ -56,7 +52,6 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
             'due_date' => $dueDate,
         ]);
 
-        $incident->forceFill(['code' => sprintf(self::CODE_FORMAT, $incident->id)])->saveQuietly();
         event(new IncidentChanged($incident->id, $incident->ulid, IncidentChange::Created, $createdBy, null, $assignedTo));
 
         return $incident->ulid;
@@ -87,6 +82,11 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
     {
         Incident::onlyTrashed()->whereKey($incident->id)->restore();
         $this->changed($incident, IncidentChange::Restored, $incident->assignee?->id);
+    }
+
+    public function announce(IncidentRecord $incident): void
+    {
+        $this->changed($incident, IncidentChange::Updated, $incident->assignee?->id);
     }
 
     private function changed(IncidentRecord $incident, IncidentChange $change, ?int $assigneeAfter): void

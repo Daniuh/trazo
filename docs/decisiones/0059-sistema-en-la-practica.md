@@ -9,7 +9,7 @@ order: 69
 # ADR-0059: Sistema en la práctica: salud medida desde la app, eventos agrupados y acciones con reautenticación
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-25
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El [ADR-0022](0022-logs-relevantes.md) fijó qué se registra (solo lo relevante, agrupado por huella) y el [ADR-0023](0023-acciones-de-sistema.md) qué acciones tiene el Super admin, sin acceso a Docker. Al construirlo había que decidir:

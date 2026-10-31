@@ -32,7 +32,7 @@ function listChips(key: 'statuses' | 'priorities' | 'assignees', options: Filter
 }
 
 const chips = computed<Chip[]>(() => {
-  const { createdFrom, createdTo, dueFrom, dueTo, creator, overdue, deleted } = props.criteria
+  const { createdFrom, createdTo, dueFrom, dueTo, creator, overdue, deleted, reopenRequested } = props.criteria
   const extra: (Chip | false)[] = [
     Boolean(createdFrom ?? createdTo) && {
       key: 'created',
@@ -47,6 +47,11 @@ const chips = computed<Chip[]>(() => {
     Boolean(creator) && { key: 'creator', label: 'Creados por mí', remove: { creator: null } },
     overdue && { key: 'overdue', label: 'Vencidos', remove: { overdue: false } },
     deleted && { key: 'deleted', label: 'Eliminados', remove: { deleted: false } },
+    reopenRequested && {
+      key: 'reopenRequested',
+      label: 'Con reapertura pendiente',
+      remove: { reopenRequested: false },
+    },
   ]
   return [
     ...listChips('statuses', props.statuses),
@@ -57,8 +62,8 @@ const chips = computed<Chip[]>(() => {
 })
 
 function clearAll(): void {
-  const { search, sort, descending, perPage } = props.criteria
-  emit('change', { ...DEFAULT_CRITERIA, search, sort, descending, perPage })
+  const { search, sort, descending, perPage, view, groupBy } = props.criteria
+  emit('change', { ...DEFAULT_CRITERIA, search, sort, descending, perPage, view, groupBy })
 }
 </script>
 
@@ -105,7 +110,7 @@ function clearAll(): void {
   min-height: $space-6;
   padding: 0 $space-2 0 $space-3;
   border: 1px solid $color-border-strong;
-  border-radius: $radius-pill;
+  border-radius: $radius-badge;
   background: $color-surface;
   color: $color-text;
   font: inherit;

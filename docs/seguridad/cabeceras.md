@@ -32,7 +32,7 @@ connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; fram
 - **Scripts:** solo los archivos del propio origen. Sin scripts en línea ni `eval`, en local ni en producción. Un XSS que lograra inyectar HTML no podría ejecutar nada.
 - **Estilos:**
   - Producción: `'self'`. El build los entrega en archivos `.css`.
-  - Local: `'self' 'unsafe-inline'`. Vite inyecta los estilos con JavaScript para la recarga en caliente.
+  - Modo desarrollo: `'self' 'unsafe-inline'`. Vite inyecta los estilos con JavaScript para la recarga en caliente. El modo final, también en local, usa la de producción.
 
   La diferencia vive en la variable `$csp_style_src` de `upstream.dev.conf` y `upstream.prod.conf`.
 - **`connect-src 'self'`** cubre la API y el websocket del tiempo real (`/ws`), que van por el mismo origen.

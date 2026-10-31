@@ -50,7 +50,7 @@ flowchart LR
 | `worker` | `trazo/api` | Procesa las colas |
 | `scheduler` | `trazo/api` | Tareas programadas |
 | `reverb` | `trazo/api` | Websockets del tiempo real. Sin puerto propio: se llega por el gateway en `/ws` ([Tiempo real](tiempo-real.md)) |
-| `frontend` | `trazo/web` | En local, Vite con recarga en caliente. En producción, el build servido por Nginx sin root. |
+| `frontend` | `trazo/web` | El build servido por Nginx sin root. En el modo desarrollo, Vite con recarga en caliente. |
 | `mysql` | MySQL 8.4 | Base de datos (`trazo` y `trazo_test` para pruebas) |
 | `redis` | Redis 8.4 | Caché (base 1), colas (base 0) y contadores de seguridad: límites de frecuencia y bloqueos del login (base 2) |
 | `backup` | MySQL 8.4 | Respaldo diario de la base, comprimido y cifrado, con 7 días de historia ([Respaldos](respaldos.md)) |
@@ -63,13 +63,28 @@ flowchart LR
 | Archivo | Para qué |
 |---|---|
 | `docker-compose.yml` | Base común a todos los entornos |
-| `docker-compose.override.yml` | Local: se carga solo. Monta el código, usa Vite y agrega Mailpit. |
+| `docker-compose.override.yml` | Local: se carga solo. Agrega Mailpit y los perfiles opcionales `zap` y `docs`, sin cambiar las imágenes. |
+| `docker-compose.dev.yml` | Modo desarrollo, opcional: monta el código, usa Vite y trae las herramientas de prueba ([Dos modos](#dos-modos)). |
 | `docker-compose.prod.yml` | Despliegue (se agrega en la fase de despliegue) |
 | `docker/php/` | Imagen de Laravel, configuración de PHP-FPM, arranque y healthcheck |
 | `docker/frontend/` | Imagen del frontend y su servidor estático |
 | `docker/nginx/` | Configuración del gateway y cabeceras de seguridad |
 | `docker/mysql/init/` | Creación de la base de pruebas en el primer arranque |
 | `docker/mysql/backup.sh` | Respaldo diario y restauración ([Respaldos](respaldos.md)) |
+
+## Dos modos
+
+| Modo | Cómo se levanta | Para qué |
+|---|---|---|
+| **Final** (por defecto) | `docker compose up -d --build` | Ver Trazo como lo verá quien lo use: el build de Vue con la CSP estricta y la API con el código dentro de la imagen. Es rápido también en Windows. |
+| **Desarrollo** | `docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml up -d --build` | Trabajar en el código: se monta desde la carpeta del equipo, Vite recarga al guardar y trae Pest, Pint, Larastan y PCOV. |
+
+- Los dos comparten la base, Redis, las claves y los respaldos: cambiar de modo no borra nada.
+- En el modo final, un cambio en el código se ve solo después de reconstruir (`--build`).
+- Las pruebas del back (`composer test`, `check` y `coverage`) y la guía visual (`/guia-visual`) solo existen en el modo desarrollo.
+- Para dejar el modo desarrollo fijo, en un `.env`: `COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.dev.yml` (en Windows, separado con `;`).
+
+Medido en Windows con Docker Desktop: la pantalla de ingreso carga en ~0,13 s en el modo final y en ~3,6 s en el de desarrollo, y la API responde en 20–80 ms frente a 0,4–1,5 s ([ADR-0068](../decisiones/0068-modo-final-por-defecto.md)).
 
 ## Decisiones de diseño
 
@@ -132,7 +147,7 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 | Ejecutar un comando de Laravel | `docker compose exec app php artisan <comando>` |
 | Detener sin borrar datos | `docker compose down` |
 | Borrar también los datos de Trazo | `docker compose down -v` (solo afecta volúmenes de Trazo) |
-| Pruebas del back con cobertura | `docker compose exec app composer coverage` (PCOV viene solo en la imagen de desarrollo) |
+| Pruebas del back con cobertura | `docker compose exec app composer coverage` (solo en el modo desarrollo, que trae PCOV) |
 | Vaciar los límites de frecuencia y bloqueos (solo desarrollo) | `docker compose exec app php artisan trazo:reset-limits` |
 | Escanear con ZAP | Ver [Escaneo con OWASP ZAP](../seguridad/zap.md) |
 | Ver o hacer respaldos | Ver [Respaldos](respaldos.md) |
@@ -140,7 +155,7 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 
 ## Dónde está en el código
 
-- [`docker-compose.yml`](../../docker-compose.yml) y [`docker-compose.override.yml`](../../docker-compose.override.yml)
+- [`docker-compose.yml`](../../docker-compose.yml), [`docker-compose.override.yml`](../../docker-compose.override.yml) y [`docker-compose.dev.yml`](../../docker-compose.dev.yml)
 - [`docker/php/Dockerfile`](../../docker/php/Dockerfile), [`entrypoint.sh`](../../docker/php/entrypoint.sh), [`dev-init.sh`](../../docker/php/dev-init.sh) y [`healthcheck.sh`](../../docker/php/healthcheck.sh)
 - [`docker/nginx/gateway.conf`](../../docker/nginx/gateway.conf) y [`snippets/security-headers.conf`](../../docker/nginx/snippets/security-headers.conf)
 - [`docker/frontend/Dockerfile`](../../docker/frontend/Dockerfile)

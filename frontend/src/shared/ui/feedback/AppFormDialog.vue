@@ -67,6 +67,9 @@ const open = defineModel<boolean>({ required: true })
   margin: 0;
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
+
+  // Quasar le da a los h2 un alto de línea de título grande
+  line-height: $line-height-tight;
 }
 
 .app-form-dialog__message {

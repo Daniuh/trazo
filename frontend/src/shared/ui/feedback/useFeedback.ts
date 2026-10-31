@@ -1,4 +1,5 @@
-// Confirmaciones y notificaciones con el estilo de Trazo. Las pantallas los usan sin conocer Quasar.
+// Confirmaciones y notificaciones con el estilo de Trazo. Las pantallas los usan sin conocer Quasar. Los avisos salen
+// arriba a la derecha, porque abajo está el dock.
 // Documentado en docs/frontend/sistema-de-diseno/componentes.md
 import { useQuasar } from 'quasar'
 import { messageFor } from '@/shared/errors'
@@ -27,7 +28,7 @@ export function useFeedback() {
     $q.notify({
       message,
       classes: 'app-notify',
-      position: 'bottom',
+      position: 'top-right',
       timeout: action ? 8000 : 4000,
       actions: action ? [{ label: action.label, color: 'white', handler: action.handler }] : undefined,
     })
@@ -38,7 +39,7 @@ export function useFeedback() {
     $q.notify({
       message: messageFor(error),
       classes: 'app-notify app-notify--error',
-      position: 'bottom',
+      position: 'top-right',
       timeout: 0,
       actions: [
         ...(action ? [{ label: action.label, color: 'white', handler: action.handler }] : []),

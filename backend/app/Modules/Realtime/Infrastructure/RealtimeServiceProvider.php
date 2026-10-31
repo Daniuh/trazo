@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 // Conecta el tiempo real con Laravel: quién puede escuchar cada canal (Channels::allows, con los permisos efectivos),
-// el oyente de los cambios de incidentes y los avisos de sesión. Documentado en docs/backend/realtime.md
+// los oyentes de los cambios y de las conversaciones de incidentes, y los avisos de sesión y de notificaciones. Documentado en docs/backend/realtime.md
 
 namespace App\Modules\Realtime\Infrastructure;
 
 use App\Modules\Incidents\Application\Events\IncidentChanged;
+use App\Modules\Incidents\Application\Events\IncidentCommented;
+use App\Modules\Notifications\Application\Ports\NotificationSignals;
 use App\Modules\Realtime\Domain\Channels;
 use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Users\Application\Ports\EffectivePermissions;
@@ -21,11 +23,13 @@ final class RealtimeServiceProvider extends ServiceProvider
     /** @var array<class-string, class-string> */
     public array $bindings = [
         SessionSignals::class => BroadcastSessionSignals::class,
+        NotificationSignals::class => BroadcastNotificationSignals::class,
     ];
 
     public function boot(): void
     {
         Event::listen(IncidentChanged::class, BroadcastIncidentChange::class);
+        Event::listen(IncidentCommented::class, BroadcastIncidentComment::class);
 
         $allows = fn (string $channel) => fn (User $user): bool => Channels::allows(
             $channel,

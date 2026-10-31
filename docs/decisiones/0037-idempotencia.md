@@ -9,7 +9,7 @@ order: 47
 # ADR-0037: Idempotency-Key en la creación de incidentes
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Un doble clic o un reintento de red pueden crear incidentes duplicados.

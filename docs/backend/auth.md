@@ -105,6 +105,9 @@ flowchart TD
 | `PASSWORD_RESET_CODE_INVALID` | 422 | Código de recuperación incorrecto, vencido, agotado o de un correo que no existe (la misma respuesta) | — |
 | `PASSWORD_RESET_EXPIRED` | 422 | El pase venció, ya se usó o la solicitud se anuló por intentos | — |
 | `PASSWORD_BREACHED` | 422 | La contraseña nueva está en filtraciones conocidas o entre las más comunes (error del campo `password`) | — |
+| `PASSWORD_REPETITIVE` | 422 | La contraseña nueva repite demasiado los mismos caracteres o un mismo bloque (error del campo `password`) | — |
+| `PASSWORD_SEQUENTIAL` | 422 | La contraseña nueva es casi toda una secuencia del alfabeto, los números o el teclado (error del campo `password`) | — |
+| `PASSWORD_PERSONAL` | 422 | La contraseña nueva contiene el correo, el nombre o la marca (error del campo `password`) | — |
 | `CURRENT_PASSWORD_INVALID` | 422 | Al cambiarla desde Mi cuenta, la contraseña actual no es correcta | — |
 | `PASSWORD_SAME_AS_CURRENT` | 422 | La contraseña nueva es igual a la actual | — |
 
@@ -177,7 +180,12 @@ Solo lo que puede ser un ataque o un problema: un ingreso con código de recuper
 ### Política de contraseñas
 - **De 12 a 128 caracteres**, con confirmación. El máximo evita que una contraseña enorme haga trabajar de más a Argon2id.
 - **No puede estar filtrada.** Primero se revisa una lista local de las 10.000 más comunes (`resources/security/common-passwords.txt`, de SecLists). Después, Have I Been Pwned con su consulta anónima: solo salen los primeros 5 caracteres del SHA-1 y la respuesta viene con relleno. Si el servicio no responde en 3 segundos, queda la lista local y se registra una advertencia; nadie se queda sin poder cambiar su contraseña por una caída externa.
-- La revisión solo corre si la contraseña ya cumple el largo (`bail`), para no consultar el servicio en vano.
+- **No puede ser predecible** ([ADR-0070](../decisiones/0070-contrasenas-predecibles.md)). `WeakPasswordPatterns` (dominio) rechaza, cada caso con su código:
+  - `PASSWORD_REPETITIVE`: menos de 5 caracteres distintos (`ddddddddddddd`, `abababababab`) o un bloque repetido (`hola1hola1hola1`).
+  - `PASSWORD_SEQUENTIAL`: secuencias de 4 o más del alfabeto, los números o las filas del teclado, en cualquier sentido, que ocupan la mitad o más de la contraseña (`123456789012`, `qwertyuiopas`). Un `1234` dentro de una frase larga sí se acepta.
+  - `PASSWORD_PERSONAL`: contiene el correo (lo que va antes de la @ y sus pedazos), el nombre o la marca (`trazo`, `psicol`), sin importar mayúsculas ni tildes. No se buscan pedazos de menos de 4 letras. Al cambiarla desde Mi cuenta se usan el correo y el nombre; al recuperarla, solo el correo que trae la petición, porque buscar el nombre antes de validar el pase revelaría datos de la cuenta.
+- Siguiendo la guía del NIST SP 800-63B, no se exigen mayúsculas, números ni símbolos: esas reglas llevan a contraseñas como `Clave2026!`.
+- Las revisiones van de la más barata a la más cara y cortan en la primera falla (`bail`): largo, confirmación, patrones y, al final, la filtración. Así no se consulta el servicio en vano.
 
 ### Recuperación en tres pasos
 
@@ -220,14 +228,14 @@ sequenceDiagram
 | Application | `CredentialVerifier`, `SessionTokens`, `SessionUserReader`, `OneTimePasswords`, `MfaStore`, `MfaPolicies`, `SecurityNotifier` | Puertos que implementa la infraestructura |
 | Infrastructure | `EloquentCredentialVerifier`, `SanctumSessionTokens`, `CacheLoginAttemptStore`, `EloquentSessionUserReader` | Implementaciones con Eloquent, Sanctum y Redis |
 | Infrastructure | `Google2faOneTimePasswords`, `EloquentMfaStore`, `DatabaseMfaPolicies`, `MailSecurityNotifier`, `Mail/SecurityNotice` | TOTP con la librería, guardado del MFA, política por rol y avisos por correo |
-| Domain | `Password/PasswordPolicy`, `Password/ResetCode`, `PasswordExceptions` | Largo de las contraseñas, generación del código y del pase, y errores de la contraseña |
+| Domain | `Password/PasswordPolicy`, `Password/WeakPasswordPatterns`, `Password/PasswordWeakness`, `Password/ResetCode`, `PasswordExceptions` | Largo de las contraseñas, patrones predecibles, generación del código y del pase, y errores de la contraseña |
 | Application | `Password/RequestPasswordReset`, `VerifyResetCode`, `ResetPassword`, `ChangePassword` | Casos de uso de la recuperación y del cambio |
 | Application | `UserAccounts`, `PasswordResets`, `ResetCodeSender`, `BreachedPasswords` | Puertos de la contraseña |
 | Infrastructure | `EloquentUserAccounts`, `DatabasePasswordResets`, `MailResetCodeSender`, `Mail/PasswordResetCode`, `HibpBreachedPasswords` | Cuentas, solicitudes con HMAC, correo del código y revisión de contraseñas filtradas |
 | Infrastructure | `AuthServiceProvider` | Conexión de los puertos, límites del login, del MFA y de la contraseña, inactividad, alcance del token de un ingreso a medias y morph map |
 | Infrastructure | `Console/DevTokenCommand` | `trazo:dev-token {correo}`: un token de sesión sin MFA para el escaneo de [ZAP](../seguridad/zap.md). Solo en desarrollo; en producción no se registra |
 | Http | `AuthController`, `MfaController`, `LoginRequest`, `VerifyMfaRequest`, `MfaCodeRequest`, `SessionPayload`, `SessionUserResource` | Endpoints, validación de entrada y forma de la respuesta |
-| Http | `PasswordController`, `ForgotPasswordRequest`, `VerifyResetCodeRequest`, `ResetPasswordRequest`, `ChangePasswordRequest`, `Rules/NewPassword`, `Rules/NotBreachedPassword` | Endpoints de la contraseña y la regla única de contraseñas nuevas |
+| Http | `PasswordController`, `ForgotPasswordRequest`, `VerifyResetCodeRequest`, `ResetPasswordRequest`, `ChangePasswordRequest`, `Rules/NewPassword`, `Rules/NotWeakPassword`, `Rules/NotBreachedPassword` | Endpoints de la contraseña y la regla única de contraseñas nuevas |
 
 ## Dónde está en el código
 

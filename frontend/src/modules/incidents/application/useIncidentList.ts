@@ -1,15 +1,15 @@
 // Estado del listado de incidentes ligado a la URL (con useRouteList), más restaurar un eliminado, contar cuántos
 // resultados daría un borrador de filtros y exportar lo filtrado. Documentado en docs/frontend/incidents.md
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { saveFile } from '@/shared/download/saveFile'
 import { toApiError, type ApiError } from '@/shared/http'
 import { useRouteList } from '@/shared/listing/useRouteList'
-import { isSearchable, type IncidentSummary, type ListCriteria } from '../domain/listing'
+import { isSearchable, type IncidentSummary, type ListCriteria, type ListPage } from '../domain/listing'
 import { listApi } from '../infrastructure/listApi'
 import { fromQuery, toQuery } from './listQuery'
 
 export function useIncidentList() {
-  const list = useRouteList<ListCriteria, IncidentSummary>({
+  const list = useRouteList<ListCriteria, IncidentSummary, ListPage>({
     fromQuery,
     toQuery,
     fetch: (criteria, signal) => listApi.list(criteria, signal),
@@ -51,5 +51,8 @@ export function useIncidentList() {
     }
   }
 
-  return { ...list, restore, countFor, exporting, exportCsv }
+  // Total de cada grupo de la página actual (lista agrupada)
+  const groups = computed(() => list.response.value?.groups ?? {})
+
+  return { ...list, groups, restore, countFor, exporting, exportCsv }
 }

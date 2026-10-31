@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Modules\Incidents\Infrastructure\IncidentCodes;
+use Database\Seeders\Support\DemoRandom;
 use Database\Seeders\Support\IncidentSamples;
 use Database\Seeders\Support\IncidentStory;
 use Illuminate\Database\Seeder;
@@ -18,7 +20,7 @@ use Illuminate\Support\Str;
 
 /**
  * @phpstan-type Context array{priorities: array<string, object>, statuses: array<string, object>, workers: list<int>, managers: list<int>, people: list<int>, names: array<int, array{id: string, name: string}>, types: array<string, int>}
- * @phpstan-type Step array{type: string, user: int, at: Carbon, from?: string, to?: string, assignee?: int}
+ * @phpstan-type Step array{type: string, user: int, at: Carbon, from?: string, to?: string, assignee?: int, note?: string}
  */
 class IncidentVolumeSeeder extends Seeder
 {
@@ -45,7 +47,7 @@ class IncidentVolumeSeeder extends Seeder
         }
 
         // Semilla fija: los mismos datos en cada máquina
-        fake()->seed(2026);
+        DemoRandom::seed(2026);
         $context = $this->context();
 
         for ($done = 0; $done < $missing; $done += self::CHUNK) {
@@ -110,17 +112,17 @@ class IncidentVolumeSeeder extends Seeder
         $resolution = (int) $priority->default_resolution_minutes;
 
         $now = Carbon::now();
-        $age = fake()->numberBetween(30, self::HISTORY_DAYS * 1440);
+        $age = DemoRandom::numberBetween(30, self::HISTORY_DAYS * 1440);
         $createdAt = $now->copy()->subMinutes($age);
-        $stillOpen = $age <= $resolution * 1.6 || fake()->boolean(self::STUCK_PERCENT);
+        $stillOpen = $age <= $resolution * 1.6 || DemoRandom::boolean(self::STUCK_PERCENT);
         $status = $context['statuses'][IncidentSamples::weighted($stillOpen ? IncidentSamples::PENDING_WEIGHTS : IncidentSamples::FINISHED_WEIGHTS)];
 
-        $dueDate = $createdAt->copy()->addMinutes((int) round($resolution * fake()->randomFloat(2, 0.8, 1.6)));
+        $dueDate = $createdAt->copy()->addMinutes((int) round($resolution * DemoRandom::randomFloat(2, 0.8, 1.6)));
         $resolvedAt = $status->is_pending || $status->code === 'cancelled'
             ? null
-            : $createdAt->copy()->addMinutes(min(fake()->numberBetween(20, $resolution), $age - 1));
-        $assigned = $status->is_initial && fake()->boolean(60) ? null : fake()->randomElement($context['workers']);
-        $createdBy = fake()->randomElement($context['people']);
+            : $createdAt->copy()->addMinutes(min(DemoRandom::numberBetween(20, $resolution), $age - 1));
+        $assigned = $status->is_initial && DemoRandom::boolean(60) ? null : DemoRandom::randomElement($context['workers']);
+        $createdBy = DemoRandom::randomElement($context['people']);
 
         $steps = IncidentStory::steps([
             'status' => (string) $status->code,
@@ -170,6 +172,7 @@ class IncidentVolumeSeeder extends Seeder
                     'user_id' => $step['user'],
                     'activity_type_id' => $context['types'][$step['type']],
                     'changes' => $this->changes($step, $context),
+                    'note' => $step['note'] ?? null,
                     'created_at' => $step['at'],
                 ];
             }
@@ -181,9 +184,8 @@ class IncidentVolumeSeeder extends Seeder
             DB::table('incident_activities')->insert($chunk);
         }
 
-        // El mismo formato que la aplicación (INC-000123), sin recortar ids de más de seis cifras
-        DB::table('incidents')->where('code', 'like', 'NEW-%')
-            ->update(['code' => DB::raw("CONCAT('INC-', IF(id > 999999, id, LPAD(id, 6, '0')))")]);
+        // El mismo formato y contador que la aplicación (TZ-26-0142), por año de creación
+        IncidentCodes::fromConfig()->assignPending('NEW-');
     }
 
     /**

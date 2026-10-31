@@ -9,7 +9,7 @@ order: 46
 # ADR-0036: Exportación en CSV
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Se menciona como deseable la exportación a Excel o CSV.

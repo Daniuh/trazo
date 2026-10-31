@@ -1,6 +1,6 @@
 <!-- Widget en el modo Personalizar: muestra sus datos reales (sin enlaces activos) con un marco punteado,
      la agarradera para arrastrarlo, el menú ⋯ con las mismas acciones para quien usa el teclado y, mientras
-     se cambia el tamaño, la medida en columnas × filas.
+     se cambia el ancho, la medida en columnas (el alto lo pone el contenido).
      Documentado en docs/frontend/dashboard.md -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -14,11 +14,9 @@ const props = defineProps<{ widget: DashboardWidget; metrics: Metrics; actions: 
 const emit = defineEmits<{ action: [key: string] }>()
 const trendDays = defineModel<TrendDays>('trendDays', { required: true })
 
-const size = computed(() => `${props.widget.w} × ${props.widget.h}`)
+const size = computed(() => `${props.widget.w} columnas`)
 // Con teclado no se ve la medida: el nombre del botón la dice
-const menuLabel = computed(
-  () => `Opciones de ${props.widget.name}, ${props.widget.w} columnas de ancho y ${props.widget.h} filas de alto`,
-)
+const menuLabel = computed(() => `Opciones de ${props.widget.name}, ${props.widget.w} columnas de ancho`)
 </script>
 
 <template>
@@ -28,7 +26,7 @@ const menuLabel = computed(
       <WidgetContent v-model:trend-days="trendDays" :widget="widget" :metrics="metrics" />
     </div>
 
-    <!-- Medida en columnas × filas, visible solo mientras se cambia el tamaño -->
+    <!-- Medida en columnas, visible solo mientras se cambia el ancho -->
     <span class="editable-widget__size" aria-hidden="true">{{ size }}</span>
 
     <div class="editable-widget__controls">

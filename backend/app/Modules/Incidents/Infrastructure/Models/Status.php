@@ -18,11 +18,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property bool $is_initial
  * @property bool $is_pending
  * @property bool $is_final
+ * @property bool $requires_note
  * @property bool $is_active
  */
 class Status extends Model
 {
-    protected $fillable = ['code', 'name', 'sort_order', 'is_initial', 'is_pending', 'is_final', 'is_active'];
+    protected $fillable = ['code', 'name', 'sort_order', 'is_initial', 'is_pending', 'is_final', 'requires_note', 'is_active'];
 
     protected function casts(): array
     {
@@ -31,6 +32,7 @@ class Status extends Model
             'is_initial' => 'boolean',
             'is_pending' => 'boolean',
             'is_final' => 'boolean',
+            'requires_note' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

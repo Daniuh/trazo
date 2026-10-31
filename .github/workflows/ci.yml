@@ -107,11 +107,13 @@ jobs:
       - name: Build de producción
         run: npm run build
 
-  # El backend se prueba dentro del mismo stack de Docker que se usa en local
+  # El backend se prueba dentro del mismo stack de Docker, en el modo desarrollo: trae Pest, Pint, Larastan y PCOV
   backend:
     name: Backend
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      COMPOSE_FILE: docker-compose.yml:docker-compose.override.yml:docker-compose.dev.yml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -134,7 +136,8 @@ jobs:
         if: always()
         run: docker compose -p trazo down -v
 
-  # Flujos críticos en las cuatro vistas, con revisión de accesibilidad (axe), contra el stack completo
+  # Flujos críticos en las cuatro vistas, con revisión de accesibilidad (axe), contra el stack completo en el modo final:
+  # el mismo build y la misma CSP que verá quien use Trazo
   e2e:
     name: E2E
     runs-on: ubuntu-24.04

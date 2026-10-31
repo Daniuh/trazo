@@ -1,4 +1,4 @@
-<!-- Tarjeta "Datos" del detalle: quién lo reportó, quién lo atiende y sus fechas. -->
+<!-- Tarjeta "Datos" de la vista previa del listado: quién lo reportó, quién lo atiende y sus fechas. -->
 <!-- Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -6,6 +6,7 @@ import { formatDateTime, formatRelative } from '@/shared/format/dates'
 import AppCard from '@/shared/ui/AppCard.vue'
 import type { Incident } from '../../domain/incident'
 
+// Estado y prioridad ya van bajo el título de la vista previa
 const props = defineProps<{ incident: Incident }>()
 
 const facts = computed(() => [
@@ -38,6 +39,7 @@ const facts = computed(() => [
 
 .incident-facts__row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: $space-3;
   padding: $space-2 0;

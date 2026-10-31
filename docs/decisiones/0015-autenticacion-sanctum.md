@@ -9,7 +9,7 @@ order: 25
 # ADR-0015: Autenticación con Laravel Sanctum y token Bearer
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Se requieren login, logout y protección de rutas. En el frontend se exige manejo de token e interceptores.

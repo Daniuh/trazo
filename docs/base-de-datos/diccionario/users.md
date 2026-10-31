@@ -15,7 +15,9 @@ Personas que usan Trazo. **Se desactivan, nunca se borran**, para conservar el h
 |---|---|---|---|
 | `id` | BIGINT UNSIGNED | PK | Clave interna; nunca sale por la API |
 | `ulid` | CHAR(26) | UNIQUE, NOT NULL | Identificador público, inmutable |
-| `name` | VARCHAR(120) | NOT NULL | Nombre visible |
+| `given_names` | VARCHAR(80) | NOT NULL | Nombres, uno o varios ("María José") |
+| `family_names` | VARCHAR(80) | NOT NULL | Apellidos, uno o varios ("De la Torre Gómez") |
+| `name` | VARCHAR(161) | Calculada y almacenada, `TRIM(CONCAT(given_names, ' ', family_names))` | Nombre completo para mostrar. No se escribe ([ADR-0086](../../decisiones/0086-nombres-y-apellidos.md)) |
 | `email` | VARCHAR(191) | UNIQUE, NOT NULL | Siempre en minúsculas y sin espacios |
 | `password` | VARCHAR(255) | NOT NULL | Hash Argon2id |
 | `is_active` | BOOLEAN | NOT NULL, por defecto `true` | Un usuario inactivo no puede entrar |
@@ -29,7 +31,7 @@ Una cuenta creada desde la administración nace con una contraseña aleatoria qu
 
 | Índice | Uso |
 |---|---|
-| `(is_active, name)` | Selector de "asignar a": solo activos, ordenados por nombre |
+| `(is_active, family_names, given_names)` | Listas de personas activas ordenadas por apellido: selector de "asignar a", administración y auditoría |
 
 ## Referenciada por
 

@@ -1,9 +1,9 @@
 <!-- Botón "Agregar widget" del modo Personalizar: abre la lista de widgets ocultos con su nombre y qué muestran.
      El elegido entra al final del dashboard. Documentado en docs/frontend/dashboard.md -->
 <script setup lang="ts">
-import { QMenu } from 'quasar'
 import { ref } from 'vue'
 import AppButton from '@/shared/ui/AppButton.vue'
+import AppMenu from '@/shared/ui/AppMenu.vue'
 import type { DashboardWidget, WidgetCode } from '../../domain/dashboard'
 
 defineProps<{ widgets: DashboardWidget[] }>()
@@ -21,7 +21,7 @@ function add(code: WidgetCode): void {
 <template>
   <AppButton variant="secondary" icon="plus">
     Agregar widget
-    <QMenu v-model="open" anchor="bottom left" self="top left" :offset="[0, 6]">
+    <AppMenu v-model="open">
       <div class="add-widget" role="menu" aria-label="Widgets para agregar">
         <p v-if="widgets.length === 0" class="add-widget__empty">Todos los widgets ya están en tu inicio.</p>
         <button
@@ -36,7 +36,7 @@ function add(code: WidgetCode): void {
           <span class="add-widget__description">{{ widget.description }}</span>
         </button>
       </div>
-    </QMenu>
+    </AppMenu>
   </AppButton>
 </template>
 
@@ -59,20 +59,11 @@ function add(code: WidgetCode): void {
 }
 
 .add-widget__item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: $space-2 $space-4;
-  border: 0;
-  background: none;
-  color: $color-text;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
+  @include menu-item;
 
-  &:hover {
-    background: $color-page;
-  }
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .add-widget__name {

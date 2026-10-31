@@ -58,7 +58,7 @@ Las fija el `docker-compose.yml` para todos los servicios de Laravel, junto con:
 
 ## Dónde está en el código
 
-- [`docker-compose.yml`](../../docker-compose.yml) (servicio `reverb` y variables) y [`docker-compose.override.yml`](../../docker-compose.override.yml)
+- [`docker-compose.yml`](../../docker-compose.yml) (servicio `reverb` y variables) y [`docker-compose.dev.yml`](../../docker-compose.dev.yml)
 - [`docker/nginx/gateway.conf`](../../docker/nginx/gateway.conf)
 - [`backend/config/reverb.php`](../../backend/config/reverb.php) y [`backend/config/broadcasting.php`](../../backend/config/broadcasting.php)
 - Decisión: [ADR-0057](../decisiones/0057-tiempo-real-en-la-practica.md)

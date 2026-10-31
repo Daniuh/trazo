@@ -77,9 +77,54 @@ describe('estado y asignación', function (): void {
             ->and(denial(IncidentAction::Assign, MANAGER, $closed))->toBe(Denial::Finalized);
     });
 
+    it('al crear, quien toma incidentes solo se asigna a sí mismo; quien asigna, a cualquiera', function (): void {
+        $access = new IncidentAccess;
+
+        expect($access->canAssignOnCreate(new Actor(1, AGENT), 1))->toBeTrue()
+            ->and($access->canAssignOnCreate(new Actor(1, AGENT), 2))->toBeFalse()
+            ->and($access->canAssignOnCreate(new Actor(1, MANAGER), 2))->toBeTrue()
+            ->and($access->canAssignOnCreate(new Actor(1, REQUESTER), 1))->toBeFalse();
+    });
+
     it('el solicitante no asigna, no cambia estados ni elimina', function (): void {
         foreach ([IncidentAction::Assign, IncidentAction::ChangeStatus, IncidentAction::Delete] as $action) {
             expect(denial($action, REQUESTER, incident()))->toBe(Denial::Forbidden);
+        }
+    });
+});
+
+describe('reabrir', function (): void {
+    $closed = fn (?int $requestedBy = null): IncidentState => new IncidentState(1, 2, false, true, false, $requestedBy);
+
+    it('se pide solo sobre lo terminado y sin otra solicitud en curso', function () use ($closed): void {
+        expect(denial(IncidentAction::RequestReopen, [...REQUESTER, 'incidents.reopen.request'], $closed()))->toBeNull()
+            ->and(denial(IncidentAction::RequestReopen, REQUESTER, $closed()))->toBe(Denial::Forbidden)
+            ->and(denial(IncidentAction::RequestReopen, [...REQUESTER, 'incidents.reopen.request'], incident()))->toBe(Denial::NotFinalized)
+            ->and(denial(IncidentAction::RequestReopen, [...REQUESTER, 'incidents.reopen.request'], $closed(1)))->toBe(Denial::ReopenPending);
+    });
+
+    it('reabre directo quien puede aprobar, si no hay una solicitud esperando', function () use ($closed): void {
+        $approver = [...MANAGER, 'incidents.reopen.approve'];
+
+        expect(denial(IncidentAction::Reopen, $approver, $closed(), 9))->toBeNull()
+            ->and(denial(IncidentAction::Reopen, MANAGER, $closed(), 9))->toBe(Denial::Forbidden)
+            ->and(denial(IncidentAction::Reopen, $approver, $closed(1), 9))->toBe(Denial::ReopenPending);
+    });
+
+    it('decide quien puede aprobar, menos quien la pidió', function () use ($closed): void {
+        $approver = [...MANAGER, 'incidents.reopen.approve'];
+
+        expect(denial(IncidentAction::DecideReopen, $approver, $closed(1), 9))->toBeNull()
+            ->and(denial(IncidentAction::DecideReopen, $approver, $closed(9), 9))->toBe(Denial::OwnReopenRequest)
+            ->and(denial(IncidentAction::DecideReopen, $approver, $closed(), 9))->toBe(Denial::NoReopenRequest)
+            ->and(denial(IncidentAction::DecideReopen, MANAGER, $closed(1), 9))->toBe(Denial::Forbidden);
+    });
+
+    it('lo eliminado no se reabre', function (): void {
+        $deleted = new IncidentState(1, null, false, true, true, 2);
+
+        foreach ([IncidentAction::RequestReopen, IncidentAction::Reopen, IncidentAction::DecideReopen] as $action) {
+            expect(denial($action, [...MANAGER, 'incidents.reopen.request', 'incidents.reopen.approve'], $deleted, 9))->toBe(Denial::NotVisible);
         }
     });
 });
@@ -89,5 +134,6 @@ it('resume todas las acciones para la API', function (): void {
 
     expect($actions)->toBe([
         'update' => true, 'change_status' => false, 'take' => false, 'assign' => false, 'delete' => false, 'restore' => false,
+        'request_reopen' => false, 'reopen' => false, 'decide_reopen' => false, 'comment' => false,
     ]);
 });

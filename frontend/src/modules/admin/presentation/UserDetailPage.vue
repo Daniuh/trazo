@@ -9,6 +9,7 @@ import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { incidentListLocation } from '@/modules/incidents/application/listLink'
 import { useCatalogStore } from '@/modules/incidents/application/useCatalogStore'
 import { toApiError } from '@/shared/http'
+import AppBackLink from '@/shared/ui/AppBackLink.vue'
 import AppBadge from '@/shared/ui/AppBadge.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppCard from '@/shared/ui/AppCard.vue'
@@ -166,20 +167,29 @@ const resetAccess = () =>
 
 <template>
   <div class="user-detail">
-    <RouterLink class="user-detail__back" :to="{ name: 'users' }">← Usuarios</RouterLink>
+    <AppBackLink :to="{ name: 'users' }" label="Usuarios" />
 
     <AppSkeleton v-if="loading && !user" :lines="6" />
     <AppErrorState v-else-if="error" :error="error" @retry="detail.load" />
 
     <template v-else-if="user">
       <header class="user-detail__header">
-        <h1 class="user-detail__title">{{ user.name }}</h1>
-        <p class="user-detail__email">{{ user.email }}</p>
-        <div class="user-detail__badges">
-          <AppBadge :tone="statusTone(user)">{{ statusLabel(user) }}</AppBadge>
-          <AppBadge tone="neutral">{{ user.role?.name ?? 'Sin rol' }}</AppBadge>
+        <div class="user-detail__identity">
+          <h1 class="user-detail__title">{{ user.name }}</h1>
+          <div class="user-detail__badges">
+            <AppBadge :tone="statusTone(user)">{{ statusLabel(user) }}</AppBadge>
+            <AppBadge tone="neutral">{{ user.role?.name ?? 'Sin rol' }}</AppBadge>
+          </div>
         </div>
-        <RouterLink v-if="activityLink" class="user-detail__link" :to="activityLink">Ver su actividad</RouterLink>
+        <AppButton
+          v-if="activityLink"
+          class="user-detail__activity"
+          variant="secondary"
+          icon="audit"
+          :to="activityLink"
+        >
+          Ver su actividad
+        </AppButton>
       </header>
 
       <AppAlert v-if="user.isSelf" tone="info">
@@ -233,7 +243,11 @@ const resetAccess = () =>
         />
       </div>
 
-      <ProfileDialog v-model="editingProfile" :current="{ name: user.name, email: user.email }" :action="saveProfile" />
+      <ProfileDialog
+        v-model="editingProfile"
+        :current="{ givenNames: user.givenNames, familyNames: user.familyNames, email: user.email }"
+        :action="saveProfile"
+      />
       <RoleDialog
         v-model="changingRole"
         :current="user.role?.code ?? null"
@@ -265,18 +279,22 @@ const resetAccess = () =>
   gap: $space-4;
 }
 
-.user-detail__back,
-.user-detail__link {
-  align-self: flex-start;
-  color: $color-primary;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-}
-
+// Celular: nombre, correo y etiquetas; debajo, "Ver su actividad" a todo el ancho
 .user-detail__header {
   display: flex;
   flex-direction: column;
+  gap: $space-3;
+}
+
+.user-detail__identity {
+  display: flex;
+  flex-direction: column;
   gap: $space-2;
+  min-width: 0;
+}
+
+.user-detail__activity {
+  width: 100%;
 }
 
 .user-detail__title {
@@ -284,12 +302,6 @@ const resetAccess = () =>
   font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
   line-height: $line-height-tight;
-  overflow-wrap: anywhere;
-}
-
-.user-detail__email {
-  margin: 0;
-  color: $color-text-secondary;
   overflow-wrap: anywhere;
 }
 
@@ -327,15 +339,30 @@ const resetAccess = () =>
   font-size: $font-size-sm;
 }
 
+// Desde tablet, "Ver su actividad" va a la derecha del nombre
+@include tablet {
+  .user-detail__header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .user-detail__activity {
+    flex-shrink: 0;
+    width: auto;
+  }
+}
+
 @include laptop {
   .user-detail__title {
     font-size: $font-size-2xl;
   }
 
+  // Permisos ocupa el alto de la columna de la izquierda, hasta el final de Acceso
   .user-detail__body {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
   }
 }
 </style>

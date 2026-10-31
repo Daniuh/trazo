@@ -9,7 +9,7 @@ order: 60
 # ADR-0050: Editor del dashboard con grid-layout-plus, sin sus estilos inyectados y con alternativa de teclado
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-23
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0030](0030-dashboard-personalizable.md) eligió `grid-layout-plus` para el modo "Personalizar" en portátil y monitor. Al construirlo aparecieron cuatro preguntas:

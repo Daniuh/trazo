@@ -55,7 +55,7 @@ final readonly class UserController
     public function update(UserRequest $request, string $user, UpdateUser $update): JsonResponse
     {
         $admin = $this->requests->admin($request);
-        $record = $update->handle($admin, $user, $request->name(), $request->email(), $this->requests->context($request));
+        $record = $update->handle($admin, $user, $request->personName(), $request->email(), $this->requests->context($request));
 
         return new JsonResponse(['data' => $this->detail($record, $admin)]);
     }

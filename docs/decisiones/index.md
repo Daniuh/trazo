@@ -79,3 +79,23 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0065](0065-documentacion-de-funciones.md) | Documentación de funciones: phpDocumentor en su imagen oficial y TypeDoc, generadas bajo demanda y en el CI |
 | [ADR-0066](0066-llave-de-la-app-sin-entrypoint.md) | La configuración lee la `APP_KEY` del volumen local cuando no llega por el entorno |
 | [ADR-0067](0067-pantallas-precompiladas-en-desarrollo.md) | Vite precompila el layout y las pantallas al arrancar, para que la primera visita no espere |
+| [ADR-0068](0068-modo-final-por-defecto.md) | `docker compose up -d` levanta el modo final (rápido); el modo desarrollo pasa a un archivo opcional |
+| [ADR-0069](0069-cambio-de-rol-con-permisos-exactos.md) | Al cambiar de rol, la persona queda con los permisos exactos del rol nuevo; el registro guarda las excepciones que tenía |
+| [ADR-0070](0070-contrasenas-predecibles.md) | Se rechazan las contraseñas repetitivas, secuenciales o con datos de la persona o la marca; la clave demo pasa a `Cometa.Demo.2026` |
+| [ADR-0071](0071-nota-de-estado-y-reapertura.md) | Resuelto y Cancelado exigen una nota; lo cerrado o cancelado solo se reabre con motivo y la aprobación de quien supervisa |
+| [ADR-0072](0072-asignarse-al-crear.md) | Quien puede tomar incidentes marca "Asignármelo" al crear; solo puede elegirse a sí mismo |
+| [ADR-0073](0073-largo-del-titulo.md) | El título de un incidente va de 5 a 80 caracteres, con contador en el formulario |
+| [ADR-0074](0074-codigo-de-incidente-por-ano.md) | El código del incidente pasa a prefijo, año y consecutivo del año (TZ-26-0142) |
+| [ADR-0075](0075-menus-que-se-abren-donde-caben.md) | Los menús miden el espacio antes de abrirse: abajo, arriba, al lado o bajando la página |
+| [ADR-0076](0076-conversacion-del-incidente.md) | Cada incidente tiene una conversación tipo chat; se borra el propio durante 5 minutos |
+| [ADR-0077](0077-centro-de-notificaciones.md) | Campana con Conversaciones y Actividad para los avisos de cada persona; el perfil pasa al pie del menú lateral |
+| [ADR-0078](0078-mis-incidentes.md) | "Mis incidentes": tablero con lo asignado, en Kanban (arrastrando para cambiar de estado), Lista, Calendario o Mi día |
+| [ADR-0079](0079-menu-en-dock.md) | El menú lateral y el encabezado dan paso a un dock abajo y centrado en las cuatro vistas; los avisos, arriba a la derecha |
+| [ADR-0080](0080-lista-agrupada-con-plazo.md) | El listado de incidentes pasa a una lista agrupada con el avance del plazo; la tabla queda como segunda vista |
+| [ADR-0081](0081-dashboard-de-riesgo.md) | El dashboard pasa a pulso con cumplimiento del plazo, mapa de riesgo, flujo de estados y balance del backlog; los widgets anteriores siguen disponibles |
+| [ADR-0082](0082-formulario-guiado.md) | El formulario del incidente guía: prioridad en tarjetas con su plazo, atajos de vencimiento, incidentes parecidos y vista previa |
+| [ADR-0083](0083-detalle-con-camino-y-actividad.md) | El detalle muestra el camino de estados, el plazo y el siguiente paso; historial y conversación en una sola actividad |
+| [ADR-0084](0084-detalle-con-historial-y-panel-de-chat.md) | Detalle con las 5 entradas recientes junto a la ficha, y el chat y toda la actividad en un panel con pestañas |
+| [ADR-0085](0085-avisos-de-coordinacion.md) | Avisos de coordinación (nuevo sin asignar, crítico, reapertura pendiente y vencido) por permiso y una sola vez |
+| [ADR-0086](0086-nombres-y-apellidos.md) | Nombres y apellidos por separado, con el nombre completo calculado por la base y las listas ordenadas por apellido |
+| [ADR-0087](0087-cuentas-por-rol-desde-el-entorno.md) | Cuentas por rol (evaluación y propias) creadas desde el entorno del servidor, también en producción |

@@ -1,5 +1,6 @@
 <!-- Mi cuenta: datos de la persona, cambiar la contraseña y su verificación en dos pasos (activarla, regenerar códigos de recuperación y
-     desactivarla si su rol no la exige). Una columna en celular y tablet; dos en portátil y monitor.
+     desactivarla si su rol no la exige). Una columna en celular y tablet; dos en portátil y monitor, con "Tus datos" del
+     mismo alto que la verificación.
      Documentado en docs/frontend/auth.md -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -220,10 +221,22 @@ function setUp(): void {
   gap: $space-2;
 }
 
+// Portátil y monitor: "Tus datos" comparte fila con la verificación y se estira hasta su mismo alto;
+// "Contraseña" queda debajo, en la primera columna
 @include laptop {
   .account__grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    align-items: start;
+    align-items: stretch;
+  }
+
+  .account__column {
+    display: contents;
+
+    > :last-child {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+    }
   }
 }
 </style>

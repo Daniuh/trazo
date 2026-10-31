@@ -29,7 +29,7 @@ Recorre la prueba en su mismo orden. Cada fila dice dónde se cumple y cómo ver
 | Pedido | Dónde | Cómo comprobarlo |
 |---|---|---|
 | Login | `POST /api/v1/auth/login` en [AuthController](../../backend/app/Modules/Auth/Http/AuthController.php) | Ingresar en `/ingresar` con una [credencial de prueba](../../README.md#credenciales-de-prueba) |
-| Logout | `POST /api/v1/auth/logout` (revoca el token) | Menú de la persona → Cerrar sesión |
+| Logout | `POST /api/v1/auth/logout` (revoca el token) | Círculo con las iniciales, al final del menú de abajo → Cerrar sesión |
 | Protección de rutas | Middleware `auth:sanctum` en cada módulo ([rutas de Auth](../../backend/app/Modules/Auth/Http/routes.php)) y guarda del front ([authGuard](../../frontend/src/modules/auth/application/authGuard.ts)) | Abrir `/incidentes` sin sesión lleva al login; la API responde 401 `UNAUTHENTICATED` |
 | Sugerencia: Sanctum | Laravel Sanctum con tokens de API ([ADR-0015](../decisiones/0015-autenticacion-sanctum.md)) | [LoginTest](../../backend/tests/Feature/Auth/LoginTest.php), [SessionTest](../../backend/tests/Feature/Auth/SessionTest.php) |
 
@@ -55,7 +55,7 @@ Endpoints en [IncidentController](../../backend/app/Modules/Incidents/Http/Incid
 |---|---|
 | Paginación | `page` y `per_page` (máximo 100, impuesto por el back) |
 | Ordenamiento | `sort` con lista blanca de campos y desempate por id |
-| Búsqueda por texto | `search` con índice FULLTEXT y búsqueda por código `INC-000123` ([ADR-0013](../decisiones/0013-busqueda-fulltext.md)) |
+| Búsqueda por texto | `search` con índice FULLTEXT y búsqueda por código `TZ-26-0142` ([ADR-0013](../decisiones/0013-busqueda-fulltext.md)) |
 | Filtro por prioridad | `filter[priority]` |
 | Filtro por estado | `filter[status]` |
 | Filtro por usuario asignado | `filter[assignee]` (también "sin asignar") |
@@ -67,12 +67,12 @@ Consulta en [EloquentIncidentList](../../backend/app/Modules/Incidents/Infrastru
 
 | Pedido | Cumplimiento |
 |---|---|
-| Total de incidentes | Widget "Total de incidentes" |
-| Incidentes por estado | Gráfico "Por estado" |
-| Incidentes vencidos | Widget "Vencidos" (pendientes con el vencimiento ya pasado) |
-| Incidentes por prioridad | Gráfico "Por prioridad", con cantidad y porcentaje |
+| Total de incidentes | "Total" en el pulso de la operación (también el widget "Total de incidentes") |
+| Incidentes por estado | "Flujo de estados": cada estado con su cantidad, Cancelado como salida (también el gráfico "Por estado") |
+| Incidentes vencidos | En la frase del pulso y en la columna "Vencido" del mapa de riesgo (también el widget "Vencidos") |
+| Incidentes por prioridad | Columna "Total" del mapa de riesgo: todos los de cada prioridad, en cualquier estado (también el gráfico "Por prioridad", con porcentaje) |
 
-Cada cifra respeta lo que la persona puede ver y lleva al listado ya filtrado. Hay seis widgets más: pendientes, sin asignar, creados contra resueltos, próximos a vencer, asignados a mí y carga por agente. Consultas en [EloquentDashboardQueries](../../backend/app/Modules/Dashboard/Infrastructure/EloquentDashboardQueries.php), con caché ([ADR-0047](../decisiones/0047-metricas-del-dashboard.md)). Pruebas: [DashboardMetricsTest](../../backend/tests/Feature/Dashboard/DashboardMetricsTest.php).
+Todo eso está en el diseño original del inicio, centrado en el riesgo ([ADR-0081](../decisiones/0081-dashboard-de-riesgo.md)). Cada cifra respeta lo que la persona puede ver y lleva al listado ya filtrado. Además: cumplimiento del plazo, mapa de riesgo por vencimiento, balance del backlog, próximos a vencer, asignados a mí y carga por agente; y en "Agregar widget", los indicadores y gráficos clásicos, sin asignar y creados contra resueltos. Consultas en [EloquentDashboardQueries](../../backend/app/Modules/Dashboard/Infrastructure/EloquentDashboardQueries.php), con caché ([ADR-0047](../decisiones/0047-metricas-del-dashboard.md)). Pruebas: [DashboardMetricsTest](../../backend/tests/Feature/Dashboard/DashboardMetricsTest.php).
 
 ### 5. Rendimiento
 
@@ -103,7 +103,7 @@ Pruebas de extremo a extremo de cada pantalla en las cuatro vistas: [frontend/e2
 
 | Pedido | Servicio en [docker-compose.yml](../../docker-compose.yml) |
 |---|---|
-| `docker-compose.yml` | Base común, más `docker-compose.override.yml` para local |
+| `docker-compose.yml` | Base común, más `docker-compose.override.yml` para local (Mailpit) y `docker-compose.dev.yml` para desarrollar ([dos modos](../operacion/docker.md#dos-modos)) |
 | Contenedor para Laravel | `app` (PHP-FPM); la misma imagen para `worker`, `scheduler` y `reverb` |
 | Nginx/Apache | `gateway` (Nginx, único puerto publicado) y `frontend` (Nginx con el build de Vue) |
 | MySQL/MariaDB | `mysql` 8.4, en una red interna sin salida |

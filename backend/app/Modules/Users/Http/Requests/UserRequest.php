@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-// Validación para crear y editar una persona: nombre, correo (normalizado y único) y, al crear, su rol y el código
+// Validación para crear y editar una persona: nombres y apellidos, correo (normalizado y único) y, al crear, su rol y el código
 // de quien administra si el rol es sensible. Documentado en docs/backend/users.md
 
 namespace App\Modules\Users\Http\Requests;
 
 use App\Modules\Shared\Domain\EmailAddress;
 use App\Modules\Users\Application\Data\NewUser;
+use App\Modules\Users\Domain\PersonName;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,8 +28,10 @@ final class UserRequest extends FormRequest
         if (is_string($this->input('email'))) {
             $this->merge(['email' => EmailAddress::normalize($this->string('email')->toString())]);
         }
-        if (is_string($this->input('name'))) {
-            $this->merge(['name' => $this->string('name')->squish()->toString()]);
+        foreach (['given_names', 'family_names'] as $part) {
+            if (is_string($this->input($part))) {
+                $this->merge([$part => PersonName::clean($this->string($part)->toString())]);
+            }
         }
     }
 
@@ -45,7 +48,10 @@ final class UserRequest extends FormRequest
         }
 
         return [
-            'name' => ['required', 'string', 'min:2', 'max:120'],
+            'given_names' => ['required', 'string', 'max:'.PersonName::MAX_PART],
+            'family_names' => ['required', 'string', 'max:'.PersonName::MAX_PART],
+            // El nombre completo lo arma la base: no se escribe
+            'name' => ['prohibited'],
             'email' => ['required', 'string', 'email:rfc', 'max:191', $unique],
             'role' => $creating ? ['required', 'string', Rule::exists('roles', 'code')] : ['prohibited'],
             'mfa_code' => $creating ? ['nullable', 'string', 'digits:6'] : ['prohibited'],
@@ -54,12 +60,12 @@ final class UserRequest extends FormRequest
 
     public function newUser(): NewUser
     {
-        return new NewUser($this->name(), $this->email(), $this->string('role')->toString());
+        return new NewUser($this->personName(), $this->email(), $this->string('role')->toString());
     }
 
-    public function name(): string
+    public function personName(): PersonName
     {
-        return $this->string('name')->toString();
+        return new PersonName($this->string('given_names')->toString(), $this->string('family_names')->toString());
     }
 
     public function email(): string

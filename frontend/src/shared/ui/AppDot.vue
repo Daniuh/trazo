@@ -14,7 +14,6 @@ defineProps<{ tone: Tone }>()
 </template>
 
 <style scoped lang="scss">
-@use 'sass:list';
 @use '@/design/tokens' as *;
 
 .app-dot {
@@ -31,9 +30,10 @@ defineProps<{ tone: Tone }>()
   border-radius: 50%;
 }
 
-@each $name, $pair in $tones {
+// El punto usa el color base del tono, el mismo de los gráficos
+@each $name, $fill in $chart-fills {
   .app-dot__mark--#{$name} {
-    background: list.nth($pair, 1);
+    background: $fill;
   }
 }
 </style>

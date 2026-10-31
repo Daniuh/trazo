@@ -1,13 +1,14 @@
-<!-- Envoltura común de todo campo: etiqueta arriba, ayuda en el ícono de información y error siempre visible. -->
+<!-- Envoltura común de todo campo: etiqueta arriba (o al lado, con "inline", para barras de una fila), ayuda en el ícono
+     de información y error siempre visible. -->
 <!-- Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import AppInfoTip from '../AppInfoTip.vue'
 
-defineProps<{ id: string; label: string; info?: string; error?: string; required?: boolean }>()
+defineProps<{ id: string; label: string; info?: string; error?: string; required?: boolean; inline?: boolean }>()
 </script>
 
 <template>
-  <div class="app-field" :class="{ 'app-field--invalid': error }">
+  <div class="app-field" :class="{ 'app-field--invalid': error, 'app-field--inline': inline }">
     <div class="app-field__label">
       <label :for="id">{{ label }}<span v-if="required" class="app-field__required" aria-hidden="true">*</span></label>
       <AppInfoTip v-if="info" :text="info" :label="`Más información sobre ${label}`" />
@@ -32,6 +33,22 @@ defineProps<{ id: string; label: string; info?: string; error?: string; required
   gap: $space-2;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
+}
+
+// Etiqueta a la izquierda del control, en la misma fila: para barras donde la etiqueta arriba ocupa demasiado
+.app-field--inline {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: $space-2;
+
+  .app-field__label {
+    white-space: nowrap;
+  }
+
+  > :deep(.q-field) {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .app-field__required {

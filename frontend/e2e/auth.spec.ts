@@ -31,8 +31,11 @@ test('cerrar sesión lleva al login', async ({ page }) => {
   await signInAs(page, 'solicitante2@trazo.test')
   await page.goto('/')
 
-  await page.getByRole('button', { name: /^Cuenta de/ }).click()
-  await page.getByRole('button', { name: 'Cerrar sesión' }).click()
+  // La cuenta va al final del dock (en celular, en el encabezado) y abre su menú
+  await page.getByRole('button', { name: /^Tu cuenta/ }).click()
+  await page.getByRole('menuitem', { name: 'Cerrar sesión' }).click()
+  // Pide confirmación, por si se tocó sin querer
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Cerrar sesión' }).click()
 
   await expect(page).toHaveURL(/\/ingresar/)
 })

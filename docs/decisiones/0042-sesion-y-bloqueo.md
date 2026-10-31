@@ -9,7 +9,7 @@ order: 52
 # ADR-0042: Duración de la sesión y bloqueo progresivo por huella del correo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0016](0016-contrasenas.md) pide un bloqueo progresivo ante intentos fallidos, y [ADR-0015](0015-autenticacion-sanctum.md) pide tokens con expiración. Faltaba definir tres cosas: los escalones del bloqueo, dónde se lleva la cuenta de fallos y cuánto dura una sesión. Además, el mensaje de login no debe revelar qué correos existen, y el bloqueo no puede convertirse en una forma de confirmarlo.

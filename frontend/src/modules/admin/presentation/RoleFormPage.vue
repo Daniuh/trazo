@@ -1,11 +1,12 @@
-<!-- Crear un rol o ver y editar uno existente. Portátil y monitor: datos y política de MFA a la izquierda, permisos a la
-     derecha; celular y tablet: una columna. Si el rol no se puede editar (el de la cima o uno de nivel igual o mayor),
+<!-- Crear un rol o ver y editar uno existente. Portátil y monitor: datos y política de MFA lado a lado y los permisos
+     debajo, a lo ancho y en columnas; celular y tablet: una columna. Si el rol no se puede editar (el de la cima o uno de nivel igual o mayor),
      se muestra sin campos. Editar un rol con personas pide confirmación; si la API pide el código de quien administra,
      se abre el diálogo del código. Documentado en docs/frontend/admin.md -->
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import AppBackLink from '@/shared/ui/AppBackLink.vue'
 import AppBadge from '@/shared/ui/AppBadge.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppCard from '@/shared/ui/AppCard.vue'
@@ -129,7 +130,7 @@ onMounted(loadAll)
 
 <template>
   <div class="role-form">
-    <RouterLink class="role-form__back" :to="{ name: 'roles' }">← Roles</RouterLink>
+    <AppBackLink :to="{ name: 'roles' }" label="Roles" />
 
     <AppErrorState v-if="loadError ?? catalog.error" :error="(loadError ?? catalog.error)!" @retry="loadAll" />
     <AppSkeleton v-else-if="loading || catalog.permissions.length === 0" :lines="6" />
@@ -171,7 +172,12 @@ onMounted(loadAll)
               :options="copyOptions"
               placeholder="Elige un rol"
             />
-            <PermissionChecklist v-model="draft.permissions" :catalog="catalog.permissions" :editing="editable" />
+            <PermissionChecklist
+              v-model="draft.permissions"
+              :catalog="catalog.permissions"
+              :editing="editable"
+              columns
+            />
           </div>
         </AppCard>
 
@@ -209,13 +215,6 @@ onMounted(loadAll)
   display: flex;
   flex-direction: column;
   gap: $space-4;
-}
-
-.role-form__back {
-  align-self: flex-start;
-  color: $color-primary;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
 }
 
 .role-form__header {
@@ -287,14 +286,15 @@ onMounted(loadAll)
     font-size: $font-size-2xl;
   }
 
-  .role-form__body {
+  // Datos y verificación lado a lado; los permisos debajo, a lo ancho, para repartir sus módulos en columnas
+  .role-form__column {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-  }
+    align-items: stretch;
 
-  .role-form__actions {
-    grid-column: 1 / -1;
+    > :only-child {
+      grid-column: 1 / -1;
+    }
   }
 }
 </style>

@@ -22,6 +22,23 @@ final class IncidentStory
         'cancelled' => [['cancelled'], ['in_progress', 'cancelled'], ['in_progress', 'on_hold', 'cancelled']],
     ];
 
+    // Notas de ejemplo para los estados que la exigen (statuses.requires_note)
+    private const NOTES = [
+        'resolved' => [
+            'Se reinició el servicio y quedó funcionando. Se confirmó con la persona que lo reportó.',
+            'Se actualizó el controlador del equipo y se hizo una prueba completa.',
+            'Se restableció el acceso y se revisaron los permisos de la cuenta.',
+            'Se cambió la pieza dañada y el equipo volvió a operar con normalidad.',
+            'Se corrigió la configuración y se dejó documentado el cambio.',
+        ],
+        'cancelled' => [
+            'Se reportó dos veces; se sigue en el otro incidente.',
+            'La persona confirmó que ya no lo necesita.',
+            'No era una falla: se explicó cómo hacerlo.',
+            'Lo atiende el proveedor externo directamente.',
+        ],
+    ];
+
     // Cuánto tarda, como máximo, en cerrarse algo ya resuelto (minutos)
     private const CLOSE_AFTER_MINUTES = 2 * 1440;
 
@@ -36,27 +53,31 @@ final class IncidentStory
      *
      * @param  array{status: string, created_at: Carbon, resolved_at: ?Carbon, assignee: ?int, now: Carbon}  $incident
      * @param  list<int>  $managers
-     * @return list<array{type: string, user: int, at: Carbon, from?: string, to?: string, assignee?: int}>
+     * @return list<array{type: string, user: int, at: Carbon, from?: string, to?: string, assignee?: int, note?: string}>
      */
     public static function steps(array $incident, array $managers): array
     {
         /** @var list<string> $path */
-        $path = fake()->randomElement(self::PATHS[$incident['status']]);
-        $manager = (int) fake()->randomElement($managers);
+        $path = DemoRandom::randomElement(self::PATHS[$incident['status']]);
+        $manager = (int) DemoRandom::randomElement($managers);
         $assignee = $incident['assignee'];
         $times = self::times($incident, count($path) + ($assignee === null ? 0 : 1));
         $next = 0;
 
         $steps = [];
         if ($assignee !== null) {
-            $assigner = fake()->boolean() ? $assignee : $manager;
+            $assigner = DemoRandom::boolean() ? $assignee : $manager;
             $steps[] = ['type' => 'assigned', 'user' => $assigner, 'at' => $times[$next++], 'assignee' => $assignee];
         }
 
         $from = 'open';
         foreach ($path as $to) {
             $byManager = in_array($to, ['closed', 'cancelled'], true) || $assignee === null;
-            $steps[] = ['type' => 'status_changed', 'user' => $byManager ? $manager : $assignee, 'at' => $times[$next++], 'from' => $from, 'to' => $to];
+            $step = ['type' => 'status_changed', 'user' => $byManager ? $manager : $assignee, 'at' => $times[$next++], 'from' => $from, 'to' => $to];
+            if (isset(self::NOTES[$to])) {
+                $step['note'] = (string) DemoRandom::randomElement(self::NOTES[$to]);
+            }
+            $steps[] = $step;
             $from = $to;
         }
 
@@ -91,7 +112,7 @@ final class IncidentStory
         $span = max(1, (int) $start->diffInMinutes($end));
         $offsets = [];
         for ($i = 0; $i < $working; $i++) {
-            $offsets[] = fake()->numberBetween(0, $span - 1);
+            $offsets[] = DemoRandom::numberBetween(0, $span - 1);
         }
         sort($offsets);
         $times = array_map(fn (int $minutes): Carbon => $start->copy()->addMinutes($minutes), $offsets);
@@ -101,7 +122,7 @@ final class IncidentStory
         }
         if ($closed && $resolved !== null) {
             $limit = max(1, min(self::CLOSE_AFTER_MINUTES, (int) $resolved->diffInMinutes($incident['now']) - 1));
-            $times[] = $resolved->copy()->addMinutes(fake()->numberBetween(1, $limit));
+            $times[] = $resolved->copy()->addMinutes(DemoRandom::numberBetween(1, $limit));
         }
 
         return $times;

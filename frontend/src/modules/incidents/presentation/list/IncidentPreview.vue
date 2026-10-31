@@ -1,5 +1,5 @@
 <!-- Vista previa del listado (solo monitor): lo esencial del incidente elegido sin salir del listado, con
-     "Cambiar estado" y "Abrir detalle". Reutiliza las piezas del detalle. Documentado en docs/frontend/incidents.md -->
+     "Cambiar estado", la solicitud de reapertura si hay una y "Abrir detalle". Reutiliza las piezas del detalle. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRealtime } from '@/modules/realtime/application/realtimeBus'
@@ -13,7 +13,11 @@ import AppSkeleton from '@/shared/ui/states/AppSkeleton.vue'
 import { useIncidentDetail } from '../../application/useIncidentDetail'
 import IncidentBadges from '../components/IncidentBadges.vue'
 import IncidentFacts from '../components/IncidentFacts.vue'
+import IncidentNoteDialog from '../components/IncidentNoteDialog.vue'
 import IncidentStatusButton from '../components/IncidentStatusButton.vue'
+import ReopenRequestNotice from '../components/ReopenRequestNotice.vue'
+import { useNoteDialog } from '../useNoteDialog'
+import { useReopenDecision } from '../useReopenDecision'
 import { useStatusChange } from '../useStatusChange'
 
 const props = defineProps<{ id: string }>()
@@ -21,11 +25,23 @@ const emit = defineEmits<{ changed: []; close: []; open: [id: string] }>()
 
 const detail = useIncidentDetail(props.id)
 const { incident, loadError, actionError, conflict, busy } = detail
-const changeStatus = useStatusChange(incident, detail.changeStatus)
+const noteDialog = useNoteDialog()
+const changeStatus = useStatusChange(incident, detail.changeStatus, noteDialog.ask)
+
+function onNoteDone(ok: boolean): void {
+  noteDialog.finish(ok)
+  if (!ok) detail.clearError()
+}
 const conflictMessage = messageFor(new ApiError('http', 'VERSION_CONFLICT'))
 
 async function onStatus(code: string): Promise<void> {
   if (await changeStatus(code)) emit('changed')
+}
+
+// Quien supervisa decide la reapertura sin salir del listado
+const reopenDecision = useReopenDecision(detail, noteDialog)
+async function onReopenDecision(decide: () => Promise<boolean>): Promise<void> {
+  if (await decide()) emit('changed')
 }
 
 onMounted(detail.load)
@@ -54,7 +70,16 @@ useRealtime('incident', (change) => {
         {{ conflictMessage }}
         <AppButton variant="link" icon="refresh" @click="detail.load">Recargar</AppButton>
       </AppAlert>
-      <AppAlert v-else-if="actionError">{{ messageFor(actionError) }}</AppAlert>
+      <AppAlert v-else-if="actionError && !noteDialog.open.value">{{ messageFor(actionError) }}</AppAlert>
+
+      <ReopenRequestNotice
+        v-if="incident.reopenRequest"
+        :request="incident.reopenRequest"
+        :can-decide="incident.actions.decideReopen"
+        :busy="busy"
+        @approve="onReopenDecision(reopenDecision.approve)"
+        @reject="onReopenDecision(reopenDecision.reject)"
+      />
 
       <p class="incident-preview__description">{{ incident.description }}</p>
       <IncidentFacts :incident="incident" />
@@ -69,6 +94,14 @@ useRealtime('incident', (change) => {
         <AppButton variant="secondary" @click="emit('open', incident.id)">Abrir detalle</AppButton>
       </div>
     </template>
+
+    <IncidentNoteDialog
+      v-model="noteDialog.open.value"
+      :request="noteDialog.request.value"
+      :failure="actionError"
+      :conflict="conflict"
+      @done="onNoteDone"
+    />
   </aside>
 </template>
 

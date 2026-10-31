@@ -1,5 +1,5 @@
 <!-- Campo de texto. Une la envoltura AppField con el input de Quasar y su accesibilidad. -->
-<!-- Las contraseñas traen un botón para mostrarlas u ocultarlas. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
+<!-- Las contraseñas traen un botón para mostrarlas u ocultarlas. Con "counter" y "maxlength" muestra cuántos caracteres van. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import { QInput } from 'quasar'
 import { computed, ref, useId } from 'vue'
@@ -14,6 +14,8 @@ const props = defineProps<{
   type?: 'text' | 'email' | 'password' | 'textarea' | 'search'
   placeholder?: string
   maxlength?: number
+  // Muestra "usados/máximo" bajo el campo; necesita maxlength
+  counter?: boolean
   autocomplete?: string
   autofocus?: boolean
   // "numeric": teclado de números en el celular (el valor sigue siendo texto)
@@ -22,6 +24,13 @@ const props = defineProps<{
 
 const model = defineModel<string>({ default: '' })
 const id = useId()
+
+const counterId = `${id}-counter`
+const showCounter = computed(() => props.counter && props.maxlength !== undefined)
+const describedBy = computed(
+  () =>
+    [props.error ? `${id}-error` : null, showCounter.value ? counterId : null].filter(Boolean).join(' ') || undefined,
+)
 
 const isPassword = computed(() => props.type === 'password')
 const revealed = ref(false)
@@ -41,7 +50,7 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
       :inputmode="inputmode"
       :autogrow="type === 'textarea'"
       :aria-invalid="Boolean(error)"
-      :aria-describedby="error ? `${id}-error` : undefined"
+      :aria-describedby="describedBy"
       outlined
       dense
       hide-bottom-space
@@ -58,6 +67,9 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
         </button>
       </template>
     </QInput>
+    <p v-if="showCounter" :id="counterId" class="app-text-field__counter">
+      {{ model.length }}/{{ maxlength }}<span class="app-text-field__counter-label"> caracteres</span>
+    </p>
   </AppField>
 </template>
 
@@ -68,6 +80,17 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
 // (Quasar fija su propio mínimo para el modo compacto, por eso el selector es más específico)
 :deep(.q-textarea.q-field--dense .q-field__native) {
   min-height: $textarea-min-height;
+}
+
+.app-text-field__counter {
+  margin: $space-1 0 0;
+  color: $color-text-secondary;
+  font-size: $font-size-xs;
+  text-align: right;
+}
+
+.app-text-field__counter-label {
+  @include visually-hidden;
 }
 
 .app-text-field__reveal {

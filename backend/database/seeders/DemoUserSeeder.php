@@ -14,17 +14,17 @@ use Illuminate\Database\Seeder;
 
 class DemoUserSeeder extends Seeder
 {
-    /** Correo => [nombre, rol] */
+    /** Correo => [nombres, apellidos, rol] */
     private const USERS = [
-        'superadmin@trazo.test' => ['Sofía Ramírez', 'super_admin'],
-        'admin@trazo.test' => ['Natalia Vargas', 'admin'],
-        'supervisor@trazo.test' => ['Carlos Mejía', 'supervisor'],
-        'agente1@trazo.test' => ['Laura Gómez', 'agent'],
-        'agente2@trazo.test' => ['Andrés Castro', 'agent'],
-        'agente3@trazo.test' => ['Valentina Ríos', 'agent'],
-        'solicitante1@trazo.test' => ['Juan Pérez', 'requester'],
-        'solicitante2@trazo.test' => ['María López', 'requester'],
-        'solicitante3@trazo.test' => ['Diego Herrera', 'requester'],
+        'superadmin@trazo.test' => ['Sofía', 'Ramírez', 'super_admin'],
+        'admin@trazo.test' => ['Natalia', 'Vargas', 'admin'],
+        'supervisor@trazo.test' => ['Carlos', 'Mejía', 'supervisor'],
+        'agente1@trazo.test' => ['Laura', 'Gómez', 'agent'],
+        'agente2@trazo.test' => ['Andrés', 'Castro', 'agent'],
+        'agente3@trazo.test' => ['Valentina', 'Ríos', 'agent'],
+        'solicitante1@trazo.test' => ['Juan', 'Pérez', 'requester'],
+        'solicitante2@trazo.test' => ['María', 'López', 'requester'],
+        'solicitante3@trazo.test' => ['Diego', 'Herrera', 'requester'],
     ];
 
     public function run(): void
@@ -36,10 +36,10 @@ class DemoUserSeeder extends Seeder
         $roles = Role::query()->pluck('id', 'code');
         $password = (string) config('trazo.demo_user_password');
 
-        foreach (self::USERS as $email => [$name, $role]) {
+        foreach (self::USERS as $email => [$given, $family, $role]) {
             $user = User::query()->firstOrCreate(
                 ['email' => $email],
-                ['name' => $name, 'password' => $password, 'is_active' => true],
+                ['given_names' => $given, 'family_names' => $family, 'password' => $password, 'is_active' => true],
             );
 
             $user->roles()->syncWithoutDetaching([$roles[$role]]);

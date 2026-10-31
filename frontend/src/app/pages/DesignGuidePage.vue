@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import { icons, type IconName } from '@/design/icons/icons'
 import { ApiError, ClientErrorCode } from '@/shared/http'
 import AppBadge from '@/shared/ui/AppBadge.vue'
+import AppBackLink from '@/shared/ui/AppBackLink.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppCard from '@/shared/ui/AppCard.vue'
 import AppDot from '@/shared/ui/AppDot.vue'
@@ -48,12 +49,12 @@ const networkError = new ApiError('network', ClientErrorCode.Network)
 
 async function askDelete() {
   const ok = await confirm({
-    title: '¿Eliminar INC-000123?',
+    title: '¿Eliminar TZ-26-0123?',
     message: 'El incidente dejará de aparecer en los listados. Un supervisor puede restaurarlo.',
     confirmLabel: 'Eliminar',
     danger: true,
   })
-  if (ok) notify('Incidente INC-000123 eliminado')
+  if (ok) notify('Incidente TZ-26-0123 eliminado')
 }
 
 function simulateSave() {
@@ -85,6 +86,10 @@ function simulateSave() {
         <AppButton variant="danger" icon="trash" @click="askDelete">Eliminar</AppButton>
         <AppButton variant="link">Ver historial</AppButton>
         <AppButton :loading="saving" @click="simulateSave">{{ saving ? 'Guardando…' : 'Guardar' }}</AppButton>
+        <AppButton variant="secondary" icon="audit" :to="{ name: 'design-guide' }"
+          >Enlace con aspecto de botón</AppButton
+        >
+        <AppBackLink :to="{ name: 'design-guide' }" label="Regresar" />
       </div>
     </AppCard>
 
@@ -123,7 +128,7 @@ function simulateSave() {
 
     <AppCard title="Mensajes">
       <div class="guide__row">
-        <AppButton variant="secondary" @click="notify('Incidente INC-000124 creado')">Notificación</AppButton>
+        <AppButton variant="secondary" @click="notify('Incidente TZ-26-0124 creado')">Notificación</AppButton>
         <AppButton variant="secondary" @click="notifyError(networkError)">Notificación de error</AppButton>
       </div>
     </AppCard>

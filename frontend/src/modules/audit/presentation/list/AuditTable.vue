@@ -1,28 +1,26 @@
 <!-- Auditoría en tabla (portátil y monitor): fecha, quién, acción, sobre qué y el primer cambio. Elegir una fila abre
-     su detalle. Con el detalle al lado (monitor), se ocultan las columnas largas. Documentado en docs/frontend/audit.md -->
+     su detalle en un panel encima; la fila queda marcada mientras está abierto. Documentado en docs/frontend/audit.md -->
 <script setup lang="ts">
-import { computed } from 'vue'
 import { formatShortDateTime } from '@/shared/format/dates'
 import AppDataTable from '@/shared/ui/AppDataTable.vue'
 import type { DataColumn } from '@/shared/ui/dataTable'
 import type { AuditCatalog, AuditEntry } from '../../domain/audit'
 import { changeSummary, targetText } from '../auditTexts'
 
-const props = defineProps<{
+defineProps<{
   items: AuditEntry[]
   catalog: AuditCatalog | null
   selectedId: number | null
-  compact: boolean
 }>()
 const emit = defineEmits<{ open: [id: number] }>()
 
-const columns = computed<DataColumn[]>(() => [
+const columns: DataColumn[] = [
   { key: 'when', label: 'Fecha', emphasis: 'secondary' },
   { key: 'who', label: 'Hecho por' },
   { key: 'action', label: 'Acción' },
   { key: 'target', label: 'Sobre', emphasis: 'grow' },
-  ...(props.compact ? [] : [{ key: 'change', label: 'Cambio', emphasis: 'grow' as const }]),
-])
+  { key: 'change', label: 'Cambio', emphasis: 'grow' },
+]
 </script>
 
 <template>

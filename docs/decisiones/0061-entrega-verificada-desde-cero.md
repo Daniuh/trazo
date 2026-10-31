@@ -9,7 +9,7 @@ order: 71
 # ADR-0061: Entrega verificada desde cero
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-25
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba exige que el proyecto sea ejecutable. Que la suite pase en el equipo de trabajo no lo garantiza: ese equipo tiene imágenes, volúmenes y dependencias de semanas anteriores. Antes de publicar se repitió la instalación como la haría alguien nuevo: un clon en una carpeta vacía, las imágenes construidas sin caché y solo los pasos del README. El resultado quedó en el [checklist de cumplimiento](../producto/cumplimiento-de-la-prueba.md#verificación-desde-cero).
@@ -59,5 +59,5 @@ Para el N+1:
 ## Dónde está en el código
 - [`backend/app/Providers/AppServiceProvider.php`](../../backend/app/Providers/AppServiceProvider.php): `Model::preventLazyLoading()`.
 - [`README.md`](../../README.md): instalación en Windows y sección "Actualizar".
-- [`docker-compose.override.yml`](../../docker-compose.override.yml): volumen anónimo `/app/node_modules` del front.
+- [`docker-compose.dev.yml`](../../docker-compose.dev.yml): volumen anónimo `/app/node_modules` del front (estaba en el override hasta el [ADR-0068](0068-modo-final-por-defecto.md)).
 - [`frontend/e2e/realtime.spec.ts`](../../frontend/e2e/realtime.spec.ts): `gotoSubscribed`.

@@ -1,4 +1,4 @@
-<!-- Dibuja un widget según su código: indicador, barras, dona, tendencia o lista. Los colores salen de los tonos
+<!-- Dibuja un widget según su código: pulso, mapa de riesgo, flujo, balance, indicador, barras, dona, tendencia o lista. Los colores salen de los tonos
      de estados y prioridades; cada fila lleva al listado con su filtro. Documentado en docs/frontend/dashboard.md -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -9,8 +9,12 @@ import AppBarList from '@/shared/ui/charts/AppBarList.vue'
 import AppDonutChart from '@/shared/ui/charts/AppDonutChart.vue'
 import type { ChartItem } from '@/shared/ui/charts/types'
 import { type BreakdownData, type DashboardWidget, type Metrics, type TrendDays } from '../../domain/dashboard'
+import BacklogWidget from './BacklogWidget.vue'
 import DigestWidget from './DigestWidget.vue'
 import KpiWidget from './KpiWidget.vue'
+import PulseWidget from './PulseWidget.vue'
+import RiskMapWidget from './RiskMapWidget.vue'
+import StatusFlowWidget from './StatusFlowWidget.vue'
 import TrendWidget from './TrendWidget.vue'
 import WidgetCard from './WidgetCard.vue'
 
@@ -51,8 +55,16 @@ const overdueCaption = computed(() => {
 
 <template>
   <WidgetCard :title="widget.name" :description="widget.description" :ready="ready">
+    <PulseWidget v-if="widget.code === 'operation_pulse' && m.operation_pulse" :data="m.operation_pulse" />
+    <RiskMapWidget v-else-if="widget.code === 'risk_map' && m.risk_map" :data="m.risk_map" />
+    <StatusFlowWidget v-else-if="widget.code === 'status_flow' && m.status_flow" :data="m.status_flow" />
+    <BacklogWidget
+      v-else-if="widget.code === 'backlog_balance' && m.backlog_balance"
+      v-model:days="trendDays"
+      :data="m.backlog_balance"
+    />
     <KpiWidget
-      v-if="widget.code === 'total_incidents' && m.total_incidents"
+      v-else-if="widget.code === 'total_incidents' && m.total_incidents"
       :data="m.total_incidents"
       :name="widget.name"
     />

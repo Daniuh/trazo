@@ -19,8 +19,10 @@ class DatabaseSeeder extends Seeder
             MfaPolicySeeder::class,
             AdminActionTypeSeeder::class,
             SystemEventTypeSeeder::class,
+            NotificationTypeSeeder::class,
             DashboardWidgetSeeder::class,
             DemoUserSeeder::class,
+            AccountSetSeeder::class,
             IncidentVolumeSeeder::class,
         ]);
     }

@@ -9,7 +9,7 @@ order: 50
 # ADR-0040: Axios como base del cliente HTTP
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba exige manejo centralizado de peticiones, interceptores y manejo de token. El cliente también debe normalizar errores, aplicar tiempos de espera y reintentar lecturas de forma segura.

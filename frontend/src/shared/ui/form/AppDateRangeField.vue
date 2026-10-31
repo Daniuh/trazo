@@ -74,9 +74,18 @@ function clear(): void {
   font-weight: $font-weight-semibold;
 }
 
+// Quasar reserva siempre seis semanas y un relleno abajo; aquí el calendario mide las semanas del mes
 .date-range__calendar {
   width: 100%;
+  min-height: 0;
+  height: auto;
   background: transparent;
+
+  :deep(.q-date__view),
+  :deep(.q-date__calendar-days-container) {
+    min-height: 0;
+    padding-bottom: 0;
+  }
 
   :deep(.q-date__calendar-item--today .q-btn) {
     box-shadow: inset 0 0 0 1px $color-primary;

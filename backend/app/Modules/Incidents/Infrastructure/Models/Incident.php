@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -106,5 +107,15 @@ class Incident extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(IncidentActivity::class);
+    }
+
+    /**
+     * La solicitud de reapertura en curso, si hay una (nunca más de una).
+     *
+     * @return HasOne<IncidentReopenRequest, $this>
+     */
+    public function pendingReopenRequest(): HasOne
+    {
+        return $this->hasOne(IncidentReopenRequest::class)->where('status', IncidentReopenRequest::PENDING);
     }
 }

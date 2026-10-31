@@ -1,8 +1,9 @@
 <!-- Diálogo para cambiar el rol de una persona (sobre AppFormDialog): solo los roles que quien administra puede dar.
-     Si la API pide el código de quien administra, lo pide la acción que recibe; si se cancela, el diálogo sigue abierto.
+     Si la persona tiene permisos personalizados, avisa que el rol nuevo los reemplaza. Si la API pide el código de
+     quien administra, lo pide la acción que recibe; si se cancela, el diálogo sigue abierto.
      Documentado en docs/frontend/admin.md -->
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { messageFor } from '@/shared/errors'
 import { toApiError } from '@/shared/http'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
@@ -20,6 +21,16 @@ const props = defineProps<{
 const open = defineModel<boolean>({ required: true })
 
 const role = ref<string | null>(props.current)
+
+// Al cambiar de rol el back borra los permisos personalizados: se avisa antes de guardar
+const clearNotice = computed(() => {
+  if (props.extraPermissions === 0 || role.value === props.current) return ''
+  const what =
+    props.extraPermissions === 1
+      ? 'se quita su cambio personalizado'
+      : `se quitan sus ${props.extraPermissions} cambios personalizados`
+  return `Con el rol nuevo, la persona queda con los permisos exactos de ese rol: ${what}.`
+})
 const error = ref<string | null>(null)
 const saving = ref(false)
 
@@ -58,8 +69,6 @@ async function save(): Promise<void> {
     @submit="save"
   >
     <RoleChoice v-model="role" :roles="roles" />
-    <AppAlert v-if="extraPermissions > 0" tone="info">
-      Las excepciones de permisos que el rol nuevo ya incluya, o que ya no apliquen, se quitarán.
-    </AppAlert>
+    <AppAlert v-if="clearNotice" tone="info">{{ clearNotice }}</AppAlert>
   </AppFormDialog>
 </template>

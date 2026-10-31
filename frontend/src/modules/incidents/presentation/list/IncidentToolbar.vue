@@ -2,11 +2,11 @@
      Celular y tablet: búsqueda, "Filtros (n)" (abre el panel), "Ordenar por" y ⋯ con "Exportar CSV".
      Exportar solo aparece con el permiso. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
-import { QMenu } from 'quasar'
 import { computed, ref, watch } from 'vue'
 import AppActionMenu from '@/shared/ui/AppActionMenu.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppIcon from '@/shared/ui/AppIcon.vue'
+import AppMenu from '@/shared/ui/AppMenu.vue'
 import AppSelect from '@/shared/ui/form/AppSelect.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
 import type { MenuItem } from '@/shared/ui/menu'
@@ -63,8 +63,8 @@ watch(
 
 const filterCount = computed(() => activeFilterCount(props.criteria))
 const moreCount = computed(() => {
-  const { createdFrom, createdTo, dueFrom, dueTo, creator, overdue, deleted } = props.criteria
-  return [createdFrom ?? createdTo, dueFrom ?? dueTo, creator, overdue, deleted].filter(Boolean).length
+  const { createdFrom, createdTo, dueFrom, dueTo, creator, overdue, deleted, reopenRequested } = props.criteria
+  return [createdFrom ?? createdTo, dueFrom ?? dueTo, creator, overdue, deleted, reopenRequested].filter(Boolean).length
 })
 
 const sortModel = computed({
@@ -96,7 +96,7 @@ function applySheet(draft: ListCriteria): void {
         v-model="search"
         label="Buscar"
         type="search"
-        placeholder="Título, descripción o código (INC-123)"
+        placeholder="Título, descripción o código (26-0142)"
         :maxlength="100"
       />
       <p v-if="searchHint" class="incident-toolbar__hint" role="status">{{ searchHint }}</p>
@@ -113,7 +113,7 @@ function applySheet(draft: ListCriteria): void {
       />
       <AppButton class="incident-toolbar__more" variant="secondary" icon="filter">
         Más filtros{{ moreCount > 0 ? ` (${moreCount})` : '' }}
-        <QMenu anchor="bottom right" self="top right" :offset="[0, 6]">
+        <AppMenu align="right">
           <div class="incident-toolbar__menu">
             <IncidentMoreFilters
               :criteria="criteria"
@@ -122,7 +122,7 @@ function applySheet(draft: ListCriteria): void {
               @change="emit('change', $event)"
             />
           </div>
-        </QMenu>
+        </AppMenu>
       </AppButton>
       <!-- En portátil no cabe con texto en la misma fila: queda el ícono, con su nombre para lectores y al pasar el cursor -->
       <AppButton
@@ -213,8 +213,9 @@ function applySheet(draft: ListCriteria): void {
     min-width: $filter-field-width;
   }
 
-  // Alinea el botón con los campos, que tienen etiqueta arriba
+  // Alinea el botón con los campos, que tienen etiqueta arriba, y le da su mismo alto
   .incident-toolbar__more {
+    min-height: $field-height;
     margin-top: calc(#{$font-size-sm} * #{$line-height-base} + #{$space-1});
   }
 }

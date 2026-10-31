@@ -9,7 +9,7 @@ order: 74
 # ADR-0064: Respaldo diario de MySQL
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El [ADR-0026](0026-despliegue.md) aprobó un respaldo diario de la base, y las [mejoras aplicadas](../mejoras/aplicadas.md) lo daban por hecho. Al revisar el anexo apareció que no existía: ningún servicio ni tarea hacía copias de la base. La documentación decía algo falso.
@@ -30,7 +30,7 @@ Un servicio `backup` en el compose base, así corre igual en local y en el despl
 - **Volcado:** `mysqldump --single-transaction --quick` lee una foto consistente de InnoDB sin bloquear las tablas: la app sigue funcionando durante el respaldo.
 - **Cifrado:** AES-256-CBC con la llave derivada por PBKDF2 (600.000 iteraciones), más una firma HMAC-SHA256 en un archivo `.hmac` al lado. La restauración revisa la firma antes de descifrar, así que un archivo dañado, modificado o cifrado con otra llave se rechaza con un mensaje claro.
 - **Llave:** en local se genera sola en el volumen `trazo_backup-key`, igual que la `APP_KEY`. En producción `BACKUP_ENCRYPTION_KEY` es obligatoria; si falta, el servicio no arranca. La llave y las credenciales pasan a `openssl` y `mysqldump` por archivos temporales privados, nunca como argumentos visibles.
-- **Horario:** cada día a las 3:00 en `America/Bogota` (`BACKUP_AT`, `BACKUP_TIMEZONE`). Si al arrancar no hay un respaldo de las últimas 24 horas, hace uno de inmediato.
+- **Horario:** cada día a las 3:00 en `America/Bogota` (`BACKUP_AT`, `BACKUP_TIMEZONE`). Si al arrancar no hay un respaldo de las últimas 24 horas, hace uno de inmediato. El servicio revisa cada 5 minutos si le toca uno (`BACKUP_CHECK_SECONDS`), así que un respaldo fallido o perdido por tener el equipo suspendido se reintenta solo. La primera versión dormía hasta la hora siguiente: tras un reinicio de Docker, que levanta los contenedores sin esperar a MySQL, el intento inicial fallaba y no había respaldo hasta el otro día.
 - **Historia:** 7 días (`BACKUP_RETENTION_DAYS`) en el volumen `trazo_backups`.
 - **Mínimo privilegio:** usa el usuario de la app, no root, y solo la red interna `data`. Como root solo prepara carpetas y llave; el trabajo lo hace el usuario `mysql` (`gosu`).
 - **Salud y recursos:** el healthcheck falla si el último respaldo tiene más de 26 horas. Tiene límites de 0,5 CPU y 256 MB.

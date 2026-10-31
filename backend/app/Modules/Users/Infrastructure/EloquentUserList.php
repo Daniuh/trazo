@@ -10,6 +10,7 @@ namespace App\Modules\Users\Infrastructure;
 use App\Modules\Users\Application\Data\UserListCriteria;
 use App\Modules\Users\Application\Data\UserPage;
 use App\Modules\Users\Application\Ports\UserListQuery;
+use App\Modules\Users\Domain\UserSort;
 use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -23,8 +24,13 @@ final readonly class EloquentUserList implements UserListQuery
         $this->filter($query, $criteria);
 
         $total = (clone $query)->count();
+        $direction = $criteria->descending ? 'desc' : 'asc';
+        // Por nombre se ordena como en una lista de personas: por apellido y luego por nombres
+        $columns = $criteria->sort === UserSort::Name ? ['users.family_names', 'users.given_names'] : ["users.{$criteria->sort->value}"];
+        foreach ($columns as $column) {
+            $query->orderBy($column, $direction);
+        }
         $items = $query
-            ->orderBy("users.{$criteria->sort->value}", $criteria->descending ? 'desc' : 'asc')
             ->orderBy('users.id')
             ->forPage($criteria->page, $criteria->perPage)
             ->get();

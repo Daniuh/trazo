@@ -40,16 +40,17 @@ Los catálogos son datos, no código: agregar un estado o cambiar el flujo es in
 | `is_initial` | BOOLEAN | Estado con el que nace un incidente |
 | `is_pending` | BOOLEAN | Trabajo pendiente: cuenta para "vencido" |
 | `is_final` | BOOLEAN | Fin del ciclo de vida |
+| `requires_note` | BOOLEAN | Llegar a este estado exige una nota ([ADR-0071](../../decisiones/0071-nota-de-estado-y-reapertura.md)) |
 | `is_active` | BOOLEAN | |
 
-| code | Nombre | Inicial | Pendiente | Final |
-|---|---|:-:|:-:|:-:|
-| `open` | Abierto | ✓ | ✓ | |
-| `in_progress` | En progreso | | ✓ | |
-| `on_hold` | En espera | | ✓ | |
-| `resolved` | Resuelto | | | |
-| `closed` | Cerrado | | | ✓ |
-| `cancelled` | Cancelado | | | ✓ |
+| code | Nombre | Inicial | Pendiente | Final | Pide nota |
+|---|---|:-:|:-:|:-:|:-:|
+| `open` | Abierto | ✓ | ✓ | | |
+| `in_progress` | En progreso | | ✓ | | |
+| `on_hold` | En espera | | ✓ | | |
+| `resolved` | Resuelto | | | | ✓ |
+| `closed` | Cerrado | | | ✓ | |
+| `cancelled` | Cancelado | | | ✓ | ✓ |
 
 Las banderas describen el comportamiento sin depender del nombre del estado: "vencido" se calcula como `due_date` pasada **y** estado con `is_pending`.
 
@@ -78,6 +79,8 @@ stateDiagram-v2
   cancelled --> [*]
 ```
 
+Cerrado y Cancelado no tienen transiciones de salida. Se reabren por un camino aparte, con solicitud y aprobación ([incident_reopen_requests](incident-reopen-requests.md)).
+
 ## activity_types
 
 | code | Nombre |
@@ -89,10 +92,13 @@ stateDiagram-v2
 | `unassigned` | Sin asignar |
 | `deleted` | Eliminado |
 | `restored` | Restaurado |
+| `reopen_requested` | Reapertura solicitada |
+| `reopen_rejected` | Reapertura rechazada |
+| `reopened` | Reabierto |
 
 ## Dónde está en el código
 
-- Migraciones: [`000006`](../../../backend/database/migrations/2026_10_21_000006_create_priorities_table.php) a [`000009`](../../../backend/database/migrations/2026_10_21_000009_create_activity_types_table.php)
+- Migraciones: [`000006`](../../../backend/database/migrations/2026_10_21_000006_create_priorities_table.php) a [`000009`](../../../backend/database/migrations/2026_10_21_000009_create_activity_types_table.php); `requires_note` en [`000035`](../../../backend/database/migrations/2026_10_27_000035_add_requires_note_to_statuses.php)
 - Modelos: [`Incidents/Infrastructure/Models/`](../../../backend/app/Modules/Incidents/Infrastructure/Models/)
 - Datos: [`IncidentCatalogSeeder.php`](../../../backend/database/seeders/IncidentCatalogSeeder.php)
 - Decisión: [ADR-0008](../../decisiones/0008-catalogos.md)

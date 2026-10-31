@@ -102,7 +102,7 @@ Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; n
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |
 |---|---|---|
-| Escribe el código del incidente, por ejemplo INC-000123 o solo 123. | El filtro de incidente no tiene forma de código | Corregirlo o tocar "Quitar el código" |
+| Escribe el código del incidente con su año, por ejemplo 26-0142. | El filtro de incidente no tiene forma de código (falta el año o sobra algo) | Corregirlo o tocar "Quitar el código" |
 | No pudimos seguir cargando la lista. Vuelve a cargarla desde el principio. | El enlace para seguir la lista no era válido (por ejemplo, se alteró a mano) | Tocar "Reintentar" o recargar la página |
 
 - **"No hay registros en los últimos 30 días":** sin fechas, la auditoría muestra solo los últimos 30 días. Para ver lo anterior, elegir un rango más amplio.
@@ -114,7 +114,12 @@ Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; n
 | Mensaje que ve el usuario | Qué significa | Qué hacer |
 |---|---|---|
 | Alguien más guardó cambios en este incidente mientras lo tenías abierto… | Otra persona guardó un cambio antes (conflicto de versión) | Pulsar "Recargar", revisar la versión actual y repetir el cambio si sigue siendo necesario |
-| Este incidente ya está cerrado o cancelado… | Está en un estado final | Si de verdad necesita cambios, crear un incidente nuevo |
+| Este incidente ya está cerrado o cancelado… | Está en un estado final | Pedir que se reabra con "Solicitar reapertura" (o reabrirlo, si es supervisor) |
+| Para este cambio de estado hace falta una nota… | Resuelto y Cancelado exigen explicar el cambio | Escribir cómo se resolvió o por qué se cancela |
+| Este incidente sigue en curso, así que no hay nada que reabrir… | Se pidió reabrir algo que ya no está cerrado ni cancelado (otra persona lo reabrió) | Recargar para ver su estado actual |
+| Ya hay una solicitud para reabrir este incidente esperando respuesta… | Alguien ya la pidió | Recargar para verla; quien supervisa la decidirá |
+| Esta solicitud de reapertura ya fue respondida por otra persona… | Dos supervisores la decidieron casi a la vez | Recargar para ver cómo quedó |
+| No puedes decidir tu propia solicitud de reapertura… | Quien la pidió intenta aprobarla o rechazarla | Pedir a otra persona con ese permiso que la decida |
 | Este incidente ya lo están atendiendo, así que ya no puedes editarlo… | Quien lo creó intenta editarlo cuando ya pasó del estado Abierto | Pedir el cambio a un supervisor |
 | Otra persona tomó este incidente hace un momento… | Dos personas intentaron tomarlo a la vez | Recargar para ver quién lo tiene |
 | Ese cambio de estado no está permitido desde el estado actual… | El estado cambió mientras tanto y esa transición ya no aplica | Recargar para ver las opciones vigentes |
@@ -134,6 +139,12 @@ Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; n
 | Ese job ya no está en la lista… | Otra persona lo reintentó o lo descartó | Actualizar la lista |
 | Ese evento ya no existe… | Se borró por antigüedad (resuelto hace más de 90 días) | Actualizar la lista |
 | Hiciste demasiados intentos seguidos. Espera… (en Sistema) | Más de 5 acciones de sistema en un minuto | Esperar el tiempo indicado |
+
+## Notificaciones
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Esa notificación ya no existe: se borró por antigüedad… | Se intentó marcar como leído un aviso de hace más de 90 días que ya se limpió | Actualizar la lista |
 
 ## Dashboard
 

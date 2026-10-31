@@ -28,7 +28,7 @@ Las firmas van juntas porque cada petición a PHP cuesta, y al abrir la app se p
 |---|---|---|
 | `incidents.all` | `incidents.view.any` | Cambios de todos los incidentes |
 | `incidents.unassigned` | `incidents.view.unassigned` | Cambios de incidentes que estaban o quedan sin asignar |
-| `users.{ULID}` | Solo esa persona | Cambios de lo que creó o tiene asignado, "te asignaron" y "tu sesión cambió" |
+| `users.{ULID}` | Solo esa persona | Cambios de lo que creó o tiene asignado, "te asignaron", "tus notificaciones cambiaron" y "tu sesión cambió" |
 
 La regla es `Channels::allows` (dominio), con los permisos efectivos de la persona. `Channels::forIncident` decide a qué canales va cada cambio:
 
@@ -41,15 +41,18 @@ La regla es `Channels::allows` (dominio), con los permisos efectivos de la perso
 | Nombre | Canal | Contenido | Cuándo |
 |---|---|---|---|
 | `incident.changed` | Los de `forIncident` | `{ id, change }` (`created`, `updated`, `deleted`, `restored`) | Cada `IncidentChanged` |
+| `incident.commented` | Los de `forIncident` (creador y asignado actuales) | `{ id, change }` (`added`, `removed`) | Cada `IncidentCommented`: llegó o se borró un mensaje de la conversación |
 | `incident.assigned` | `users.{asignado}` | `{ id }` | El incidente quedó asignado a otra persona que no es quien hizo el cambio |
+| `notifications.changed` | `users.{persona}` | `{}` | Llegó un aviso nuevo al centro de notificaciones, o la persona marcó avisos como leídos en otra pestaña |
 | `session.changed` | `users.{persona}` | `{}` | Cambio de rol, de permisos, de datos o de estado; restablecer el MFA o el acceso; editar su rol; cambiar o recuperar la contraseña |
 
 - **Por la cola y tras confirmar** (`Signal`, `afterCommit`): no frenan la respuesta y nunca salen de un cambio que al final se deshizo.
-- **Sin el aviso propio:** `incident.changed` sale con `toOthers()`. La pestaña que hizo el cambio manda su `X-Socket-ID` y no lo recibe.
+- **Sin el aviso propio:** `incident.changed` e `incident.commented` salen con `toOthers()`. La pestaña que hizo el cambio manda su `X-Socket-ID` y no lo recibe.
 
 ### De dónde salen
 
 - **Incidentes:** el repositorio emite `IncidentChanged` con el id, el ULID, qué pasó, quién lo creó y a quién estaba y queda asignado. Lo escuchan la caché del dashboard y `BroadcastIncidentChange`.
+- **Notificaciones:** el módulo [Notifications](notifications.md) llama a su puerto `NotificationSignals` al crear avisos o marcarlos como leídos. Lo implementa `BroadcastNotificationSignals`.
 - **Sesión:** los casos de uso de Users y de Auth llaman al puerto compartido `SessionSignals`. Lo implementa `BroadcastSessionSignals`, que traduce los ids a canales personales.
 
 ## Configuración
@@ -63,8 +66,8 @@ La regla es `Channels::allows` (dominio), con los permisos efectivos de la perso
 |---|---|---|
 | Domain | `Channels` | Nombres de canal, quién escucha cada uno y a cuáles va un cambio |
 | Shared/Application | `Ports/SessionSignals` | "La sesión de estas personas cambió"; lo usan Users y Auth |
-| Infrastructure | `Events/Signal` (+ `IncidentSignal`, `AssignedSignal`, `SessionSignal`) | Los avisos que salen por Reverb |
-| Infrastructure | `BroadcastIncidentChange`, `BroadcastSessionSignals` | Traducen eventos y ids a avisos y canales |
+| Infrastructure | `Events/Signal` (+ `IncidentSignal`, `CommentSignal`, `AssignedSignal`, `NotificationsSignal`, `SessionSignal`) | Los avisos que salen por Reverb |
+| Infrastructure | `BroadcastIncidentChange`, `BroadcastIncidentComment`, `BroadcastNotificationSignals`, `BroadcastSessionSignals` | Traducen eventos y ids a avisos y canales |
 | Infrastructure | `RealtimeServiceProvider` | Autorización de los canales, oyente e implementación del puerto |
 | Http | `RealtimeController`, `routes.php` | Configuración de conexión y firma de suscripciones (una copia de la petición por canal para `Broadcast::auth`) |
 | Http | `Requests/ChannelAuthRequest`, `Rules/SocketId` | Valida el id de la conexión y la lista de canales |

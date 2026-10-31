@@ -35,8 +35,9 @@ function incidentEntry(changes: IncidentAuditEntry['changes']): IncidentAuditEnt
     ...base,
     tab: 'incidents',
     type: { code: 'updated', name: 'Editado' },
-    incident: { id: 'i1', code: 'INC-000123', title: 'Impresora', deleted: false },
+    incident: { id: 'i1', code: 'TZ-26-0123', title: 'Impresora', deleted: false },
     changes,
+    note: null,
     links: { incident: true },
   }
 }
@@ -56,17 +57,17 @@ function adminEntry(code: string, details: AdminAuditEntry['details'], extra: Pa
 
 describe('criterios en la URL', () => {
   it('el filtro de "sobre qué" usa la clave de cada pestaña y el rol solo existe en administración', () => {
-    const criteria = { ...EMPTY_CRITERIA, actor: 'u1', types: ['created', 'updated'], target: 'INC-7', role: 'agent' }
+    const criteria = { ...EMPTY_CRITERIA, actor: 'u1', types: ['created', 'updated'], target: '26-7', role: 'agent' }
 
-    expect(toAuditQuery(criteria, 'incidents')).toEqual({ actor: 'u1', type: 'created,updated', incident: 'INC-7' })
+    expect(toAuditQuery(criteria, 'incidents')).toEqual({ actor: 'u1', type: 'created,updated', incident: '26-7' })
     expect(toAuditQuery(criteria, 'admin')).toEqual({
       actor: 'u1',
       type: 'created,updated',
-      user: 'INC-7',
+      user: '26-7',
       role: 'agent',
     })
-    expect(fromAuditQuery({ incident: 'INC-7', role: 'agent' }, 'incidents')).toMatchObject({
-      target: 'INC-7',
+    expect(fromAuditQuery({ incident: '26-7', role: 'agent' }, 'incidents')).toMatchObject({
+      target: '26-7',
       role: null,
     })
     expect(fromAuditQuery({ user: 'u2', role: 'agent' }, 'admin')).toMatchObject({ target: 'u2', role: 'agent' })
@@ -90,13 +91,27 @@ describe('textos de los cambios', () => {
       { label: 'Asignado a', value: 'Ana → Sin asignar' },
     ])
     expect(changeSummary(entry, null)).toBe('Estado: Abierto → En progreso (+1)')
-    expect(targetText(entry)).toBe('INC-000123 · Impresora')
+    expect(targetText(entry)).toBe('TZ-26-0123 · Impresora')
   })
 
   it('la administración muestra nombres de roles y permisos, y el código si ya no existen', () => {
     expect(changeRows(adminEntry('user_role_changed', { role: { from: 'agent', to: 'supervisor' } }), catalog)).toEqual(
       [{ label: 'Rol', value: 'Agente → Supervisor' }],
     )
+    // Al cambiar de rol, las excepciones que tenía la persona
+    expect(
+      changeRows(
+        adminEntry('user_role_changed', {
+          role: { from: 'agent', to: 'supervisor' },
+          cleared: { granted: ['incidents.export'], denied: ['incidents.take'] },
+        }),
+        catalog,
+      ),
+    ).toEqual([
+      { label: 'Rol', value: 'Agente → Supervisor' },
+      { label: 'Permisos adicionales que se quitaron', value: 'Exportar incidentes' },
+      { label: 'Permisos del rol que se devolvieron', value: 'incidents.take' },
+    ])
     expect(
       changeRows(
         adminEntry('user_permissions_changed', { added: ['incidents.export', 'audit.view'], removed: [] }),

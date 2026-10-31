@@ -1,5 +1,6 @@
 <!-- Columnas agrupadas por punto (p. ej. creados y resueltos por día), con leyenda y fechas de inicio, mitad y fin.
-     Al pasar el cursor, cada grupo muestra sus valores. Para lectores de pantalla hay una tabla oculta con todos los datos.
+     Al pasar el cursor, cada grupo muestra sus valores. La escala es de raíz cuadrada: un día atípico se nota más alto, pero
+     no aplasta a los demás contra el piso. Para lectores de pantalla hay una tabla oculta con todos los datos.
      Documentado en docs/frontend/sistema-de-diseno/graficos.md -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -15,17 +16,23 @@ const HEIGHT = 100
 const max = computed(() =>
   Math.max(1, ...props.points.flatMap((point) => props.series.map((s) => point.values[s.key] ?? 0))),
 )
-const barWidth = computed(() => (SLOT * 0.8) / props.series.length)
+// Alto en raíz cuadrada: conserva el orden y las diferencias, pero un pico (190 frente a 10) no deja a los demás en
+// una línea. El valor exacto de cada día sigue en el texto al pasar el cursor y en la tabla oculta
+const scaled = (value: number) => (Math.sqrt(value) / Math.sqrt(max.value)) * HEIGHT
+// Ancho de cada grupo: con pocos puntos (7 días) las columnas no se ensanchan de más; se quedan como con 14 y centradas
+const FEW_POINTS = 14
+const groupWidth = computed(() => SLOT * 0.8 * Math.min(1, props.points.length / FEW_POINTS))
+const barWidth = computed(() => groupWidth.value / props.series.length)
 
 const bars = computed(() =>
   props.points.flatMap((point, index) =>
     props.series.map((serie, position) => {
       const value = point.values[serie.key] ?? 0
-      const height = (value / max.value) * HEIGHT
+      const height = scaled(value)
       return {
         key: `${point.key}-${serie.key}`,
         tone: serie.tone,
-        x: index * SLOT + SLOT * 0.1 + position * barWidth.value,
+        x: index * SLOT + (SLOT - groupWidth.value) / 2 + position * barWidth.value,
         y: HEIGHT - height,
         height,
       }
@@ -55,35 +62,39 @@ const ticks = computed(() => {
       <li v-for="serie in series" :key="serie.key" class="app-columns__legend-item">
         <span class="app-columns__mark" :class="`app-columns__mark--${serie.tone}`" />{{ serie.label }}
       </li>
-      <li class="app-columns__max">Máximo por día: {{ formatNumber(max) }}</li>
+      <li class="app-columns__max">Día con más: {{ formatNumber(max) }}</li>
     </ul>
 
     <div class="app-columns__plot" aria-hidden="true">
-      <svg class="app-columns__svg" :viewBox="`0 0 ${points.length * SLOT} ${HEIGHT}`" preserveAspectRatio="none">
-        <line class="app-columns__base" x1="0" :x2="points.length * SLOT" :y1="HEIGHT" :y2="HEIGHT" />
-        <rect
-          v-for="bar in bars"
-          :key="bar.key"
-          class="app-columns__bar"
-          :class="`app-columns__bar--${bar.tone}`"
-          :x="bar.x"
-          :y="bar.y"
-          :width="barWidth"
-          :height="bar.height"
-        />
-        <!-- Zona invisible por grupo, para mostrar sus valores al pasar el cursor -->
-        <rect
-          v-for="group in groups"
-          :key="group.key"
-          class="app-columns__hit"
-          :x="group.x"
-          y="0"
-          :width="SLOT"
-          :height="HEIGHT"
-        >
-          <title>{{ group.title }}</title>
-        </rect>
-      </svg>
+      <!-- El lienzo toma el alto del contenedor: el SVG va encima, sin imponer su proporción (si no, con 7 días
+           sería más alto que ancho y estiraría la tarjeta) -->
+      <div class="app-columns__canvas">
+        <svg class="app-columns__svg" :viewBox="`0 0 ${points.length * SLOT} ${HEIGHT}`" preserveAspectRatio="none">
+          <line class="app-columns__base" x1="0" :x2="points.length * SLOT" :y1="HEIGHT" :y2="HEIGHT" />
+          <rect
+            v-for="bar in bars"
+            :key="bar.key"
+            class="app-columns__bar"
+            :class="`app-columns__bar--${bar.tone}`"
+            :x="bar.x"
+            :y="bar.y"
+            :width="barWidth"
+            :height="bar.height"
+          />
+          <!-- Zona invisible por grupo, para mostrar sus valores al pasar el cursor -->
+          <rect
+            v-for="group in groups"
+            :key="group.key"
+            class="app-columns__hit"
+            :x="group.x"
+            y="0"
+            :width="SLOT"
+            :height="HEIGHT"
+          >
+            <title>{{ group.title }}</title>
+          </rect>
+        </svg>
+      </div>
       <div class="app-columns__ticks">
         <span v-for="tick in ticks" :key="tick">{{ tick }}</span>
       </div>
@@ -171,11 +182,18 @@ const ticks = computed(() => {
   min-height: $chart-columns-height;
 }
 
-.app-columns__svg {
-  display: block;
+.app-columns__canvas {
+  position: relative;
   flex: 1;
-  width: 100%;
   min-height: 0;
+}
+
+.app-columns__svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .app-columns__base {

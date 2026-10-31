@@ -13,7 +13,7 @@ uses(RefreshDatabase::class);
 
 function startSession(string $email = 'agente1@trazo.test'): string
 {
-    return test()->postJson('/api/v1/auth/login', ['email' => $email, 'password' => 'Trazo.Demo.2026'])->json('data.token');
+    return test()->postJson('/api/v1/auth/login', ['email' => $email, 'password' => 'Cometa.Demo.2026'])->json('data.token');
 }
 
 // Cada llamada se resuelve como una petición nueva, sin el usuario que Laravel recuerda entre llamadas de la prueba

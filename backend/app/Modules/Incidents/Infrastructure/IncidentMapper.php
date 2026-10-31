@@ -10,6 +10,7 @@ namespace App\Modules\Incidents\Infrastructure;
 use App\Modules\Incidents\Application\Data\IncidentRecord;
 use App\Modules\Incidents\Application\Data\Person;
 use App\Modules\Incidents\Application\Data\PriorityInfo;
+use App\Modules\Incidents\Application\Data\ReopenRequestInfo;
 use App\Modules\Incidents\Domain\StatusFlags;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
 use App\Modules\Incidents\Infrastructure\Models\Priority;
@@ -22,6 +23,9 @@ use LogicException;
 
 final class IncidentMapper
 {
+    // Lo que toRecord necesita cargado; el listado y el detalle usan la misma lista para dar las mismas acciones
+    public const array RELATIONS = ['priority', 'status', 'creator:id,ulid,name', 'assignee:id,ulid,name', 'pendingReopenRequest.requester:id,ulid,name'];
+
     public function toRecord(Incident $incident): IncidentRecord
     {
         return new IncidentRecord(
@@ -40,6 +44,18 @@ final class IncidentMapper
             $this->date($incident->updated_at),
             $incident->deleted_at?->toDateTimeImmutable(),
             $incident->lock_version,
+            $this->reopenRequest($incident),
+        );
+    }
+
+    private function reopenRequest(Incident $incident): ?ReopenRequestInfo
+    {
+        $request = $incident->relationLoaded('pendingReopenRequest') ? $incident->pendingReopenRequest : null;
+
+        return $request === null ? null : new ReopenRequestInfo(
+            $this->person(self::loaded($request->requester)),
+            $request->reason,
+            $request->created_at->toDateTimeImmutable(),
         );
     }
 
@@ -50,7 +66,7 @@ final class IncidentMapper
 
     public function status(Status $status): StatusFlags
     {
-        return new StatusFlags($status->id, $status->code, $status->name, $status->is_initial, $status->is_pending, $status->is_final);
+        return new StatusFlags($status->id, $status->code, $status->name, $status->is_initial, $status->is_pending, $status->is_final, $status->requires_note);
     }
 
     public function person(User $user): Person

@@ -1,6 +1,6 @@
-<!-- Auditoría global: una pestaña por registro (incidentes y administración), cada una con su permiso. Monitor: tabla
-     con el detalle al lado. Portátil: tabla y el detalle en un panel a la derecha. Tablet y celular: tarjetas y el
-     detalle en un panel inferior. La lista avanza con "Cargar más". Documentado en docs/frontend/audit.md -->
+<!-- Auditoría global: una pestaña por registro (incidentes y administración), cada una con su permiso. Portátil y
+     monitor: tabla y el detalle en un panel que entra por la derecha, encima de la tabla (la tabla no se mueve). Tablet y
+     celular: tarjetas y el detalle en un panel inferior. La lista avanza con "Cargar más". Documentado en docs/frontend/audit.md -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -26,7 +26,7 @@ const props = defineProps<{ tab: AuditTab }>()
 
 const router = useRouter()
 const session = useSessionStore()
-const { isLaptopUp, isDesktop } = useViewport()
+const { isLaptopUp } = useViewport()
 
 const list = useAuditList(props.tab)
 const { criteria, items, meta, next, loading, loadingMore, error } = list
@@ -45,9 +45,9 @@ const tabModel = computed({
 
 const selectedId = ref<number | null>(null)
 const selected = computed(() => items.value.find((entry) => entry.id === selectedId.value) ?? null)
-const besideTable = computed(() => isDesktop.value && selected.value !== null)
+// El detalle siempre se abre encima: la tabla conserva su tamaño y sus columnas al elegir un registro
 const sheetOpen = computed({
-  get: () => !isDesktop.value && selected.value !== null,
+  get: () => selected.value !== null,
   set: (open: boolean) => {
     if (!open) selectedId.value = null
   },
@@ -58,11 +58,15 @@ const filtered = computed(() => activeAuditFilterCount(criteria.value) > 0)
 const incidentError = computed(() => (error.value ? fieldMessagesFor(error.value)['filter.incident'] : undefined))
 
 const shortDate = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
-const periodText = computed(() =>
-  meta.value
-    ? `Del ${shortDate.format(new Date(meta.value.from))} al ${shortDate.format(new Date(meta.value.to))}`
-    : '',
-)
+const dayMonth = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short' })
+// Si las dos fechas son del mismo año, el año va una sola vez: así cabe junto a los filtros en el celular
+const periodText = computed(() => {
+  if (!meta.value) return ''
+  const from = new Date(meta.value.from)
+  const to = new Date(meta.value.to)
+  const start = from.getFullYear() === to.getFullYear() ? dayMonth.format(from) : shortDate.format(from)
+  return `Del ${start} al ${shortDate.format(to)}`
+})
 
 function filterByActor(id: string): void {
   selectedId.value = null
@@ -77,19 +81,22 @@ function filterByActor(id: string): void {
       <AppSegmented v-if="tabs.length > 1" v-model="tabModel" label="Registro" :options="tabs" />
     </header>
 
-    <AuditToolbar
-      :tab="tab"
-      :criteria="criteria"
-      :catalog="catalog"
-      :incident-error="incidentError"
-      @change="list.update"
-    />
-    <p v-if="periodText" class="audit-page__period">
-      <AppIcon name="calendar" size="sm" />
-      {{ periodText }}
-    </p>
+    <!-- Filtros a la izquierda y, en la misma fila a la derecha, el rango que se está mostrando -->
+    <div class="audit-page__filters">
+      <AuditToolbar
+        :tab="tab"
+        :criteria="criteria"
+        :catalog="catalog"
+        :incident-error="incidentError"
+        @change="list.update"
+      />
+      <p v-if="periodText" class="audit-page__period">
+        <AppIcon class="audit-page__period-icon" name="calendar" size="sm" />
+        {{ periodText }}
+      </p>
+    </div>
 
-    <div class="audit-page__body" :class="{ 'audit-page__body--detail': besideTable }">
+    <div class="audit-page__body">
       <section class="audit-page__results" :aria-busy="loading" aria-label="Registros">
         <AppErrorState v-if="catalogError" :error="catalogError" @retry="loadCatalog" />
         <AppErrorState v-else-if="error && !incidentError" :error="error" @retry="list.load" />
@@ -115,8 +122,7 @@ function filterByActor(id: string): void {
             v-if="isLaptopUp"
             :items="items"
             :catalog="catalog"
-            :selected-id="besideTable ? selectedId : null"
-            :compact="besideTable"
+            :selected-id="selectedId"
             @open="selectedId = $event"
           />
           <AuditCards v-else :items="items" :catalog="catalog" @open="selectedId = $event" />
@@ -127,16 +133,6 @@ function filterByActor(id: string): void {
           <p v-else class="audit-page__end">No hay más registros en este rango.</p>
         </template>
       </section>
-
-      <aside v-if="besideTable && selected" class="audit-page__detail" aria-label="Detalle del registro">
-        <header class="audit-page__detail-header">
-          <h2 class="audit-page__detail-title">{{ selected.type.name }}</h2>
-          <button class="audit-page__close" type="button" aria-label="Cerrar detalle" @click="selectedId = null">
-            <AppIcon name="close" />
-          </button>
-        </header>
-        <AuditDetail :entry="selected" :catalog="catalog" @actor="filterByActor" />
-      </aside>
     </div>
 
     <AppSheet v-model:open="sheetOpen" :title="selected?.type.name ?? ''">
@@ -175,6 +171,13 @@ function filterByActor(id: string): void {
   line-height: $line-height-tight;
 }
 
+.audit-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $space-3;
+}
+
 .audit-page__period,
 .audit-page__end {
   display: flex;
@@ -183,6 +186,17 @@ function filterByActor(id: string): void {
   margin: 0;
   color: $color-text-secondary;
   font-size: $font-size-sm;
+}
+
+// Al final de la fila de filtros, centrado a la altura del botón o de los campos
+.audit-page__period {
+  min-height: $touch-target;
+  margin-left: auto;
+}
+
+// En celular el ícono no cabe junto al botón de filtros; vuelve desde tablet
+.audit-page__period-icon {
+  display: none;
 }
 
 .audit-page__end {
@@ -195,40 +209,9 @@ function filterByActor(id: string): void {
   transition: opacity $duration-base;
 }
 
-.audit-page__detail {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-  padding: $space-4;
-  border: 1px solid $color-border;
-  border-radius: $radius-card;
-  background: $color-surface;
-}
-
-.audit-page__detail-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: $space-3;
-}
-
-.audit-page__detail-title {
-  margin: 0;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-}
-
-.audit-page__close {
-  display: inline-flex;
-  padding: $space-1;
-  border: 0;
-  border-radius: $radius-control;
-  background: none;
-  color: $color-text-secondary;
-  cursor: pointer;
-
-  &:hover {
-    color: $color-text;
+@include tablet {
+  .audit-page__period-icon {
+    display: inline-flex;
   }
 }
 
@@ -236,15 +219,9 @@ function filterByActor(id: string): void {
   .audit-page__title {
     font-size: $font-size-2xl;
   }
-}
 
-// En monitor, con un registro elegido: tabla a la izquierda y detalle a la derecha
-@include desktop {
-  .audit-page__body--detail {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) $preview-width;
-    align-items: start;
-    gap: $space-4;
+  .audit-page__period {
+    min-height: $field-height;
   }
 }
 </style>

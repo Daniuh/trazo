@@ -50,8 +50,28 @@ export const incidentsApi = {
     return toIncident(data.data)
   },
 
-  async changeStatus(id: string, version: number, status: string): Promise<Incident> {
-    const { data } = await http.put<Envelope<IncidentDto>>(`${path(id)}/status`, { status, version })
+  async changeStatus(id: string, version: number, status: string, note: string | null): Promise<Incident> {
+    const { data } = await http.put<Envelope<IncidentDto>>(`${path(id)}/status`, { status, version, note })
+    return toIncident(data.data)
+  },
+
+  async requestReopen(id: string, reason: string): Promise<Incident> {
+    const { data } = await http.post<Envelope<IncidentDto>>(`${path(id)}/reopen-request`, { reason })
+    return toIncident(data.data)
+  },
+
+  async reopen(id: string, version: number, reason: string): Promise<Incident> {
+    const { data } = await http.post<Envelope<IncidentDto>>(`${path(id)}/reopen`, { reason, version })
+    return toIncident(data.data)
+  },
+
+  async approveReopen(id: string, version: number): Promise<Incident> {
+    const { data } = await http.post<Envelope<IncidentDto>>(`${path(id)}/reopen-request/approve`, { version })
+    return toIncident(data.data)
+  },
+
+  async rejectReopen(id: string, reason: string): Promise<Incident> {
+    const { data } = await http.post<Envelope<IncidentDto>>(`${path(id)}/reopen-request/reject`, { reason })
     return toIncident(data.data)
   },
 

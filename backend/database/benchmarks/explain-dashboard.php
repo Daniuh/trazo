@@ -6,6 +6,7 @@ declare(strict_types=1);
 // para quien ve todo, un agente y un solicitante. Los pasos están en docs/base-de-datos/rendimiento.md
 
 use App\Modules\Dashboard\Application\Ports\DashboardQueries;
+use App\Modules\Incidents\Domain\DueWindow;
 use App\Modules\Incidents\Domain\VisibilityScope as V;
 use Illuminate\Support\Facades\DB;
 
@@ -28,6 +29,10 @@ $sources = [
     'próximos a vencer' => fn (int $id, V $s) => $q->dueBetween($id, $s, $pending, $now, $now->modify('+48 hours'), 5),
     'asignados a mí' => fn (int $id, V $s) => $q->assignedTo($id, $s, $pending, 5),
     'carga por agente' => fn (int $id, V $s) => $q->workload($id, $s, $pending, $now, 8),
+    // Diseño centrado en el riesgo (ADR-0081)
+    'cumplimiento del plazo (30 días)' => fn (int $id, V $s) => $q->onTimeResolutions($id, $s, $now->modify('-30 days')),
+    'mapa de riesgo' => fn (int $id, V $s) => $q->riskMatrix($id, $s, $pending, DueWindow::at($now, new DateTimeZone('America/Bogota'))),
+    'salidas sin resolver por hora (90 días)' => fn (int $id, V $s) => $q->exitsWithoutResolution($id, $s, $pending, $now->modify('-90 days')),
 ];
 $sources['por estado y prioridad']($agent, $scopes['todo'][1]); // calienta la caché de MySQL antes de medir
 foreach ($scopes as $scopeName => [$actor, $scope]) {

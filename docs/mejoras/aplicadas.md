@@ -29,7 +29,7 @@ Este anexo reúne lo que Trazo incorpora más allá de lo solicitado. Ninguna de
 | Catálogos y flujo de estados como datos | Cambiar estados o transiciones sin migraciones | [ADR-0008](../decisiones/0008-catalogos.md) |
 | Borrado lógico y auditoría inmutable | Nunca se pierde la trazabilidad | [ADR-0011](../decisiones/0011-borrado-y-restricciones.md) |
 | Bloqueo optimista | Ningún cambio se pisa sin aviso | [ADR-0012](../decisiones/0012-bloqueo-optimista.md) |
-| Código legible `INC-000123` y fecha de resolución | Más claro para las personas; habilita métricas de tiempo | [ADR-0010](../decisiones/0010-ulid.md) |
+| Código legible por año (`TZ-26-0142`) y fecha de resolución | Más claro para las personas, dice de qué año es y sigue corto; habilita métricas de tiempo | [ADR-0010](../decisiones/0010-ulid.md) y [ADR-0074](../decisiones/0074-codigo-de-incidente-por-ano.md) |
 | Seeder con volumen configurable e índices validados sobre 100.000+ registros | Demuestra el rendimiento con datos reales | [ADR-0014](../decisiones/0014-crecimiento.md) |
 | `Idempotency-Key` al crear | Sin duplicados por doble clic o reintentos | [ADR-0037](../decisiones/0037-idempotencia.md) |
 | Carga diferida estricta fuera de producción | Un N+1 nuevo falla en la suite, no en manos del usuario | [ADR-0061](../decisiones/0061-entrega-verificada-desde-cero.md) |
@@ -56,3 +56,4 @@ Este anexo reúne lo que Trazo incorpora más allá de lo solicitado. Ninguna de
 | Límites de recursos por contenedor | Convivencia con otros servicios en el mismo servidor | [ADR-0026](../decisiones/0026-despliegue.md) |
 | Documentación de funciones (phpDocumentor y TypeDoc) revisada en el CI | Un comentario roto se detecta en el PR | [ADR-0065](../decisiones/0065-documentacion-de-funciones.md) |
 | OpenAPI generada desde el código | La referencia de la API nunca se desactualiza | [ADR-0006](../decisiones/0006-contrato-api.md) |
+| Nota al cambiar de estado (obligatoria al resolver y cancelar) y reapertura con aprobación | Cada cierre explica qué se hizo, y lo cerrado solo vuelve a abrirse con motivo y con la aprobación de quien supervisa | [ADR-0071](../decisiones/0071-nota-de-estado-y-reapertura.md) |

@@ -160,8 +160,8 @@ const sizeOptions = computed(() => props.perPageOptions.map((size) => ({ label: 
 
 @include laptop {
   .app-pagination__button {
-    min-width: 2.25rem;
-    min-height: 2.25rem;
+    min-width: $control-height-compact;
+    min-height: $control-height-compact;
   }
 }
 </style>

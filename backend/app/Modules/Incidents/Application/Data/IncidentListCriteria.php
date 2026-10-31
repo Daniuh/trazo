@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Incidents\Application\Data;
 
+use App\Modules\Incidents\Domain\IncidentGroup;
 use App\Modules\Incidents\Domain\IncidentSort;
 use DateTimeImmutable;
 
@@ -35,5 +36,9 @@ final readonly class IncidentListCriteria
         public ?DateTimeImmutable $dueTo = null,
         public bool $overdue = false,
         public bool $deleted = false,
+        // Solo los que tienen una solicitud de reapertura pendiente
+        public bool $reopenRequested = false,
+        // Sin grupo, solo el orden elegido; con grupo, primero el grupo y dentro de él ese orden
+        public ?IncidentGroup $group = null,
     ) {}
 }

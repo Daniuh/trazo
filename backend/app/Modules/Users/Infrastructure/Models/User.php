@@ -21,7 +21,9 @@ use Laravel\Sanctum\HasApiTokens;
 /**
  * @property int $id
  * @property string $ulid
- * @property string $name
+ * @property string $given_names
+ * @property string $family_names
+ * @property string $name nombre completo, calculado por la base
  * @property string $email
  * @property bool $is_active
  * @property Carbon|null $last_login_at
@@ -37,7 +39,8 @@ class User extends Authenticatable
 
     use HasUlids;
 
-    protected $fillable = ['name', 'email', 'password', 'is_active'];
+    // "name" es una columna calculada (nombres + apellidos): no se escribe
+    protected $fillable = ['given_names', 'family_names', 'email', 'password', 'is_active'];
 
     protected $hidden = ['password'];
 

@@ -44,6 +44,7 @@ const RENAMES: Record<string, string> = {
   is_overdue: 'isOverdue',
   due_from: 'dueFrom',
   due_to: 'dueTo',
+  on_time: 'onTime',
 }
 
 function camelize(value: unknown): unknown {

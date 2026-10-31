@@ -1,5 +1,6 @@
 # Hooks de Git: revisiones rápidas antes de cada commit. El CI corre la validación completa.
-# Las revisiones del backend se ejecutan dentro del contenedor, así que el stack debe estar levantado.
+# Pint corre en un contenedor de un solo uso con la imagen de desarrollo (la final no trae Pint), sea cual sea el modo
+# del stack. Necesita que el modo desarrollo se haya levantado al menos una vez (dependencias en el volumen trazo_vendor).
 # Documentado en docs/operacion/flujo-de-trabajo.md
 
 pre-commit:
@@ -7,7 +8,7 @@ pre-commit:
     backend-format:
       root: backend/
       glob: "*.php"
-      run: docker compose -p trazo exec -T app vendor/bin/pint --test {staged_files}
+      run: docker compose -p trazo -f ../docker-compose.yml -f ../docker-compose.override.yml -f ../docker-compose.dev.yml run --rm --no-deps -T app vendor/bin/pint --test {staged_files}
     frontend-lint:
       root: frontend/
       glob: "*.{ts,vue,js}"

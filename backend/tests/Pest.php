@@ -37,6 +37,14 @@ function actingAsDemo(string $email): User
 }
 
 /**
+ * ULID público de un usuario de demostración, para usarlo en las rutas y en el cuerpo de las peticiones.
+ */
+function demoUlid(string $email): string
+{
+    return (string) User::query()->where('email', $email)->value('ulid');
+}
+
+/**
  * Deja a la persona con el MFA ya activo, como si lo hubiera configurado en su teléfono, y devuelve su secreto.
  */
 function activeMfaSecret(User $user): string

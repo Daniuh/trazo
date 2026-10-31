@@ -25,6 +25,7 @@ const code = ref('')
   <AppCard title="Más campos">
     <div class="guide-form">
       <AppCheckbox v-model="overdue" label="Solo vencidos" />
+      <AppCheckbox :model-value="false" indeterminate label="Todos (a medias)" />
       <AppChoiceChips
         v-model="statuses"
         label="Estado"

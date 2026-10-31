@@ -87,11 +87,11 @@ Tres pantallas dentro del mismo marco del login (`AuthPanel`):
 
 - **Nada queda guardado en el navegador:** el correo, el pase y si hace falta el segundo factor viven solo en memoria (`useRecoveryStore`). Si se recarga a mitad de camino, las pantallas vuelven a `/recuperar`.
 - **Si el pase venció** (`PASSWORD_RESET_EXPIRED`), el aviso ofrece pedir un código nuevo.
-- **Requisitos a la vista:** `NewPasswordFields` muestra una lista que se marca mientras se escribe: el largo (12 a 128) y que las dos coincidan. Que no esté filtrada solo lo puede decir la API; si lo está, el error aparece debajo del campo.
+- **Requisitos a la vista:** `NewPasswordFields` muestra una lista que se marca mientras se escribe: el largo (12 a 128) y que las dos coincidan. Que no sea predecible (repeticiones, secuencias o datos personales) y que no esté filtrada solo lo puede decir la API: esos requisitos se muestran sin marca y, si fallan, el error con su motivo aparece debajo del campo. Sus reglas no se copian en el front.
 
 ## Mi cuenta
 
-`/mi-cuenta`, desde el menú de la persona. Una columna en celular y tablet; dos en portátil y monitor.
+`/mi-cuenta`, desde el menú de la persona. Una columna en celular y tablet; dos en portátil y monitor, donde "Tus datos" se estira hasta el alto de "Verificación en dos pasos" para que queden alineadas, y "Contraseña" va debajo de "Tus datos".
 
 - **Tus datos:** nombre, correo y rol.
 - **Contraseña:** "Cambiar contraseña" abre un diálogo (`ChangePasswordDialog`) con la actual, la nueva y su confirmación. Una contraseña actual equivocada o una nueva igual a la actual se marcan en su campo, sin cerrar el diálogo. Al cambiarla, avisa que se cerraron las demás sesiones; la actual sigue abierta.

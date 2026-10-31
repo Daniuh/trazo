@@ -12,6 +12,7 @@ import AppDataTable from './AppDataTable.vue'
 import AppQrCode from './AppQrCode.vue'
 import AppRadioList from './form/AppRadioList.vue'
 import AppErrorState from './states/AppErrorState.vue'
+import { rowsThatFit } from './useFitCount'
 
 describe('AppIcon', () => {
   it('dibuja las figuras del ícono sin atributos sobrantes', () => {
@@ -173,5 +174,16 @@ describe('AppRadioList', () => {
     expect(list.text()).toContain('Atiende incidentes.')
     expect(list.findAll('.app-radio-list__option--selected')).toHaveLength(1)
     expect(list.get('fieldset').attributes('aria-describedby')).toBe(list.get('[role="alert"]').attributes('id'))
+  })
+})
+
+describe('rowsThatFit', () => {
+  it('cuenta solo las filas completas que caben, con su separación', () => {
+    // Filas de 24 px con 8 px entre ellas: en 100 px caben 3 (24 + 8 + 24 + 8 + 24 = 88)
+    expect(rowsThatFit(100, 24, 8)).toBe(3)
+    expect(rowsThatFit(88, 24, 8)).toBe(3)
+    expect(rowsThatFit(87, 24, 8)).toBe(2)
+    expect(rowsThatFit(10, 24, 8)).toBe(0)
+    expect(rowsThatFit(100, 0, 8)).toBe(0)
   })
 })

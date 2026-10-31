@@ -22,10 +22,10 @@ beforeEach(() => {
 
 describe('lista de cada pestaña', () => {
   it('incidentes usa su consulta, con el código del incidente de la URL', async () => {
-    await withSetup(() => useAuditList('incidents'), '/auditoria/incidentes?incident=INC-7')
+    await withSetup(() => useAuditList('incidents'), '/auditoria/incidentes?incident=26-7')
     await flush()
 
-    expect(api.incidents).toHaveBeenCalledWith(expect.objectContaining({ target: 'INC-7' }), null, expect.anything())
+    expect(api.incidents).toHaveBeenCalledWith(expect.objectContaining({ target: '26-7' }), null, expect.anything())
     expect(api.admin).not.toHaveBeenCalled()
   })
 

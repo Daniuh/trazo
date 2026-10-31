@@ -9,7 +9,7 @@ order: 67
 # ADR-0057: Tiempo real en la práctica: canales por alcance, avisos sin datos y Reverb detrás del gateway
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El [ADR-0024](0024-tiempo-real.md) ya había fijado lo esencial: Reverb, canales privados y mensajes sin datos que obligan a volver a consultar la API. Al construirlo había que decidir:

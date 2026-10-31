@@ -1,25 +1,22 @@
-<!-- Estructura de la aplicación: encabezado, menú lateral y contenido, adaptados a las cuatro vistas. -->
-<!-- Celular: menú hamburguesa. Tablet: menú de íconos. Portátil y monitor: menú expandido. El menú muestra solo lo permitido. Documentado en docs/frontend/sistema-de-diseno/layout.md -->
+<!-- Estructura de la aplicación: sin encabezado, el contenido ocupa toda la pantalla y el menú va en un dock que flota
+     abajo y centrado (AppDock), con solo lo permitido y, al final, la campana y la cuenta, en las cuatro vistas.
+     Documentado en docs/frontend/sistema-de-diseno/layout.md -->
 <script setup lang="ts">
-import { QDrawer, QHeader, QLayout, QPageContainer } from 'quasar'
+import { QLayout, QPageContainer } from 'quasar'
 import { computed, ref } from 'vue'
-import { layout } from '@/design/tokens/layout'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import NotificationBell from '@/modules/notifications/presentation/NotificationBell.vue'
 import { useRealtimeConnection } from '@/modules/realtime/application/useRealtimeConnection'
 import { useRealtimeNotices } from '@/modules/realtime/presentation/useRealtimeNotices'
 import { maintenanceNotice } from '@/shared/http'
-import AppIcon from '@/shared/ui/AppIcon.vue'
 import AppLogo from '@/shared/ui/brand/AppLogo.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
-import { useViewport } from '@/shared/ui/useViewport'
 import { visibleNavigation } from '../navigation'
-import AppNavigation from './AppNavigation.vue'
+import AppDock from './AppDock.vue'
 import AppUserMenu from './AppUserMenu.vue'
 import { useRouteLoading } from './useRouteLoading'
 
-const { isMobile, isTablet } = useViewport()
 const { loading } = useRouteLoading()
-const drawerOpen = ref(false)
 const session = useSessionStore()
 const navigation = computed(() => visibleNavigation(session.can))
 
@@ -30,47 +27,12 @@ useRealtimeNotices()
 // El foco va al contenido sin cambiar la URL (el router usa el historial, no el #)
 const content = ref<HTMLElement>()
 const focusContent = () => content.value?.focus()
-
-// En celular el menú se cierra al elegir una sección
-const closeOnMobile = () => {
-  if (isMobile.value) drawerOpen.value = false
-}
 </script>
 
 <template>
-  <QLayout view="hHh LpR fFf">
+  <QLayout view="lHh lpr fFf">
     <!-- Primer elemento al usar Tab: lleva directo al contenido sin recorrer el menú (WCAG 2.4.1) -->
     <a class="shell-skip" href="#contenido" @click.prevent="focusContent">Saltar al contenido</a>
-    <QHeader class="shell-header">
-      <div class="shell-header__bar">
-        <button
-          v-if="isMobile"
-          class="shell-header__menu"
-          type="button"
-          aria-label="Abrir menú"
-          :aria-expanded="drawerOpen"
-          @click="drawerOpen = !drawerOpen"
-        >
-          <AppIcon name="menu" size="lg" />
-        </button>
-        <RouterLink to="/" class="shell-header__brand"><AppLogo /></RouterLink>
-        <AppUserMenu />
-      </div>
-    </QHeader>
-
-    <QDrawer
-      v-model="drawerOpen"
-      class="shell-drawer"
-      :width="layout.sidebarWidth"
-      :mini-width="layout.sidebarMiniWidth"
-      :mini="isTablet"
-      :breakpoint="layout.mobileMaxWidth"
-      show-if-above
-      bordered
-    >
-      <AppNavigation :items="navigation" :compact="isTablet" @navigate="closeOnMobile" />
-    </QDrawer>
-
     <QPageContainer>
       <main id="contenido" ref="content" class="shell-content" tabindex="-1">
         <div v-if="loading" class="shell-loading" role="status">
@@ -88,13 +50,18 @@ const closeOnMobile = () => {
         </RouterView>
       </main>
     </QPageContainer>
+
+    <AppDock :items="navigation">
+      <NotificationBell />
+      <AppUserMenu />
+    </AppDock>
   </QLayout>
 </template>
 
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
 
-// Solo para lectores y teclado hasta que recibe el foco; entonces aparece arriba a la izquierda, sobre el encabezado
+// Solo para lectores y teclado hasta que recibe el foco; entonces aparece arriba a la izquierda
 .shell-skip {
   @include visually-hidden;
 
@@ -121,41 +88,9 @@ const closeOnMobile = () => {
   outline: none;
 }
 
-.shell-header {
-  border-bottom: 1px solid $color-border;
-  background: $color-surface;
-  color: $color-text;
-}
-
-.shell-header__bar {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  height: $header-height;
-  padding: 0 $space-3;
-}
-
-.shell-header__menu {
-  display: inline-flex;
-  padding: $space-2;
-  border: 0;
-  border-radius: $radius-control;
-  background: none;
-  color: $color-text;
-  cursor: pointer;
-}
-
-.shell-header__brand {
-  font-size: $font-size-xl;
-  text-decoration: none;
-}
-
-.shell-drawer {
-  background: $color-surface;
-}
-
+// Abajo, el espacio del dock: lo último de la página nunca queda tapado
 .shell-content {
-  padding: $space-4;
+  padding: $space-4 $space-4 $dock-clearance-mobile;
 }
 
 .shell-maintenance {
@@ -175,18 +110,14 @@ const closeOnMobile = () => {
 }
 
 @include tablet {
-  .shell-header__bar {
-    padding: 0 $space-5;
-  }
-
   .shell-content {
-    padding: $space-5;
+    padding: $space-5 $space-5 $dock-clearance;
   }
 }
 
 @include laptop {
   .shell-content {
-    padding: $space-6;
+    padding: $space-6 $space-6 $dock-clearance;
   }
 }
 

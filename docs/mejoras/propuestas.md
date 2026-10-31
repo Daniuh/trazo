@@ -17,6 +17,7 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Passkeys (huella o rostro) | Acceso sin contraseña y resistente a páginas falsas | Amplía mucho el alcance; la estructura de factores MFA ya lo permite |
 | Aprobación push en el celular | Confirmar el acceso con un toque | Requiere una aplicación móvil propia |
 | Sesión con cookie httpOnly | Mayor resistencia al robo de sesión por XSS | La prueba evalúa el manejo explícito de token |
+| Medidor de fortaleza con zxcvbn | Estima cuánto tardaría en adivinarse una contraseña y lo muestra mientras se escribe | Es una dependencia nueva en el back y en el front; las reglas de patrones propias ([ADR-0070](../decisiones/0070-contrasenas-predecibles.md)) cubren los casos comunes |
 | Historial inmutable a nivel de base de datos | Ni un acceso directo a la base podría alterar la auditoría | Es configuración de infraestructura productiva |
 
 ## Datos y escala
@@ -35,7 +36,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 
 | Propuesta | Valor |
 |---|---|
-| Comentarios en incidentes | Conversación sobre cada caso |
+| Comentarios en incidentes | Conversación sobre cada caso, aparte de la nota de cada cambio de estado ([ADR-0071](../decisiones/0071-nota-de-estado-y-reapertura.md)) |
+| Retirar una solicitud de reapertura | Que quien la pidió la cancele antes de que la decidan |
 | Exportación `.xlsx` nativa | Formato con estilos para Excel |
 | Exportaciones grandes en segundo plano | Superar el tope de 50.000 filas: el archivo se arma en la cola y se avisa cuando está listo ([ADR-0058](../decisiones/0058-exportacion-en-la-practica.md)) |
 | Exportar la auditoría | Llevar los registros a otra herramienta; requiere decidir qué hacer con la IP y el navegador |
@@ -51,6 +53,7 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Propuesta | Valor |
 |---|---|
 | Ramas `hotfix/*` | Correcciones urgentes sin pasar por todo el flujo |
+| Silenciar tipos de aviso por persona | Que cada quien elija qué avisos de coordinación recibe, si en la operación real resultan muchos ([ADR-0085](../decisiones/0085-avisos-de-coordinacion.md)) |
 | Avisos de eventos críticos | Un correo o una marca en el menú cuando aparece un evento crítico, sin tener que entrar a Sistema ([ADR-0059](../decisiones/0059-sistema-en-la-practica.md)) |
 | Monitoreo externo (Sentry, Grafana) | Trazas completas de los errores, métricas en el tiempo y alertas fuera de la app |
 | Interfaz visual del contrato OpenAPI, autoalojada | Explorar la API desde el navegador sin cargar scripts de una CDN, compatible con la CSP ([ADR-0060](../decisiones/0060-pasada-de-calidad.md)) |

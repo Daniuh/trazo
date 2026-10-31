@@ -46,7 +46,7 @@ describe('jerarquía', function (): void {
     it('el administrador no toca a otro administrador ni al Super admin', function (): void {
         adminAs('admin@trazo.test');
 
-        $this->patchJson('/api/v1/users/'.managedUlid('superadmin@trazo.test'), ['name' => 'Otro nombre', 'email' => 'superadmin@trazo.test'])
+        $this->patchJson('/api/v1/users/'.managedUlid('superadmin@trazo.test'), ['given_names' => 'Otro', 'family_names' => 'Nombre', 'email' => 'superadmin@trazo.test'])
             ->assertForbidden()->assertJsonPath('code', 'USER_OUTRANKED');
         $this->postJson('/api/v1/users/'.managedUlid('superadmin@trazo.test').'/deactivate')
             ->assertForbidden()->assertJsonPath('code', 'USER_OUTRANKED');
@@ -179,15 +179,21 @@ describe('permisos por persona', function (): void {
             ->assertConflict()->assertJsonPath('code', 'USER_ROOT_FULL_ACCESS');
     });
 
-    it('al cambiar de rol se quitan las excepciones que el rol nuevo vuelve innecesarias', function (): void {
+    it('al cambiar de rol la persona queda con los permisos exactos del rol nuevo', function (): void {
         adminAs('superadmin@trazo.test');
         $agent = managedUlid('agente1@trazo.test');
         $current = $this->getJson("/api/v1/users/{$agent}")->json('data.permissions.effective');
-        $this->putJson("/api/v1/users/{$agent}/permissions", ['permissions' => [...$current, 'audit.incidents.view']])->assertOk();
+        $changed = [...array_values(array_diff($current, ['incidents.take'])), 'audit.admin.view'];
+        $this->putJson("/api/v1/users/{$agent}/permissions", ['permissions' => $changed])->assertOk();
 
-        // El supervisor ya trae la auditoría de incidentes: el concedido sobra
-        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'supervisor'])->assertOk()
-            ->assertJsonPath('data.permissions.granted', []);
+        // El supervisor no trae la auditoría de administración: aun así el concedido no se arrastra
+        $response = $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'supervisor'])->assertOk()
+            ->assertJsonPath('data.permissions.granted', [])
+            ->assertJsonPath('data.permissions.denied', []);
+        expect($response->json('data.permissions.effective'))->toEqualCanonicalizing($response->json('data.permissions.role'));
+
+        $details = json_decode((string) DB::table('admin_actions')->latest('id')->value('details'), true);
+        expect($details['cleared'])->toEqual(['granted' => ['audit.admin.view'], 'denied' => ['incidents.take']]);
     });
 
     it('quitarle a alguien el permiso de atender incidentes lo saca del selector de "asignar a"', function (): void {
@@ -212,7 +218,7 @@ describe('restablecer y proteger el acceso', function (): void {
 
         $this->postJson("/api/v1/users/{$agent->ulid}/access-reset", ['mfa_code' => currentCode($secret)])->assertOk();
 
-        expect(Hash::check('Trazo.Demo.2026', (string) User::query()->whereKey($agent->id)->value('password')))->toBeFalse()
+        expect(Hash::check('Cometa.Demo.2026', (string) User::query()->whereKey($agent->id)->value('password')))->toBeFalse()
             ->and(DB::table('personal_access_tokens')->where('tokenable_id', $agent->id)->count())->toBe(0);
         Mail::assertQueued(AccountNotice::class, fn (AccountNotice $mail): bool => $mail->event->value === 'access_reset'
             && str_ends_with($mail->params['url'], '/recuperar'));

@@ -13,6 +13,7 @@ interface ActivityLog
 {
     /**
      * @param  array<string, mixed>|null  $changes  Ej.: ['title' => ['from' => 'A', 'to' => 'B']]
+     * @param  string|null  $note  Lo que la persona escribió: la solución, el motivo de cancelar o de reabrir
      */
-    public function record(int $incidentId, int $userId, string $type, ?array $changes, RequestContext $context): void;
+    public function record(int $incidentId, int $userId, string $type, ?array $changes, RequestContext $context, ?string $note = null): void;
 }

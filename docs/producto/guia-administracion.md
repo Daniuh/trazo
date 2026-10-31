@@ -18,8 +18,8 @@ Algunas acciones piden el **código de la aplicación de autenticación** aunque
 En **Usuarios**:
 
 - **Buscar** por nombre o correo, y filtrar por rol o estado.
-- **Crear una cuenta:** pulsa **Nueva persona**, indica nombre, correo y rol, y confirma con **Crear cuenta**. La persona recibe un correo de bienvenida con un enlace para crear su contraseña; nadie más la conoce.
-- **Editar** nombre y correo. Si cambia el correo, se avisa a la dirección anterior.
+- **Crear una cuenta:** pulsa **Nueva persona**, indica nombres, apellidos, correo y rol, y confirma con **Crear cuenta**. La persona recibe un correo de bienvenida con un enlace para crear su contraseña; nadie más la conoce.
+- **Editar** nombres, apellidos y correo. La lista de personas se ordena por apellido. Si cambia el correo, se avisa a la dirección anterior.
 - **Desactivar** una cuenta: sus sesiones se cierran en el acto y no puede volver a entrar. **Activar** la habilita de nuevo. Si tiene incidentes pendientes asignados, la ficha lo advierte para reasignarlos.
 - **Ver su actividad:** abre la auditoría filtrada con lo que esa persona hizo.
 
@@ -27,7 +27,7 @@ En **Usuarios**:
 
 En la ficha de la persona:
 
-- **Rol:** elige uno de los roles que están por debajo del tuyo. Al cambiarlo, se quitan las excepciones que ya no tengan sentido con el nuevo rol.
+- **Rol:** elige uno de los roles que están por debajo del tuyo. Al cambiarlo, la persona queda con los permisos exactos del nuevo rol: se quitan los permisos que le habías dado o quitado aparte. Antes de guardar, Trazo te dice cuántos son, y en Auditoría queda cuáles eran.
 - **Permisos:** marca o desmarca permisos puntuales. Los marcados que el rol no trae quedan como **concedidos**; los que el rol trae y desmarcas quedan como **quitados**. Solo puedes conceder lo que tú mismo tienes.
 
 La persona ve los cambios al instante: su menú y sus botones se actualizan sin volver a entrar.
@@ -36,7 +36,7 @@ La persona ve los cambios al instante: su menú y sus botones se actualizan sin 
 
 En **Roles**, el Super admin puede:
 
-- **Crear un rol** con un nombre, un nivel (menor que el propio) y sus permisos. **Copiar permisos de** otro rol ahorra empezar de cero.
+- **Crear un rol** con un nombre, un nivel (menor que el propio) y sus permisos. **Copiar permisos de** otro rol ahorra empezar de cero. Los permisos van agrupados por módulo, cada uno con su conteo y la casilla **Todos** para marcarlo o desmarcarlo completo; en el celular los módulos se abren y cierran tocándolos.
 - **Editar** los permisos, el nivel o la exigencia de verificación en dos pasos de un rol. Antes de guardar, Trazo indica cuántas personas se verán afectadas.
 - **Eliminar** un rol creado, si nadie lo tiene. Los cinco roles base no se eliminan, y el de Super admin no se modifica.
 

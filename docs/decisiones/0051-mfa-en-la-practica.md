@@ -9,7 +9,7 @@ order: 61
 # ADR-0051: MFA en la práctica: token de un ingreso a medias, sin atajo local y avisos por correo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0017](0017-mfa-totp.md) definió el MFA con TOTP. Al construirlo había que decidir:

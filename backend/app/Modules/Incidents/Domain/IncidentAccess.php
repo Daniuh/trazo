@@ -27,7 +27,18 @@ final class IncidentAccess
             IncidentAction::Assign => $this->workDenial($actor, $incident) ?? $this->unless($actor->can('incidents.assign')),
             IncidentAction::Delete => $incident->deleted ? Denial::NotVisible : $this->unless($actor->can('incidents.delete')),
             IncidentAction::Restore => $this->unless($actor->can('incidents.restore')) ?? ($incident->deleted ? null : Denial::NotDeleted),
+            IncidentAction::RequestReopen => $this->reopenDenial($incident) ?? $this->unless($actor->can('incidents.reopen.request')),
+            IncidentAction::Reopen => $this->reopenDenial($incident) ?? $this->unless($actor->can('incidents.reopen.approve')),
+            IncidentAction::DecideReopen => $this->decideDenial($actor, $incident),
+            // También en lo terminado: un seguimiento no cambia el estado; lo eliminado no admite mensajes
+            IncidentAction::Comment => $incident->deleted ? Denial::NotVisible : $this->unless($actor->can('incidents.comment')),
         };
+    }
+
+    // Asignar al crear: quien asigna elige a cualquiera; quien solo puede tomar incidentes, solo a sí mismo
+    public function canAssignOnCreate(Actor $actor, int $assigneeId): bool
+    {
+        return $actor->can('incidents.assign') || ($actor->can('incidents.take') && $assigneeId === $actor->id);
     }
 
     /**
@@ -79,6 +90,29 @@ final class IncidentAccess
         return match (true) {
             $incident->deleted => Denial::NotVisible,
             $incident->statusIsFinal => Denial::Finalized,
+            default => null,
+        };
+    }
+
+    // Reabrir o pedirlo: solo lo terminado y sin otra solicitud en curso
+    private function reopenDenial(IncidentState $incident): ?Denial
+    {
+        return match (true) {
+            $incident->deleted => Denial::NotVisible,
+            ! $incident->statusIsFinal => Denial::NotFinalized,
+            $incident->reopenRequestedBy !== null => Denial::ReopenPending,
+            default => null,
+        };
+    }
+
+    // Aprobar o rechazar: hay una solicitud pendiente, la persona puede decidir y no es quien la pidió
+    private function decideDenial(Actor $actor, IncidentState $incident): ?Denial
+    {
+        return match (true) {
+            $incident->deleted => Denial::NotVisible,
+            $incident->reopenRequestedBy === null => Denial::NoReopenRequest,
+            ! $actor->can('incidents.reopen.approve') => Denial::Forbidden,
+            $incident->reopenRequestedBy === $actor->id => Denial::OwnReopenRequest,
             default => null,
         };
     }

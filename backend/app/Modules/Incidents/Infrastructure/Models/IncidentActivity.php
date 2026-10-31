@@ -19,6 +19,7 @@ use LogicException;
  * @property int $user_id
  * @property int $activity_type_id
  * @property array<string, mixed>|null $changes
+ * @property string|null $note
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property Carbon $created_at
@@ -27,7 +28,7 @@ class IncidentActivity extends Model
 {
     public const UPDATED_AT = null;
 
-    protected $fillable = ['incident_id', 'user_id', 'activity_type_id', 'changes', 'ip_address', 'user_agent'];
+    protected $fillable = ['incident_id', 'user_id', 'activity_type_id', 'changes', 'note', 'ip_address', 'user_agent'];
 
     protected function casts(): array
     {

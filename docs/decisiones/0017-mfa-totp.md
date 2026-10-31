@@ -9,7 +9,7 @@ order: 27
 # ADR-0017: MFA con TOTP para todos los usuarios
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Las cuentas con acceso a información operativa y a acciones de sistema necesitan un segundo factor. A la vez, el acceso con credenciales de prueba debe seguir siendo simple.

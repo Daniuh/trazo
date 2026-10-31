@@ -28,7 +28,7 @@ Parámetros de las dos listas:
 | `filter[from]`, `filter[to]` | Rango (ISO 8601). Sin fechas, los últimos 30 días. Con solo `to`, los 30 días anteriores. Con solo `from`, hasta ahora |
 | `filter[actor]` | ULID de quien hizo el cambio |
 | `filter[type]` | Códigos de tipo, separados por comas |
-| `filter[incident]` | Solo incidentes: el código como lo escriba una persona (`INC-123`, `inc-000123` o `123`) |
+| `filter[incident]` | Solo incidentes: el código como lo escriba una persona (`TZ-26-0142`, `tz26-142` o `26-142`; el año es obligatorio) |
 | `filter[user]`, `filter[role]` | Solo administración: persona afectada (ULID) o rol afectado (código; también encuentra un rol eliminado) |
 | `cursor` | El `meta.next_cursor` de la respuesta anterior |
 | `per_page` | De 1 a 100; 25 por defecto |
@@ -36,7 +36,7 @@ Parámetros de las dos listas:
 Un filtro que apunta a algo que no existe (una persona, un tipo o un incidente) devuelve la lista vacía.
 
 ```json
-GET /api/v1/audit/incidents?filter[incident]=INC-629
+GET /api/v1/audit/incidents?filter[incident]=26-629
 
 {
   "data": [{
@@ -44,7 +44,7 @@ GET /api/v1/audit/incidents?filter[incident]=INC-629
     "created_at": "2026-10-24T21:54:57+00:00",
     "type": { "code": "status_changed", "name": "Cambio de estado" },
     "user": { "id": "01m5nzqh9rk9w9sr18d87hwkat", "name": "Carlos Mejía" },
-    "incident": { "id": "01m5qyhqrkxexrgj35w0b3fh9y", "code": "INC-000629", "title": "…", "deleted": false },
+    "incident": { "id": "01m5qyhqrkxexrgj35w0b3fh9y", "code": "TZ-26-0629", "title": "…", "deleted": false },
     "changes": { "status": { "from": { "code": "open", "name": "Abierto" }, "to": { "code": "in_progress", "name": "En progreso" } } },
     "ip_address": "172.20.0.1",
     "user_agent": "Mozilla/5.0 …",
@@ -105,7 +105,7 @@ Rendimiento medido sobre 523.088 filas: menos de 2 ms en cada caso, sin ordenar 
 | Infrastructure | `AuditWindow`, `DatabaseAuditCatalog` | Rango, cursor y fila de más, comunes a las dos; catálogos |
 | Http | `AuditController`, `AuditResource` | Respuesta con `meta` y `links` |
 | Http | `Requests/AuditRequest` (+ `IncidentAuditRequest`, `AdminAuditRequest`) | Revisan el permiso antes de validar, igual que la administración (`ChecksPermission`) |
-| Http | `Rules/IncidentCode` y `Rules/Cursor` (de Shared) | Código de incidente normalizado a `INC-000123` y cursor válido |
+| Http | `Rules/IncidentCode` y `Rules/Cursor` (de Shared) | Código de incidente normalizado a `TZ-26-0142` (con `IncidentCode` del dominio de Incidentes) y cursor válido |
 
 Quien consulta se arma con `RequestAdmin` del módulo Users: nivel y permisos efectivos.
 

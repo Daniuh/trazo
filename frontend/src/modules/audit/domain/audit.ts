@@ -28,6 +28,8 @@ export interface IncidentAuditEntry extends AuditEntryBase {
   tab: 'incidents'
   incident: { id: string; code: string; title: string; deleted: boolean }
   changes: Record<string, Change> | null
+  // La solución, el motivo de cancelar o de reabrir, si la persona lo escribió
+  note: string | null
   links: { incident: boolean }
 }
 
@@ -60,7 +62,7 @@ export interface AuditCriteria {
   to: string | null
   actor: string | null
   types: string[]
-  // Incidentes: código INC-000123. Administración: persona afectada (ULID)
+  // Incidentes: código (TZ-26-0142). Administración: persona afectada (ULID)
   target: string | null
   role: string | null
 }
