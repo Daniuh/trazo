@@ -66,3 +66,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0052](0052-recuperacion-y-cambio-de-contrasena.md) | Recuperación y cambio de contraseña: pase de un solo uso, HMAC, Have I Been Pwned y segundo factor |
 | [ADR-0053](0053-administracion-de-usuarios.md) | Administración de usuarios: jerarquía por nivel, permisos por persona y reautenticación |
 | [ADR-0054](0054-matriz-de-permisos-no-destructiva.md) | La matriz de permisos se siembra solo para roles y permisos nuevos |
+| [ADR-0055](0055-edicion-de-roles.md) | Edición de roles: rol de la cima bloqueado, nivel único, roles de sistema y sin correo masivo |

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { activeUserFilterCount, DEFAULT_USER_CRITERIA } from './listing'
 import { canToggle, differenceCount, differenceFromRole, groupByModule } from './permissions'
+import { draftChanged, draftOf, type Role } from './role'
 import type { PermissionOption } from './user'
 
 const option = (code: string, grantable = true): PermissionOption => ({
@@ -42,5 +43,28 @@ describe('listado', () => {
     expect(
       activeUserFilterCount({ ...DEFAULT_USER_CRITERIA, search: 'ana', roles: ['agent'], status: 'inactive' }),
     ).toBe(2)
+  })
+})
+
+describe('roles', () => {
+  const role: Role = {
+    code: 'agent',
+    name: 'Agente',
+    level: 40,
+    isSystem: true,
+    permissions: ['incidents.take', 'incidents.create'],
+    mfa: { required: true, graceLogins: 1 },
+    members: 3,
+    assignable: true,
+    actions: { update: true, delete: false },
+  }
+
+  it('el borrador parte del rol guardado y detecta cambios reales (sin importar el orden de los permisos)', () => {
+    const draft = draftOf(role)
+
+    expect(draftChanged(draft, role)).toBe(false)
+    expect(draftChanged({ ...draft, permissions: ['incidents.create', 'incidents.take'] }, role)).toBe(false)
+    expect(draftChanged({ ...draft, level: ' 45 ' }, role)).toBe(true)
+    expect(draftChanged({ ...draft, mfa: { required: true, graceLogins: 0 } }, role)).toBe(true)
   })
 })

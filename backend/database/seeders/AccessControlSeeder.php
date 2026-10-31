@@ -75,7 +75,8 @@ class AccessControlSeeder extends Seeder
             $newPermissions = $this->missing('permissions', array_keys(self::PERMISSIONS));
 
             $this->insertMissing('roles', 'code', array_map(
-                fn (string $code, array $role): array => ['code' => $code, 'name' => $role[0], 'level' => $role[1]],
+                // Los roles base son de sistema: no se borran
+                fn (string $code, array $role): array => ['code' => $code, 'name' => $role[0], 'level' => $role[1], 'is_system' => true],
                 array_keys(self::ROLES),
                 self::ROLES,
             ));

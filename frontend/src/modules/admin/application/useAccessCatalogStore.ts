@@ -36,5 +36,10 @@ export const useAccessCatalogStore = defineStore('access-catalog', () => {
   const role = (code: string | null | undefined) => roles.value.find((item) => item.code === code) ?? null
   const assignableRoles = computed(() => roles.value.filter((item) => item.assignable))
 
-  return { roles, permissions, error, load, role, assignableRoles }
+  // Después de crear, editar o eliminar un rol: la próxima pantalla que los pida los vuelve a leer
+  function invalidate(): void {
+    owner.value = null
+  }
+
+  return { roles, permissions, error, load, role, assignableRoles, invalidate }
 })

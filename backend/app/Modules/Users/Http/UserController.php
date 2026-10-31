@@ -40,7 +40,7 @@ final readonly class UserController
     public function store(UserRequest $request, CreateUser $create): JsonResponse
     {
         $admin = $this->requests->admin($request);
-        $user = $create->handle($admin, $request->newUser(), $request->code(), $this->requests->context($request));
+        $user = $create->handle($admin, $request->newUser(), $request->mfaCode(), $this->requests->context($request));
 
         return new JsonResponse(['data' => $this->detail($user, $admin)], 201);
     }

@@ -88,13 +88,13 @@ describe('reautenticación', function (): void {
 
         $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'admin'])
             ->assertUnprocessable()->assertJsonPath('code', 'REAUTHENTICATION_REQUIRED');
-        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'admin', 'code' => '000000'])
+        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'admin', 'mfa_code' => '000000'])
             ->assertUnprocessable()->assertJsonPath('code', 'MFA_CODE_INVALID')->assertJsonPath('params.attempts_left', 4);
-        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'admin', 'code' => currentCode($secret)])
+        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'admin', 'mfa_code' => currentCode($secret)])
             ->assertOk()->assertJsonPath('data.role.code', 'admin');
 
         // El mismo código no sirve dos veces
-        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'agent', 'code' => currentCode($secret)])
+        $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'agent', 'mfa_code' => currentCode($secret)])
             ->assertUnprocessable()->assertJsonPath('code', 'MFA_CODE_ALREADY_USED');
     });
 
@@ -102,7 +102,7 @@ describe('reautenticación', function (): void {
         adminAs('superadmin@trazo.test');
         activeMfaSecret(User::query()->where('email', 'agente1@trazo.test')->firstOrFail());
 
-        $this->deleteJson('/api/v1/users/'.managedUlid('agente1@trazo.test').'/mfa', ['code' => '123456'])
+        $this->deleteJson('/api/v1/users/'.managedUlid('agente1@trazo.test').'/mfa', ['mfa_code' => '123456'])
             ->assertUnprocessable()->assertJsonPath('code', 'REAUTHENTICATION_UNAVAILABLE');
     });
 
@@ -112,10 +112,10 @@ describe('reautenticación', function (): void {
         $agent = managedUlid('agente1@trazo.test');
 
         foreach (range(1, 5) as $ignored) {
-            $this->postJson("/api/v1/users/{$agent}/access-reset", ['code' => '000000'])->assertUnprocessable();
+            $this->postJson("/api/v1/users/{$agent}/access-reset", ['mfa_code' => '000000'])->assertUnprocessable();
         }
 
-        $this->postJson("/api/v1/users/{$agent}/access-reset", ['code' => '000000'])
+        $this->postJson("/api/v1/users/{$agent}/access-reset", ['mfa_code' => '000000'])
             ->assertStatus(423)->assertJsonPath('code', 'REAUTHENTICATION_LOCKED')->assertHeader('Retry-After');
     });
 });
@@ -157,14 +157,14 @@ describe('permisos por persona', function (): void {
         // Conceder un permiso sensible exige el código del Super admin
         $this->putJson("/api/v1/users/{$admin}/permissions", ['permissions' => [...$current, 'users.mfa.reset']])
             ->assertUnprocessable()->assertJsonPath('code', 'REAUTHENTICATION_REQUIRED');
-        $this->putJson("/api/v1/users/{$admin}/permissions", ['permissions' => [...$current, 'users.mfa.reset'], 'code' => currentCode($rootSecret)])
+        $this->putJson("/api/v1/users/{$admin}/permissions", ['permissions' => [...$current, 'users.mfa.reset'], 'mfa_code' => currentCode($rootSecret)])
             ->assertOk()->assertJsonPath('data.permissions.granted', ['users.mfa.reset']);
 
         $agent = User::query()->where('email', 'agente1@trazo.test')->firstOrFail();
         activeMfaSecret($agent);
         $adminSecret = activeMfaSecret(adminAs('admin@trazo.test'));
 
-        $this->deleteJson("/api/v1/users/{$agent->ulid}/mfa", ['code' => currentCode($adminSecret)])
+        $this->deleteJson("/api/v1/users/{$agent->ulid}/mfa", ['mfa_code' => currentCode($adminSecret)])
             ->assertOk()->assertJsonPath('data.mfa_enabled', false);
         expect(DB::table('user_recovery_codes')->where('user_id', $agent->id)->count())->toBe(0);
         Mail::assertQueued(AccountNotice::class, fn (AccountNotice $mail): bool => $mail->event->value === 'mfa_reset');
@@ -210,7 +210,7 @@ describe('restablecer y proteger el acceso', function (): void {
         $agent = User::query()->where('email', 'agente2@trazo.test')->firstOrFail();
         $agent->createToken('session', ['session']);
 
-        $this->postJson("/api/v1/users/{$agent->ulid}/access-reset", ['code' => currentCode($secret)])->assertOk();
+        $this->postJson("/api/v1/users/{$agent->ulid}/access-reset", ['mfa_code' => currentCode($secret)])->assertOk();
 
         expect(Hash::check('Trazo.Demo.2026', (string) User::query()->whereKey($agent->id)->value('password')))->toBeFalse()
             ->and(DB::table('personal_access_tokens')->where('tokenable_id', $agent->id)->count())->toBe(0);
@@ -221,7 +221,7 @@ describe('restablecer y proteger el acceso', function (): void {
     it('el administrador no restablece accesos si no se lo conceden', function (): void {
         adminAs('admin@trazo.test');
 
-        $this->postJson('/api/v1/users/'.managedUlid('agente1@trazo.test').'/access-reset', ['code' => '123456'])
+        $this->postJson('/api/v1/users/'.managedUlid('agente1@trazo.test').'/access-reset', ['mfa_code' => '123456'])
             ->assertForbidden()->assertJsonPath('code', 'FORBIDDEN_ACTION');
     });
 
@@ -244,7 +244,7 @@ describe('restablecer y proteger el acceso', function (): void {
 
         $this->postJson("/api/v1/users/{$other->ulid}/deactivate")
             ->assertConflict()->assertJsonPath('code', 'LAST_SUPER_ADMIN');
-        $this->putJson("/api/v1/users/{$other->ulid}/roles", ['role' => 'agent', 'code' => currentCode($secret)])
+        $this->putJson("/api/v1/users/{$other->ulid}/roles", ['role' => 'agent', 'mfa_code' => currentCode($secret)])
             ->assertConflict()->assertJsonPath('code', 'LAST_SUPER_ADMIN');
         expect(User::query()->whereKey($other->id)->value('is_active'))->toBeTrue();
     });

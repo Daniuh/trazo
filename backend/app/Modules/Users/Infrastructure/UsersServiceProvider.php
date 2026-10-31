@@ -11,6 +11,7 @@ use App\Modules\Users\Application\Ports\AccountSecurity;
 use App\Modules\Users\Application\Ports\AdminLog;
 use App\Modules\Users\Application\Ports\EffectivePermissions;
 use App\Modules\Users\Application\Ports\RoleCatalog;
+use App\Modules\Users\Application\Ports\RoleRepository;
 use App\Modules\Users\Application\Ports\UserListQuery;
 use App\Modules\Users\Application\Ports\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +22,7 @@ final class UsersServiceProvider extends ServiceProvider
     public array $bindings = [
         UserRepository::class => EloquentUserRepository::class,
         UserListQuery::class => EloquentUserList::class,
+        RoleRepository::class => DatabaseRoleRepository::class,
         AccountSecurity::class => AuthAccountSecurity::class,
     ];
 

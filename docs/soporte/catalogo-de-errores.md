@@ -80,6 +80,21 @@ Después de recuperar la contraseña se cierran todas las sesiones abiertas; des
 
 **Si alguien perdió su teléfono y sus códigos de recuperación,** el Super admin restablece su verificación en dos pasos desde su ficha; en el siguiente ingreso la configura de nuevo. **Si no puede ingresar por la contraseña,** puede usar "¿Olvidaste tu contraseña?" o el Super admin puede restablecer su acceso.
 
+## Roles
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Este rol está en tu nivel o por encima, así que no lo puedes cambiar. | Solo se editan los roles por debajo del nivel de quien administra | Pedírselo al Super admin |
+| El rol Super admin tiene siempre todos los permisos, así que no se edita ni se elimina. | El rol de la cima está bloqueado para todos | Ninguna; es el comportamiento esperado |
+| Este es uno de los roles base de Trazo, así que no se puede eliminar… | Los cinco roles de sistema se editan, pero no se eliminan | Editarlo, o crear un rol nuevo |
+| Hay personas con este rol. Cámbiales el rol antes de eliminarlo. | Un rol en uso no se elimina | Cambiar el rol de esas personas desde el menú Usuarios |
+| Elige un nivel por debajo del tuyo: como máximo N. | El nivel elegido está en el de quien administra o por encima | Elegir un nivel menor |
+| Este valor ya está en uso. Prueba con otro. (junto al código o al nivel) | Ya existe un rol con ese código, o con ese nivel (cada nivel es de un solo rol) | Elegir otro código u otro nivel |
+| Usa solo letras minúsculas sin tildes, números y guion bajo… | El código del rol tiene un formato no válido | Corregirlo, por ejemplo `soporte_n2` |
+| Para confirmar este cambio, escribe el código de tu aplicación de autenticación. | El cambio toca permisos de administración, cambia el nivel o relaja la verificación en dos pasos del rol | Escribir el código en el diálogo que se abre |
+
+Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; no se les envía correo. Cada creación, edición o eliminación queda registrada con quién la hizo.
+
 ## Incidentes
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |

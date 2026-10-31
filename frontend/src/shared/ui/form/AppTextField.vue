@@ -16,6 +16,8 @@ const props = defineProps<{
   maxlength?: number
   autocomplete?: string
   autofocus?: boolean
+  // "numeric": teclado de números en el celular (el valor sigue siendo texto)
+  inputmode?: 'numeric'
 }>()
 
 const model = defineModel<string>({ default: '' })
@@ -36,6 +38,7 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
       :maxlength="maxlength"
       :autocomplete="autocomplete"
       :autofocus="autofocus"
+      :inputmode="inputmode"
       :autogrow="type === 'textarea'"
       :aria-invalid="Boolean(error)"
       :aria-describedby="error ? `${id}-error` : undefined"

@@ -20,10 +20,25 @@ final class DatabaseAdminLog implements AdminLog
 
     public function record(AdminActionType $type, int $adminId, ?int $targetUserId, array $details, RequestContext $context): void
     {
+        $this->insert($type, $adminId, ['target_user_id' => $targetUserId], $details, $context);
+    }
+
+    public function recordForRole(AdminActionType $type, int $adminId, ?int $roleId, array $details, RequestContext $context): void
+    {
+        // Al eliminar un rol ya no hay a qué apuntar: el código y el nombre quedan en el detalle
+        $this->insert($type, $adminId, ['target_role_id' => $roleId], $details, $context);
+    }
+
+    /**
+     * @param  array<string, int|null>  $target
+     * @param  array<string, mixed>  $details
+     */
+    private function insert(AdminActionType $type, int $adminId, array $target, array $details, RequestContext $context): void
+    {
         DB::table('admin_actions')->insert([
             'user_id' => $adminId,
             'admin_action_type_id' => $this->typeId($type),
-            'target_user_id' => $targetUserId,
+            ...$target,
             'details' => $details === [] ? null : json_encode($details, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             'ip_address' => $context->ip,
             'user_agent' => $context->userAgent === null ? null : Str::limit($context->userAgent, 252),
