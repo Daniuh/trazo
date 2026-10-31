@@ -18,7 +18,7 @@ Cada cambio de un incidente queda registrado aquí: quién, qué y cuándo. Es l
 | `user_id` | BIGINT UNSIGNED | FK → `users`, RESTRICT | Quién hizo el cambio |
 | `activity_type_id` | TINYINT UNSIGNED | FK → `activity_types`, RESTRICT | |
 | `changes` | JSON | NULL | Valores anteriores y nuevos |
-| `ip_address` | VARCHAR(45) | NULL | Alcanza para IPv6 |
+| `ip_address` | VARCHAR(45) | NULL | Alcanza para IPv6. Vacía en el historial de los datos de demostración, que no viene de una petición |
 | `user_agent` | VARCHAR(255) | NULL | |
 | `created_at` | TIMESTAMP | NOT NULL | Sin `updated_at`: el registro no cambia |
 
