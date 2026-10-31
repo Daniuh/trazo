@@ -24,6 +24,9 @@ Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las p
 | `AppPopupField` | Base de los campos que abren un panel: se ve como un selector y abre un menú bajo el campo en portátil y monitor, o un panel inferior de borde a borde en celular y tablet. Lo usan `AppDateTimeField` y `AppDateRangeField`. |
 | `AppDateRangeField` | Rango de fechas sin hora, para filtros ("1 de oct – 22 de oct"). Toma días completos en la hora local: desde el inicio del primer día hasta el final del último. La lógica vive en `dateRange.ts`, con sus pruebas. |
 | `AppCheckbox` | Casilla con el estilo de Trazo y alto táctil en celular y tablet. |
+| `AppCodeField` | Código numérico de un solo uso (6 dígitos por defecto) en un solo campo: teclado numérico, `autocomplete="one-time-code"`, solo acepta dígitos (pegar "123 456" funciona) y los muestra separados. |
+| `AppQrCode` | Código QR dibujado como SVG desde la matriz de la librería `qrcode`, sin `v-html` y con los colores de los tokens. Imagen con nombre para lectores de pantalla. |
+| `AppCopyBlock` | Texto para copiar (una clave, un código) con el botón "Copiar", que cambia a "Copiado" y lo anuncia. |
 | `AppChoiceChips` | Selección múltiple como chips que se activan y desactivan, cómoda para tocar. Activo: fondo azul y texto blanco. |
 | `AppActionMenu` | Menú de opciones que se abre desde el botón que lo contiene. Cada opción puede llevar ícono, marcarse como peligrosa, quedar desactivada (visible pero sin efecto) o separarse de las anteriores con una línea; se cierra al elegir. El tipo de las opciones está en `menu.ts`. |
 | `AppSegmented` | Una opción entre pocas, como botones unidos ("7 días · 30 días · 90 días"). Se anuncia como grupo de opciones (`radiogroup`); la activa va en azul con texto blanco. |

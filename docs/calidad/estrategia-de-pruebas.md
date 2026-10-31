@@ -56,6 +56,7 @@ Los flujos críticos se prueban en un navegador real contra el stack de Docker c
 | Filtros | Llegan desde la URL, se ven como etiquetas y se quitan |
 | Permisos | El solicitante no ve los filtros de gestión |
 | Dashboard | Cada rol ve su resumen (general o personal, con sus widgets); "Vencidos" lleva al listado filtrado; la tendencia cambia de período |
+| MFA | Con una cuenta propia (agente3): la primera vez se configura desde la pantalla (QR, clave y 8 códigos de recuperación); las siguientes, un código incorrecto avisa los intentos que quedan y el correcto deja entrar. Mi cuenta muestra "Activa". Todo pasa por axe |
 | Personalizar | En portátil y monitor: quitar con el menú ⋯, agregar, guardar y restaurar el original; aviso al salir con cambios sin guardar y al cancelar. En tablet y celular no hay botón y el ícono de información explica dónde hacerlo |
 
 - **Accesibilidad:** el login, el formulario, el detalle, el listado, el dashboard y su modo Personalizar pasan por axe-core con las reglas WCAG 2.1 A y AA. Cualquier problema hace fallar la prueba.

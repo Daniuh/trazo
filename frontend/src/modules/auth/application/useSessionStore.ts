@@ -1,10 +1,11 @@
 // Estado de la sesión: quién está conectado y qué puede ver. El token vive en tokenStore (memoria y sessionStorage).
+// Un ingreso a medias (falta el MFA) guarda su token solo en memoria: si se recarga la página, se vuelve a ingresar.
 // Documentado en docs/frontend/auth.md
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { ApiError, toApiError, tokenStore } from '@/shared/http'
-import { hasPermission, type SessionUser } from '../domain/session'
-import { authApi } from '../infrastructure/authApi'
+import { hasPermission, isPendingStep, type LoginStep, type PendingStep, type SessionUser } from '../domain/session'
+import { authApi, type LoginResult, type MfaSetupData } from '../infrastructure/authApi'
 
 // Resultado de recuperar la sesión al recargar: con sesión, sin sesión o sin poder comprobarlo
 export type RestoreResult = 'signed-in' | 'signed-out' | 'unreachable'
@@ -16,16 +17,62 @@ export const useSessionStore = defineStore('session', () => {
   const isAuthenticated = computed(() => user.value !== null)
   // Por qué no se pudo comprobar la sesión (sin conexión, mantenimiento, lentitud)
   const connectionError = ref<ApiError | null>(null)
+  // Ingreso a medias: contraseña correcta, falta verificar o configurar el MFA
+  const pending = ref<{ token: string; step: PendingStep } | null>(null)
 
   function clear(): void {
     tokenStore.clear()
     user.value = null
+    pending.value = null
   }
 
-  async function login(email: string, password: string): Promise<void> {
-    const session = await authApi.login(email, password)
-    tokenStore.set(session.token)
-    user.value = session.user
+  function open(result: LoginResult): void {
+    if (isPendingStep(result.step) || !result.user) {
+      pending.value = { token: result.token, step: result.step as PendingStep }
+      return
+    }
+    tokenStore.set(result.token)
+    user.value = result.user
+    pending.value = null
+  }
+
+  async function login(email: string, password: string): Promise<LoginStep> {
+    const result = await authApi.login(email, password)
+    open(result)
+    return result.step
+  }
+
+  async function verifyMfa(answer: { code: string } | { recoveryCode: string }): Promise<void> {
+    if (!pending.value) throw new ApiError('http', UNAUTHENTICATED)
+    open(await authApi.verifyMfa(pending.value.token, answer))
+  }
+
+  // Durante el ingreso usa el token del ingreso a medias; con la sesión abierta, el de la sesión
+  async function startMfaSetup(): Promise<MfaSetupData> {
+    return authApi.startMfaSetup(pending.value?.step === 'mfa_setup' ? pending.value.token : undefined)
+  }
+
+  async function confirmMfaSetup(code: string): Promise<string[]> {
+    const challenge = pending.value?.step === 'mfa_setup' ? pending.value.token : undefined
+    const result = await authApi.confirmMfaSetup(code, challenge)
+    if (result.session) open(result.session)
+    else await refresh()
+    return result.recoveryCodes
+  }
+
+  async function regenerateRecoveryCodes(code: string): Promise<string[]> {
+    const codes = await authApi.regenerateRecoveryCodes(code)
+    await refresh()
+    return codes
+  }
+
+  async function disableMfa(code: string): Promise<void> {
+    await authApi.disableMfa(code)
+    await refresh()
+  }
+
+  async function refresh(): Promise<void> {
+    user.value = await authApi.me()
   }
 
   // Al recargar la página queda el token pero no el usuario: se pide de nuevo a la API.
@@ -61,5 +108,21 @@ export const useSessionStore = defineStore('session', () => {
 
   const can = (permission: string) => hasPermission(user.value, permission)
 
-  return { user, isAuthenticated, connectionError, login, restore, logout, clear, can }
+  return {
+    user,
+    pending,
+    isAuthenticated,
+    connectionError,
+    login,
+    verifyMfa,
+    startMfaSetup,
+    confirmMfaSetup,
+    regenerateRecoveryCodes,
+    disableMfa,
+    refresh,
+    restore,
+    logout,
+    clear,
+    can,
+  }
 })

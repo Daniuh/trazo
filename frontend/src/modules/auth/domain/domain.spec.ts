@@ -9,6 +9,7 @@ const user: SessionUser = {
   email: 'agente1@trazo.test',
   roles: [{ code: 'agent', name: 'Agente' }],
   permissions: ['incidents.create', 'incidents.view.assigned'],
+  mfa: { enabled: false, required: false, recoveryCodesLeft: 0 },
 }
 
 describe('hasPermission', () => {

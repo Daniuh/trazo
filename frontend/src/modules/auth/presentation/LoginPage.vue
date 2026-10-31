@@ -2,7 +2,7 @@
 <!-- La validación aquí es solo visual: quien decide es la API. Documentado en docs/frontend/auth.md -->
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
 import { ApiError, toApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
@@ -11,6 +11,7 @@ import AppTextField from '@/shared/ui/form/AppTextField.vue'
 import { SESSION_EXPIRED_REASON } from '../application/authGuard'
 import { useSessionStore } from '../application/useSessionStore'
 import { safeRedirect } from '../domain/safeRedirect'
+import type { LoginStep } from '../domain/session'
 import AuthPanel from './AuthPanel.vue'
 
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -36,6 +37,16 @@ function localErrors(): Record<string, string> {
   return errors
 }
 
+// Después de la contraseña: entrar, o pasar al segundo paso del MFA (verificar o configurarlo)
+function nextRoute(step: LoginStep): RouteLocationRaw {
+  const volver = safeRedirect(route.query.volver)
+  const keep = volver ? { volver } : {}
+  if (step === 'mfa_verify') return { name: 'mfa-verify', query: keep }
+  if (step === 'mfa_setup') return { name: 'mfa-setup', query: keep }
+  if (step === 'setup_suggested') return { name: 'mfa-setup', query: { ...keep, sugerido: '1' } }
+  return volver ?? { name: 'home' }
+}
+
 async function submit(): Promise<void> {
   // Un segundo Enter mientras se espera la respuesta no debe contar como otro intento
   if (submitting.value) return
@@ -45,8 +56,8 @@ async function submit(): Promise<void> {
 
   submitting.value = true
   try {
-    await session.login(form.email, form.password)
-    await router.replace(safeRedirect(route.query.volver) ?? { name: 'home' })
+    const step = await session.login(form.email, form.password)
+    await router.replace(nextRoute(step))
   } catch (raw) {
     const error = toApiError(raw)
     fieldErrors.value = fieldMessagesFor(error)

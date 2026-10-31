@@ -1,11 +1,14 @@
 // Pruebas de los componentes base: accesibilidad, estados y reglas de diseño.
 import { mount } from '@vue/test-utils'
+import { Quasar } from 'quasar'
 import { describe, expect, it } from 'vitest'
 import { ApiError, ClientErrorCode } from '@/shared/http'
 import AppBadge from './AppBadge.vue'
 import AppButton from './AppButton.vue'
+import AppCodeField from './form/AppCodeField.vue'
 import AppIcon from './AppIcon.vue'
 import AppInfoTip from './AppInfoTip.vue'
+import AppQrCode from './AppQrCode.vue'
 import AppErrorState from './states/AppErrorState.vue'
 
 describe('AppIcon', () => {
@@ -84,5 +87,36 @@ describe('AppErrorState', () => {
     expect(state.text()).toContain('No pudimos conectarnos')
     await state.get('button').trigger('click')
     expect(state.emitted('retry')).toHaveLength(1)
+  })
+})
+
+describe('AppCodeField', () => {
+  it('deja solo dígitos y corta en el largo del código, para poder pegar "123 456"', async () => {
+    const field = mount(AppCodeField, {
+      props: { label: 'Código', modelValue: '' },
+      global: { plugins: [Quasar] },
+    })
+
+    await field.find('input').setValue('123 45-678')
+
+    expect(field.emitted('update:modelValue')?.at(-1)).toEqual(['123456'])
+    expect(field.find('input').attributes('inputmode')).toBe('numeric')
+    expect(field.find('input').attributes('autocomplete')).toBe('one-time-code')
+  })
+})
+
+describe('AppQrCode', () => {
+  it('dibuja el código como imagen con nombre y deja el margen que exige la norma', () => {
+    const qr = mount(AppQrCode, {
+      props: { value: 'otpauth://totp/Trazo:a@trazo.test?secret=ABC', label: 'Código QR' },
+    })
+    const [, , width] = (qr.attributes('viewBox') ?? '').split(' ').map(Number)
+
+    expect(qr.attributes('role')).toBe('img')
+    expect(qr.attributes('aria-label')).toBe('Código QR')
+    // Un QR tiene 21 módulos como mínimo, más 4 de margen por lado
+    expect(width).toBeGreaterThanOrEqual(29)
+    // El patrón de esquina siempre empieza oscuro, justo después del margen
+    expect(qr.find('path').attributes('d')).toMatch(/^M4 4h1v1h-1z/)
   })
 })

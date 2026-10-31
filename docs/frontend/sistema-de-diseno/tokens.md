@@ -74,6 +74,9 @@ Escala de 4 px (`$space-1` a `$space-7`: 4, 8, 12, 16, 24, 32 y 48). Radios de 8
 | `$dashboard-drop-zone` | azul base al 15 % | Fondo de la zona donde cae el widget que se arrastra |
 | `$shadow-dragging` | sombra amplia | Widget que se arrastra o se estira: flota sobre los demás |
 | `$menu-wide-width` | 20 rem | Menús con una descripción por opción ("Agregar widget") |
+| `$qr-size` | 11 rem | Código QR del MFA (se escanea bien desde cualquier teléfono) |
+| `$code-column-min-width` | 8,5 rem | Columna de cada código de recuperación |
+| `$letter-spacing-code` | 0,12 em | Separación de caracteres en códigos y claves, para leerlos sin error |
 | `$chart-bar-height` | 0,625 rem | Grosor de las barras horizontales |
 | `$chart-label-width` | 7 rem | Columna de nombres en las barras |
 | `$chart-donut-size` | 8 rem | Diámetro de la dona |

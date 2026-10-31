@@ -68,7 +68,17 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 
 Estos usuarios **solo existen fuera de producción**: el seeder no los crea cuando `APP_ENV=production`.
 
-> Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Es el comportamiento esperado.
+### Verificación en dos pasos
+
+Todos los roles la exigen, también en local, para que funcione igual que en producción. Hace falta una aplicación de autenticación en el teléfono (Google Authenticator, Microsoft Authenticator, Authy o cualquier otra):
+
+1. **Primer ingreso** con cada cuenta: Trazo ofrece configurarla, pero se puede posponer con "Configurar más tarde".
+2. **Desde el segundo ingreso** hay que configurarla: se escanea el código QR con la aplicación, se escribe el código de 6 dígitos que muestra y se guardan los 8 códigos de recuperación.
+3. **Después,** cada ingreso pide el código de la aplicación. Si no se tiene el teléfono a mano, sirve uno de los códigos de recuperación (cada uno una sola vez).
+
+Desde **Mi cuenta** (menú de la persona, arriba a la derecha) se ve su estado y se pueden generar códigos de recuperación nuevos. Cada cambio llega como aviso al correo de la cuenta; en local, a Mailpit (http://localhost:8025).
+
+> Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 
 ## Variables de entorno
 
@@ -163,6 +173,8 @@ npm run check
 # Necesitan el stack levantado y, la primera vez, los navegadores de Playwright: npx playwright install chromium
 npm run test:e2e
 ```
+
+Las pruebas de extremo a extremo hacen de "teléfono" para la verificación en dos pasos: guardan la clave de cada cuenta de prueba en `frontend/e2e/.auth/` (no se versiona) y calculan sus códigos. Si esa carpeta se borra, las cuentas que ya tenían la verificación activa no se pueden usar en las pruebas hasta recargar los datos (`docker compose exec app php artisan migrate:fresh --seed`).
 
 La [estrategia de pruebas](docs/calidad/estrategia-de-pruebas.md) explica qué cubre cada una.
 

@@ -19,6 +19,7 @@ Personas que usan Trazo. **Se desactivan, nunca se borran**, para conservar el h
 | `email` | VARCHAR(191) | UNIQUE, NOT NULL | Siempre en minúsculas y sin espacios |
 | `password` | VARCHAR(255) | NOT NULL | Hash Argon2id |
 | `is_active` | BOOLEAN | NOT NULL, por defecto `true` | Un usuario inactivo no puede entrar |
+| `mfa_grace_used` | TINYINT UNSIGNED | NOT NULL, por defecto `0` | Ingresos en que pospuso configurar el MFA; se compara con la gracia de su política ([MFA](mfa.md)) |
 | `created_at`, `updated_at` | TIMESTAMP | | |
 
 ## Índices

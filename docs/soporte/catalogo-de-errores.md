@@ -34,6 +34,20 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 | Por seguridad, pausamos el ingreso con este correo… Vuelve a intentarlo en N minutos. | Hubo 5 o más intentos fallidos seguidos con ese correo. La espera crece: 1 min, 5 min, 15 min y 1 hora | Esperar el tiempo indicado. Si nadie más conoce la cuenta, puede ser un intento de acceso: avisar al equipo de seguridad |
 | Tu sesión terminó. Inicia sesión de nuevo para continuar. (en la pantalla de login) | La sesión venció (8 horas), estuvo más de 1 hora sin uso, se cerró o la cuenta se desactivó | Volver a ingresar; se regresa a la página donde estaba |
 
+## Verificación en dos pasos
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| El código no es correcto… Te quedan N intentos. | El código no coincide con el de la aplicación | Escribir el código que muestra ahora la aplicación. Si siempre falla, revisar que la hora del teléfono sea automática |
+| Ese código ya se usó… | Era un código correcto, pero ya se había usado (cada uno sirve una vez) | Esperar a que la aplicación muestre uno nuevo (cambia cada 30 segundos) |
+| Ese código de recuperación no es válido o ya se usó… | El código no existe, está incompleto o ya se usó | Revisar que tenga sus 10 caracteres; probar con otro de los guardados |
+| Por seguridad cerramos este ingreso después de varios códigos incorrectos… | 5 códigos incorrectos en el mismo ingreso | Volver a ingresar con correo y contraseña |
+| Pasó demasiado tiempo desde que escribiste tu contraseña… | El segundo paso tiene 5 minutos | Volver a ingresar |
+| Tu rol exige la verificación en dos pasos, así que no se puede desactivar. | Se intentó desactivar el MFA de un rol que lo exige | Ninguna; si el teléfono se perdió, ingresar con un código de recuperación y configurarlo de nuevo |
+| Tu cuenta ya tiene activa la verificación en dos pasos. / Tu cuenta no tiene activa… / La configuración no está en curso… / Ya ingresaste… | El estado cambió en otra pestaña o la página quedó desactualizada | Recargar la página |
+
+**Si alguien perdió su teléfono y sus códigos de recuperación,** no puede entrar solo. Un administrador tendrá que restablecer su MFA (llega con la administración de usuarios).
+
 ## Incidentes
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |
