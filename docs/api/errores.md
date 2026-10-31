@@ -36,7 +36,7 @@ Todos los errores salen con `Content-Type: application/problem+json` siguiendo e
 | `errors` | No | Errores por campo, cada uno con su `code` y sus `params` |
 | `trace_id` | Sí | Identificador de la petición; coincide con la cabecera `X-Request-Id` |
 
-Los 429 incluyen `Retry-After` y los 405 incluyen `Allow`.
+Los 429 y los 423 incluyen `Retry-After`, y los 405 incluyen `Allow`.
 
 ## Códigos generales
 
@@ -52,7 +52,7 @@ Los 429 incluyen `Retry-After` y los 405 incluyen `Allow`.
 | `SERVICE_UNAVAILABLE` | 503 | Modo mantenimiento |
 | `INTERNAL_ERROR` | 500 | Error inesperado (el detalle queda solo en los logs) |
 
-Los códigos de negocio de cada módulo (por ejemplo `INVALID_STATUS_TRANSITION`) se documentan en su módulo.
+Los códigos de negocio de cada módulo (por ejemplo `INVALID_STATUS_TRANSITION`) se documentan en su módulo. Los de sesión (`INVALID_CREDENTIALS` y `ACCOUNT_LOCKED`) están en [Módulo Auth](../backend/auth.md#errores).
 
 ## Códigos de validación por campo
 

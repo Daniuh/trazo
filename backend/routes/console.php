@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+// Tareas programadas (las ejecuta el servicio scheduler).
+// Documentado en docs/backend/auth.md
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+use Illuminate\Support\Facades\Schedule;
+
+// Borra los tokens de sesión vencidos hace más de un día
+Schedule::command('sanctum:prune-expired --hours=24')->daily();

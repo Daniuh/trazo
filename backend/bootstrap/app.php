@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Van primero para que incluso un 404 de ruta lleve su id y salga en JSON
         $middleware->prepend([AssignRequestId::class, ForceJsonResponse::class]);
+        // Límite general de 120 peticiones por minuto (definido en AppServiceProvider)
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(

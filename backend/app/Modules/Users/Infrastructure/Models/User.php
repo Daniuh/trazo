@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Users\Infrastructure\Models;
 
+use App\Modules\Shared\Domain\EmailAddress;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property int $id
@@ -25,6 +27,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable
 {
+    use HasApiTokens;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
@@ -64,7 +68,7 @@ class User extends Authenticatable
      */
     protected function email(): Attribute
     {
-        return Attribute::set(fn (string $value): string => mb_strtolower(trim($value)));
+        return Attribute::set(fn (string $value): string => EmailAddress::normalize($value));
     }
 
     /**

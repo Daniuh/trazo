@@ -60,6 +60,7 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | `priorities`, `statuses`, `status_transitions`, `activity_types` | [Catálogos](diccionario/catalogos.md) |
 | `incidents` | [incidents](diccionario/incidents.md) |
 | `incident_activities` | [incident_activities](diccionario/incident-activities.md) |
+| `personal_access_tokens` | [personal_access_tokens](diccionario/personal-access-tokens.md) |
 | `failed_jobs` | Tabla estándar de Laravel para trabajos de cola fallidos |
 
 Datos iniciales: [Seeders](seeders.md).

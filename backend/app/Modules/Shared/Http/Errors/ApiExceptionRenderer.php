@@ -7,9 +7,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Shared\Http\Errors;
 
+use App\Modules\Shared\Domain\Exceptions\AuthenticationFailedException;
 use App\Modules\Shared\Domain\Exceptions\ConflictException;
 use App\Modules\Shared\Domain\Exceptions\DomainException;
 use App\Modules\Shared\Domain\Exceptions\ResourceNotFoundException;
+use App\Modules\Shared\Domain\Exceptions\TemporarilyLockedException;
 use App\Modules\Shared\Http\Middleware\AssignRequestId;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -37,7 +39,12 @@ final class ApiExceptionRenderer
                 ErrorCode::ValidationFailed->value,
                 errors: $this->validation->format($e->validator),
             ),
-            $e instanceof DomainException => new ProblemDetails($this->statusFor($e), $e->errorCode(), $e->params()),
+            $e instanceof DomainException => new ProblemDetails(
+                $this->statusFor($e),
+                $e->errorCode(),
+                $e->params(),
+                headers: $e instanceof TemporarilyLockedException ? ['Retry-After' => (string) $e->retryAfterSeconds()] : [],
+            ),
             $e instanceof AuthenticationException => ProblemDetails::fromCode(ErrorCode::Unauthenticated),
             $e instanceof AuthorizationException => ProblemDetails::fromCode(ErrorCode::ForbiddenAction),
             $e instanceof ModelNotFoundException => ProblemDetails::fromCode(ErrorCode::ResourceNotFound),
@@ -50,8 +57,10 @@ final class ApiExceptionRenderer
     private function statusFor(DomainException $e): int
     {
         return match (true) {
+            $e instanceof AuthenticationFailedException => 401,
             $e instanceof ResourceNotFoundException => 404,
             $e instanceof ConflictException => 409,
+            $e instanceof TemporarilyLockedException => 423,
             default => 422,
         };
     }
