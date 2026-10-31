@@ -18,6 +18,8 @@ use App\Modules\Auth\Domain\LockoutPolicy;
 use App\Modules\Auth\Domain\LoginAttemptStore;
 use App\Modules\Auth\Domain\Mfa\LoginStep;
 use App\Modules\Auth\Domain\Mfa\MfaGate;
+use App\Modules\Shared\Application\Ports\SystemEvents;
+use App\Modules\Shared\Application\SystemEventType;
 use App\Modules\Shared\Domain\EmailAddress;
 use Psr\Log\LoggerInterface;
 
@@ -31,6 +33,7 @@ final readonly class LoginUser
         private MfaStore $mfa,
         private MfaPolicies $policies,
         private LoggerInterface $logger,
+        private SystemEvents $events,
     ) {}
 
     /**
@@ -49,7 +52,7 @@ final readonly class LoginUser
 
         $userId = $this->credentials->verify($email, $password);
         if ($userId === null) {
-            $this->registerFailure($key, $ip);
+            $this->registerFailure($key, $email, $ip);
         }
 
         $this->attempts->clear($key);
@@ -79,7 +82,7 @@ final readonly class LoginUser
      * @throws AccountLockedException
      * @throws InvalidCredentialsException
      */
-    private function registerFailure(string $key, string $ip): never
+    private function registerFailure(string $key, string $email, string $ip): never
     {
         $failures = $this->attempts->recordFailure($key);
         $lockSeconds = $this->policy->lockSecondsAfter($failures);
@@ -92,6 +95,13 @@ final readonly class LoginUser
         // Un fallo aislado no se registra; un bloqueo sí, porque puede ser un ataque
         $this->logger->warning('Inicio de sesión bloqueado por intentos fallidos', [
             'email_hash' => $key,
+            'ip' => $ip,
+            'failures' => $failures,
+            'lock_seconds' => $lockSeconds,
+        ]);
+        // Agrupado por cuenta: el contador dice cuántas veces la bloquearon
+        $this->events->record(SystemEventType::LoginLocked, $key, "Ingreso bloqueado tras {$failures} intentos fallidos", [
+            'account' => EmailAddress::masked($email),
             'ip' => $ip,
             'failures' => $failures,
             'lock_seconds' => $lockSeconds,

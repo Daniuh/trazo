@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 use App\Modules\Audit\Domain\AdminAuditScope;
 use App\Modules\Audit\Domain\AuditAccess;
-use App\Modules\Audit\Domain\AuditCursor;
 use App\Modules\Audit\Domain\AuditPeriod;
+use App\Modules\Shared\Domain\TimeCursor;
 use App\Modules\Users\Domain\Administrator;
 
 describe('acceso', function (): void {
@@ -70,14 +70,14 @@ describe('rango de fechas', function (): void {
 
 describe('cursor', function (): void {
     it('va y vuelve sin perder la fecha ni el id', function (): void {
-        $cursor = new AuditCursor(new DateTimeImmutable('2026-10-24 21:54:57', new DateTimeZone('UTC')), 3158);
-        $decoded = AuditCursor::decode($cursor->encode());
+        $cursor = new TimeCursor(new DateTimeImmutable('2026-10-24 21:54:57', new DateTimeZone('UTC')), 3158);
+        $decoded = TimeCursor::decode($cursor->encode());
 
         expect($decoded?->id)->toBe(3158)->and($decoded?->sqlDate())->toBe('2026-10-24 21:54:57');
     });
 
     it('rechaza uno alterado', function (string $value): void {
-        expect(AuditCursor::decode($value))->toBeNull();
+        expect(TimeCursor::decode($value))->toBeNull();
     })->with([
         'texto suelto' => 'hola',
         'sin id' => rtrim(base64_encode('2026-10-24 21:54:57'), '='),

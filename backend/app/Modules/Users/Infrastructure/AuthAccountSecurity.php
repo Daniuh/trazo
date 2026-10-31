@@ -12,6 +12,8 @@ use App\Modules\Auth\Application\Mfa\TotpCheck;
 use App\Modules\Auth\Application\Ports\MfaStore;
 use App\Modules\Auth\Application\Ports\SessionTokens;
 use App\Modules\Auth\Domain\Exceptions\MfaExceptions;
+use App\Modules\Shared\Application\Ports\SystemEvents;
+use App\Modules\Shared\Application\SystemEventType;
 use App\Modules\Shared\Domain\Exceptions\RuleViolationException;
 use App\Modules\Shared\Domain\Exceptions\TemporarilyLockedException;
 use App\Modules\Users\Application\Ports\AccountSecurity;
@@ -27,6 +29,7 @@ final readonly class AuthAccountSecurity implements AccountSecurity
         private SessionTokens $sessions,
         private MfaStore $mfa,
         private TotpCheck $totp,
+        private SystemEvents $events,
     ) {}
 
     public function revokeSessions(int $userId): void
@@ -57,9 +60,15 @@ final readonly class AuthAccountSecurity implements AccountSecurity
         }
 
         if (! $this->totp->consume($adminId, $factor, $code)) {
-            RateLimiter::hit($key, self::DECAY_SECONDS);
+            $failures = RateLimiter::hit($key, self::DECAY_SECONDS);
+            // Quien ya tiene sesión y falla el código varias veces puede estar usando una sesión robada
+            if ($failures === self::MAX_FAILURES) {
+                $this->events->record(SystemEventType::ReauthenticationLocked, "user:{$adminId}", 'Reautenticación bloqueada tras varios códigos incorrectos', [
+                    'user_id' => $adminId,
+                ]);
+            }
 
-            throw MfaExceptions::invalidCode(max(0, self::MAX_FAILURES - (int) RateLimiter::attempts($key)));
+            throw MfaExceptions::invalidCode(max(0, self::MAX_FAILURES - $failures));
         }
 
         RateLimiter::clear($key);

@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Audit\Application\Data;
 
-use App\Modules\Audit\Domain\AuditCursor;
 use App\Modules\Audit\Domain\AuditPeriod;
+use App\Modules\Shared\Domain\TimeCursor;
 
 final readonly class IncidentAuditCriteria
 {
@@ -21,7 +21,7 @@ final readonly class IncidentAuditCriteria
         public ?string $actor,
         public array $types,
         public ?string $incident,
-        public ?AuditCursor $cursor,
+        public ?TimeCursor $cursor,
         public int $perPage,
     ) {}
 }

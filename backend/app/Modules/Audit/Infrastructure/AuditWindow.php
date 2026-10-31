@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Audit\Infrastructure;
 
-use App\Modules\Audit\Domain\AuditCursor;
 use App\Modules\Audit\Domain\AuditPeriod;
+use App\Modules\Shared\Domain\TimeCursor;
 use DateTimeImmutable;
 use DateTimeZone;
 use Illuminate\Database\Query\Builder;
@@ -20,7 +20,7 @@ final class AuditWindow
 {
     private const SQL_DATE = 'Y-m-d H:i:s';
 
-    public static function apply(Builder $query, string $table, AuditPeriod $period, ?AuditCursor $cursor, int $perPage): void
+    public static function apply(Builder $query, string $table, AuditPeriod $period, ?TimeCursor $cursor, int $perPage): void
     {
         $query->whereBetween("{$table}.created_at", [self::sql($period->from), self::sql($period->to)]);
 
@@ -38,14 +38,14 @@ final class AuditWindow
      * Separa la fila de más y arma el cursor desde la última entregada.
      *
      * @param  Collection<int, stdClass>  $rows
-     * @return array{list<stdClass>, AuditCursor|null}
+     * @return array{list<stdClass>, TimeCursor|null}
      */
     public static function split(Collection $rows, int $perPage): array
     {
         $items = array_values($rows->take($perPage)->all());
         $last = end($items);
         $next = $rows->count() > $perPage && $last !== false
-            ? new AuditCursor(self::date((string) $last->created_at), (int) $last->id)
+            ? new TimeCursor(self::date((string) $last->created_at), (int) $last->id)
             : null;
 
         return [$items, $next];

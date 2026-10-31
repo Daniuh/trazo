@@ -59,6 +59,10 @@ Si la respuesta no trae el formato de error de la API (por ejemplo, una página 
 
 **Descargas.** Una petición con `responseType: 'blob'` (la exportación) recibe también el error como archivo. Antes de armar el `ApiError`, el cliente lee ese archivo si es JSON, y así se conserva el código de la API (`EXPORT_TOO_LARGE`, `TOO_MANY_REQUESTS`…). El archivo bueno se guarda con `saveFile` (`shared/download/saveFile.ts`), con el nombre que propone el servidor en `Content-Disposition` (`filenameFrom`). Con el token en la cabecera no sirve un enlace directo, y un token en la URL quedaría en el historial y en los logs.
 
+**Modo mantenimiento.** Un 503 emite `maintenance` y muestra "Trazo está en mantenimiento". Quien puede seguir trabajando recibe la cabecera `X-Maintenance` en cada respuesta: el cliente la refleja en `maintenanceNotice` (`shared/http/maintenance.ts`) y el shell muestra el aviso mientras siga llegando ([Módulo de sistema](system.md#aviso-de-mantenimiento)).
+
+**Reautenticación.** `needsCode(error)` dice si la API pidió el código de la aplicación (`REAUTHENTICATION_REQUIRED`). `useReauth` (`shared/ui/feedback`) abre el diálogo del código y reintenta con él; lo usan la administración y el sistema.
+
 ## Sesión vencida
 
 Solo el código `UNAUTHENTICATED` cierra la sesión en el navegador. Un 401 con otro código, como `INVALID_CREDENTIALS` en el login, lo maneja la pantalla que hizo la petición. Si no fuera así, una contraseña mal escrita se trataría como una sesión vencida.

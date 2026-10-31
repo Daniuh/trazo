@@ -1,8 +1,8 @@
 // Reautenticación en la pantalla: intenta el cambio sin código y, si la API lo pide, abre el diálogo del código
 // (AppCodeDialog) y lo reintenta con él. Así el front no decide qué cambios son sensibles: lo decide la API.
-// Documentado en docs/frontend/admin.md
+// Documentado en docs/frontend/http-y-errores.md
 import { reactive, watch } from 'vue'
-import { needsCode } from '../application/useUserDetail'
+import { needsCode } from '@/shared/http'
 
 export interface ReauthTexts {
   title: string

@@ -14,6 +14,8 @@ use App\Modules\Auth\Application\Ports\SecurityNotifier;
 use App\Modules\Auth\Application\Ports\SessionTokens;
 use App\Modules\Auth\Domain\Exceptions\MfaExceptions;
 use App\Modules\Auth\Domain\LoginAttemptStore;
+use App\Modules\Shared\Application\Ports\SystemEvents;
+use App\Modules\Shared\Application\SystemEventType;
 use App\Modules\Shared\Domain\Exceptions\DomainException;
 use Psr\Log\LoggerInterface;
 
@@ -26,6 +28,7 @@ final readonly class VerifyMfa
         private LoginAttemptStore $attempts,
         private SecurityNotifier $notifier,
         private LoggerInterface $logger,
+        private SystemEvents $events,
         private int $maxAttempts,
     ) {}
 
@@ -69,6 +72,10 @@ final readonly class VerifyMfa
             $this->attempts->clear($key);
             $this->tokens->revoke($challengeTokenId);
             $this->logger->warning('Ingreso con MFA cortado por intentos fallidos', ['user_id' => $userId]);
+            $this->events->record(SystemEventType::MfaAttemptsExceeded, "user:{$userId}", 'Ingreso cortado tras varios códigos de verificación incorrectos', [
+                'user_id' => $userId,
+                'with_recovery_code' => $recovery,
+            ]);
 
             throw MfaExceptions::tooManyAttempts();
         }

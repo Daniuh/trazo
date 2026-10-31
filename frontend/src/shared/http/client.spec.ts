@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ApiError } from './apiError'
 import { createHttpClient } from './client'
 import { createHttpEvents } from './events'
+import { maintenanceNotice } from './maintenance'
 import { createTokenStore } from './tokenStore'
 
 type Reply = { status: number; data?: unknown; headers?: Record<string, string> } | 'network'
@@ -166,5 +167,17 @@ describe('descargas', () => {
 
     expect(error.code).toBe('EXPORT_TOO_LARGE')
     expect(error.params).toEqual({ total: 60000, max: 50000 })
+  })
+})
+
+describe('modo mantenimiento', () => {
+  it('muestra el aviso mientras la API lo indica y lo quita cuando deja de hacerlo', async () => {
+    const { client } = setup({ status: 200, headers: { 'x-maintenance': 'on' } }, { status: 200 })
+
+    await client.get('/incidents')
+    expect(maintenanceNotice.value).toBe(true)
+
+    await client.get('/incidents')
+    expect(maintenanceNotice.value).toBe(false)
   })
 })

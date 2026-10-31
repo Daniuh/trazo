@@ -4,6 +4,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { ApiError, toApiError } from './apiError'
 import { httpEvents, type HttpEventBus } from './events'
+import { MAINTENANCE_HEADER, maintenanceNotice } from './maintenance'
 import { currentSocketId } from './socketId'
 import { tokenStore, type TokenStore } from './tokenStore'
 
@@ -63,6 +64,12 @@ export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance
     const socket = currentSocketId()
     if (socket) config.headers['X-Socket-ID'] = socket
     return config
+  })
+
+  // Cada respuesta dice si sigue el mantenimiento: el aviso aparece y desaparece solo
+  client.interceptors.response.use((response) => {
+    maintenanceNotice.value = response.headers[MAINTENANCE_HEADER] === 'on'
+    return response
   })
 
   client.interceptors.response.use(undefined, async (raw: unknown) => {

@@ -43,8 +43,3 @@ export function useUserDetail(id: string) {
     resetAccess: (code?: string) => apply(usersApi.resetAccess(id, code)),
   }
 }
-
-// La API pide el código de quien administra para este cambio
-export function needsCode(raw: unknown): boolean {
-  return toApiError(raw).code === 'REAUTHENTICATION_REQUIRED'
-}

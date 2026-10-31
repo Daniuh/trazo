@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace App\Modules\Auth\Infrastructure;
 
 use App\Modules\Auth\Application\Ports\BreachedPasswords;
+use App\Modules\Shared\Application\Ports\SystemEvents;
+use App\Modules\Shared\Application\SystemEventType;
 use Illuminate\Http\Client\Factory as Http;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -23,6 +25,7 @@ final class HibpBreachedPasswords implements BreachedPasswords
     public function __construct(
         private readonly Http $http,
         private readonly LoggerInterface $logger,
+        private readonly SystemEvents $events,
         private readonly string $commonListPath,
         private readonly int $timeoutSeconds,
     ) {}
@@ -45,12 +48,14 @@ final class HibpBreachedPasswords implements BreachedPasswords
                 ->get(self::RANGE_URL.$prefix);
         } catch (Throwable $error) {
             $this->logger->warning('Have I Been Pwned no respondió; se usa solo la lista local', ['error' => $error->getMessage()]);
+            $this->unavailable(['reason' => 'timeout_or_network']);
 
             return null;
         }
 
         if (! $response->successful()) {
             $this->logger->warning('Have I Been Pwned respondió con error; se usa solo la lista local', ['status' => $response->status()]);
+            $this->unavailable(['reason' => 'http_error', 'status' => $response->status()]);
 
             return null;
         }
@@ -64,6 +69,17 @@ final class HibpBreachedPasswords implements BreachedPasswords
         }
 
         return false;
+    }
+
+    /**
+     * @param  array<string, scalar>  $context
+     */
+    private function unavailable(array $context): void
+    {
+        $this->events->record(SystemEventType::ExternalServiceUnavailable, 'hibp', 'Have I Been Pwned no respondió; se revisó solo con la lista local', [
+            'service' => 'Have I Been Pwned',
+            ...$context,
+        ]);
     }
 
     private function isCommon(string $password): bool

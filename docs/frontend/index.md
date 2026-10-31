@@ -22,7 +22,7 @@ frontend/src/
 │   ├── layout/          → estructura común (encabezado, menú, contenido)
 │   ├── navigation.ts    → reúne el menú de todos los módulos
 │   └── pages/           → páginas globales (404 y guía visual en desarrollo)
-├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth, incidents, dashboard, admin, audit y realtime)
+├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth, incidents, dashboard, admin, audit, realtime y system)
 │   ├── domain/          → tipos y reglas puras
 │   ├── application/     → casos de uso (composables y stores)
 │   ├── infrastructure/  → repositorios de la API y mappers

@@ -26,6 +26,7 @@ use App\Modules\Auth\Application\Ports\SessionUserReader;
 use App\Modules\Auth\Application\Ports\UserAccounts;
 use App\Modules\Auth\Domain\LockoutPolicy;
 use App\Modules\Auth\Domain\LoginAttemptStore;
+use App\Modules\Shared\Application\Ports\SystemEvents;
 use App\Modules\Shared\Domain\EmailAddress;
 use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -61,6 +62,7 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->bind(BreachedPasswords::class, fn ($app): BreachedPasswords => new HibpBreachedPasswords(
             $app->make(HttpClient::class),
             $app->make(LoggerInterface::class),
+            $app->make(SystemEvents::class),
             (string) config('trazo.auth.password.common_list'),
             (int) config('trazo.auth.password.breach_check_timeout'),
         ));

@@ -128,6 +128,7 @@ flowchart TD
 - **Dónde vive:** en Redis, con la huella SHA-256 del correo como clave, nunca el correo en claro.
 - **Ajustes:** los escalones son datos en `config/trazo.php`.
 - **Registro en el log:** cada bloqueo se registra como advertencia, con la huella, la IP y la cantidad de fallos. Los fallos aislados no se registran, para no llenar el log de ruido.
+- **Evento del sistema:** el bloqueo queda además como evento `login_locked`, agrupado por cuenta y con el correo enmascarado (`da***@gmail.com`), para que el Super admin lo vea en [Sistema](system.md#eventos). Lo mismo pasa con un ingreso cortado por códigos MFA (`mfa_attempts_exceeded`), un código de recuperación anulado (`reset_code_voided`) y Have I Been Pwned sin responder (`external_service_unavailable`).
 
 ### Sesión
 | Regla | Valor | Dónde se cambia |

@@ -1,5 +1,6 @@
 // API pública del módulo HTTP compartido.
-export { ApiError, ClientErrorCode, toApiError } from './apiError'
+export { ApiError, ClientErrorCode, needsCode, toApiError } from './apiError'
+export { maintenanceNotice } from './maintenance'
 export type { ApiErrorDetails, ApiErrorKind, ErrorParams, FieldError } from './apiError'
 export { createHttpClient, http } from './client'
 export { httpEvents } from './events'

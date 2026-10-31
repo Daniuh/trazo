@@ -62,6 +62,12 @@ return [
         'workload_limit' => 8,
     ],
 
+    // Pantalla de sistema. Documentado en docs/backend/system.md
+    'system' => [
+        // Los eventos resueltos se borran pasado este tiempo
+        'events_retention_days' => (int) env('SYSTEM_EVENTS_RETENTION_DAYS', 90),
+    ],
+
     // Exportación de incidentes en CSV. Documentado en docs/backend/incidents.md
     'export' => [
         // Más filas que esto se rechazan: hay que acotar los filtros

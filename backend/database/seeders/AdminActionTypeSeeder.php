@@ -27,6 +27,13 @@ class AdminActionTypeSeeder extends Seeder
         'role_updated' => 'Rol editado',
         'role_deleted' => 'Rol eliminado',
         'incidents_exported' => 'Incidentes exportados',
+        'system_workers_restarted' => 'Workers reiniciados',
+        'system_realtime_restarted' => 'Tiempo real reiniciado',
+        'system_cache_cleared' => 'Caché de datos limpiada',
+        'system_maintenance_enabled' => 'Modo mantenimiento activado',
+        'system_maintenance_disabled' => 'Modo mantenimiento desactivado',
+        'system_jobs_retried' => 'Jobs fallidos reintentados',
+        'system_job_discarded' => 'Job fallido descartado',
     ];
 
     public function run(): void

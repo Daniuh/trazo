@@ -21,6 +21,8 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | `AccessControlSeeder` | Roles (con su nivel), permisos y la matriz inicial. La matriz solo se siembra para un rol o un permiso que se crea en esa ejecución ([ADR-0054](../decisiones/0054-matriz-de-permisos-no-destructiva.md)) | Todos |
 | `MfaPolicySeeder` | Política de MFA por rol: obligatorio, con un ingreso de gracia | Todos |
 | `AdminActionTypeSeeder` | Catálogo de acciones administrativas | Todos |
+| `SystemEventTypeSeeder` | Catálogo de eventos del sistema, con categoría y severidad | Todos |
+| `SystemEventTypeSeeder` | Catálogo de eventos del sistema, con categoría y severidad | Todos |
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
 | `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
 

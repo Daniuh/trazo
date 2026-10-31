@@ -8,8 +8,12 @@ declare(strict_types=1);
 use App\Modules\Shared\Domain\Exceptions\ConflictException;
 use App\Modules\Shared\Domain\Exceptions\ResourceNotFoundException;
 use App\Modules\Shared\Domain\Exceptions\RuleViolationException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// El error 500 queda como evento del sistema: se deshace al terminar cada prueba
+uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     // Rutas solo para pruebas, montadas bajo el mismo prefijo y grupo que la API real

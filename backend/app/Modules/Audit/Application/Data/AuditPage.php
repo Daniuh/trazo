@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Audit\Application\Data;
 
-use App\Modules\Audit\Domain\AuditCursor;
 use App\Modules\Audit\Domain\AuditPeriod;
+use App\Modules\Shared\Domain\TimeCursor;
 
 /**
  * @template T
@@ -20,7 +20,7 @@ final readonly class AuditPage
      */
     public function __construct(
         public array $items,
-        public ?AuditCursor $next,
+        public ?TimeCursor $next,
         public AuditPeriod $period,
     ) {}
 }

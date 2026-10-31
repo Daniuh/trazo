@@ -30,6 +30,8 @@ throw new ConflictException('INVALID_STATUS_TRANSITION', ['from' => 'closed', 't
 
 Cada módulo define sus propios códigos en su capa de dominio. La traducción a estado HTTP ocurre en un único lugar: el renderizador de errores.
 
+Una excepción de dominio es una respuesta esperada (un código incorrecto, un conflicto, falta de permiso), no una falla: `bootstrap/app.php` la excluye del reporte de Laravel (`dontReport`), así no llena el log. Lo que sí es una falla (un 500) queda además como [evento del sistema](system.md#eventos).
+
 ## Errores de la API
 
 Toda excepción que llega a la API, sea de negocio, de validación, del framework o inesperada, pasa por `ApiExceptionRenderer` y sale en formato RFC 9457 sin detalles técnicos. El formato completo y la lista de códigos están en [Errores de la API](../api/errores.md).
@@ -67,8 +69,13 @@ Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay se
 | `AdminLog`, `AdminActionType` | Application | Registro de acciones administrativas en `admin_actions`, con su tipo del catálogo |
 | `DatabaseAdminLog` | Infrastructure | Implementa `AdminLog`; lee los tipos una vez por petición |
 | `SessionSignals` | Application | Avisa en vivo que la sesión de alguien cambió ([Realtime](realtime.md)) |
+| `SystemEvents`, `SystemEventType` | Application | Registro de eventos del sistema agrupados por huella; lo implementa el [módulo System](system.md) |
 
 `Clock`, `Transaction` y `RequestContext` vivían en el módulo de incidentes; al necesitarlos también Usuarios y el Dashboard, se movieron aquí para que ningún módulo dependa de otro por algo tan general. `AdminLog` vivía en Usuarios y se movió cuando la exportación de incidentes también tuvo que dejar constancia ([ADR-0058](../decisiones/0058-exportacion-en-la-practica.md)); la fase de sistema registrará ahí sus acciones.
+
+## Cursor de listas
+
+`TimeCursor` (Domain) es el "cargar más" de las listas que crecen sin parar: la fecha y el id del último registro entregado, en base64 sin relleno. La siguiente tanda empieza justo después, sin importar cuántos registros lleguen mientras tanto. La regla `Http/Rules/Cursor` rechaza uno alterado a mano (`INVALID_CURSOR`). Lo usan la [auditoría](audit.md) y los [eventos del sistema](system.md#eventos).
 
 ## Descarga en CSV
 
@@ -90,4 +97,6 @@ La usa la [exportación de incidentes](incidents.md#exportación); cada módulo 
 - [`Domain/EmailAddress.php`](../../backend/app/Modules/Shared/Domain/EmailAddress.php) y [`app/Providers/AppServiceProvider.php`](../../backend/app/Providers/AppServiceProvider.php).
 - [`Application/Ports/`](../../backend/app/Modules/Shared/Application/Ports/), [`Application/Data/RequestContext.php`](../../backend/app/Modules/Shared/Application/Data/RequestContext.php), [`Application/AdminActionType.php`](../../backend/app/Modules/Shared/Application/AdminActionType.php), [`Infrastructure/LaravelSupport.php`](../../backend/app/Modules/Shared/Infrastructure/LaravelSupport.php) y [`Infrastructure/DatabaseAdminLog.php`](../../backend/app/Modules/Shared/Infrastructure/DatabaseAdminLog.php).
 - [`Http/CsvDownload.php`](../../backend/app/Modules/Shared/Http/CsvDownload.php): descarga en CSV.
+- [`Domain/TimeCursor.php`](../../backend/app/Modules/Shared/Domain/TimeCursor.php) y [`Http/Rules/Cursor.php`](../../backend/app/Modules/Shared/Http/Rules/Cursor.php): cursor de listas.
+- [`Application/Ports/SystemEvents.php`](../../backend/app/Modules/Shared/Application/Ports/SystemEvents.php) y [`Application/SystemEventType.php`](../../backend/app/Modules/Shared/Application/SystemEventType.php): registro de eventos del sistema.
 - Pruebas: [`tests/Feature/Shared/`](../../backend/tests/Feature/Shared/).

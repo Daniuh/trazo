@@ -24,7 +24,7 @@ import AccessCard from './components/AccessCard.vue'
 import PermissionsCard from './components/PermissionsCard.vue'
 import ProfileDialog from './components/ProfileDialog.vue'
 import RoleDialog from './components/RoleDialog.vue'
-import { useReauth } from './useReauth'
+import { useReauth } from '@/shared/ui/feedback/useReauth'
 import { roleDescription, statusLabel, statusTone } from './userTexts'
 
 const route = useRoute()
