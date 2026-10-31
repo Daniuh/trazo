@@ -31,7 +31,8 @@ backend/
 | Módulo | Estado | Documento |
 |---|---|---|
 | Shared | Listo | [Shared](shared.md) |
-| Auth, Incidents, Users, Dashboard, System | Pendientes | — |
+| Users, Incidents | Modelos y esquema listos; casos de uso pendientes | [Modelo de datos](../base-de-datos/modelo.md) |
+| Auth, Dashboard, System | Pendientes | — |
 
 ## Cómo se agrega un módulo
 

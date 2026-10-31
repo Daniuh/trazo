@@ -2,26 +2,21 @@
 
 declare(strict_types=1);
 
+// Siembra completa. Todos los seeders son idempotentes: ejecutarlos varias veces no duplica nada.
+// Documentado en docs/base-de-datos/seeders.md
+
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            IncidentCatalogSeeder::class,
+            AccessControlSeeder::class,
+            DemoUserSeeder::class,
         ]);
     }
 }
