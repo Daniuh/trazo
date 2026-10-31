@@ -1,5 +1,5 @@
 #!/bin/sh
-# Preparación del entorno local: permisos del código montado, dependencias y migraciones.
+# Preparación del entorno local: permisos del código montado, dependencias, migraciones y seeders.
 # Corre como root solo para ajustar permisos; todo lo demás se ejecuta como www-data.
 # Documentado en docs/operacion/docker.md
 set -e
@@ -14,4 +14,4 @@ chmod -R a+rwX vendor storage bootstrap/cache
 [ -f .env ] || su-exec www-data sh -c 'echo "# Local: la configuración viene de docker-compose." > .env'
 
 su-exec www-data composer install --no-interaction --prefer-dist
-su-exec www-data php artisan migrate --force
+su-exec www-data php artisan migrate --force --seed

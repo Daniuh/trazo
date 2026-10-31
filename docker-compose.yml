@@ -93,10 +93,10 @@ services:
       resources:
         limits: { cpus: "0.5", memory: 256M }
 
-  # Se ejecuta una vez antes de la API: migraciones (y seeders cuando existan)
+  # Se ejecuta una vez antes de la API: migraciones y seeders (idempotentes, se pueden repetir)
   init:
     <<: *laravel
-    command: ["php", "artisan", "migrate", "--force"]
+    command: ["php", "artisan", "migrate", "--force", "--seed"]
     restart: "no"
     depends_on:
       mysql: { condition: service_healthy }
