@@ -13,7 +13,7 @@ El listado de incidentes es la consulta más usada y la que más crece. Sus índ
 
 ## Cómo se mide
 
-1. Cargar la base de pruebas con volumen (unos 20 segundos):
+1. Cargar la base de pruebas con volumen (alrededor de un minuto, porque cada incidente trae su historial: unas 520.000 filas en `incident_activities`):
    ```bash
    docker compose -p trazo exec -e DB_DATABASE=trazo_test -e SEED_INCIDENTS=100000 app php artisan migrate:fresh --seed --force
    ```

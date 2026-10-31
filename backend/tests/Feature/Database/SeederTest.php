@@ -107,5 +107,5 @@ it('carga el volumen de incidentes pedido, coherente y sin duplicar al repetir',
         ->and($incidents->pluck('code')->every(fn (string $code): bool => preg_match('/^INC-\d{6}$/', $code) === 1))->toBeTrue()
         ->and($incidents->whereIn('status', ['resolved', 'closed'])->whereNull('resolved_at'))->toBeEmpty()
         ->and($incidents->whereIn('status', ['open', 'in_progress', 'on_hold'])->whereNotNull('resolved_at'))->toBeEmpty()
-        ->and(DB::table('incident_activities')->count())->toBe(60);
+        ->and(DB::table('incident_activities')->distinct()->count('incident_id'))->toBe(60);
 });
