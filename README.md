@@ -78,6 +78,13 @@ Todos los roles la exigen, también en local, para que funcione igual que en pro
 
 Desde **Mi cuenta** (menú de la persona, arriba a la derecha) se ve su estado y se pueden generar códigos de recuperación nuevos. Cada cambio llega como aviso al correo de la cuenta; en local, a Mailpit (http://localhost:8025).
 
+### Contraseña
+
+- **¿La olvidaste?** En el login, "¿Olvidaste tu contraseña?" envía un código de 6 dígitos al correo (vale 15 minutos; en local llega a Mailpit). Si la cuenta tiene la verificación en dos pasos, también pide el código de la aplicación o uno de recuperación. Al terminar se cierran todas las sesiones abiertas.
+- **Cambiarla:** desde Mi cuenta, con la contraseña actual. Se cierran las demás sesiones y la actual sigue abierta.
+- **Requisitos:** de 12 a 128 caracteres y que no aparezca en filtraciones conocidas ni entre las más usadas.
+- En los dos casos llega un aviso "Tu contraseña cambió". Si cambias la contraseña de un usuario de demostración, ya no entrará con `Trazo.Demo.2026`.
+
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 
 ## Variables de entorno

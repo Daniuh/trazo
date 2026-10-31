@@ -48,6 +48,20 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 
 **Si alguien perdió su teléfono y sus códigos de recuperación,** no puede entrar solo. Un administrador tendrá que restablecer su MFA (llega con la administración de usuarios).
 
+## Contraseña
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| El código no es correcto o ya venció… | El código del correo está mal escrito, venció (15 minutos), se pidió uno más nuevo o se agotaron los intentos. Si el correo no tiene cuenta, el mensaje es el mismo a propósito | Usar el código del último correo o pedir uno nuevo. Si no llega, revisar el correo no deseado |
+| Pasó demasiado tiempo o el código ya se usó… | Pasaron más de 10 minutos desde que se verificó el código, o la solicitud se anuló por intentos fallidos | Pedir un código nuevo desde "¿Olvidaste tu contraseña?" |
+| Tu cuenta tiene la verificación en dos pasos: escribe el código… | La cuenta tiene MFA y no se escribió ningún código | Escribir el código de la aplicación o, si no se tiene el teléfono, uno de los códigos de recuperación |
+| Esta contraseña aparece en filtraciones conocidas o es de las más usadas… | La contraseña está en filtraciones públicas o entre las más comunes, aunque cumpla el largo | Elegir otra, por ejemplo varias palabras que solo la persona relacione |
+| La contraseña actual no es correcta. | Al cambiarla desde Mi cuenta, la contraseña actual no coincide | Escribirla de nuevo; si se olvidó, cerrar sesión y usar "¿Olvidaste tu contraseña?" |
+| La contraseña nueva debe ser distinta de la actual. | Se escribió la misma contraseña | Elegir una distinta |
+| Hiciste demasiados intentos seguidos… | Más de 3 códigos pedidos en 15 minutos, o más de 5 intentos por minuto | Esperar el tiempo indicado |
+
+Después de recuperar la contraseña se cierran todas las sesiones abiertas; después de cambiarla desde Mi cuenta, todas menos la actual. En los dos casos llega un correo "Tu contraseña cambió". Si la persona no lo hizo, debe recuperar la contraseña de inmediato y avisar al equipo de seguridad.
+
 ## Incidentes
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 use App\Modules\Auth\Http\AuthController;
 use App\Modules\Auth\Http\MfaController;
+use App\Modules\Auth\Http\PasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
@@ -17,6 +18,14 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
             Route::post('logout', 'logout')->name('logout');
             Route::get('me', 'me')->name('me');
         });
+    });
+
+    // Recuperar la contraseña (sin sesión) y cambiarla desde Mi cuenta
+    Route::prefix('password')->name('password.')->controller(PasswordController::class)->group(function (): void {
+        Route::post('forgot', 'forgot')->middleware('throttle:password-forgot')->name('forgot');
+        Route::post('verify-code', 'verifyCode')->middleware('throttle:password-reset')->name('verify-code');
+        Route::post('reset', 'reset')->middleware('throttle:password-reset')->name('reset');
+        Route::put('', 'change')->middleware(['auth:sanctum', 'throttle:password-change'])->name('change');
     });
 
     Route::prefix('mfa')->name('mfa.')->middleware('auth:sanctum')->controller(MfaController::class)->group(function (): void {

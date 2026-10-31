@@ -7,6 +7,8 @@ import { useSessionStore } from './useSessionStore'
 export const LOGIN_ROUTE = 'login'
 export const CONNECTION_ROUTE = 'connection-error'
 export const SESSION_EXPIRED_REASON = 'sesion-vencida'
+// Después de recuperar la contraseña: el login lo avisa
+export const PASSWORD_CHANGED_REASON = 'contrasena-cambiada'
 
 export function installAuthGuard(router: Router): void {
   router.beforeEach(async (to) => {

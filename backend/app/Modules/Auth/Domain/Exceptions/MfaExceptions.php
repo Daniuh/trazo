@@ -19,6 +19,12 @@ final class MfaExceptions
         return new RuleViolationException('MFA_CODE_INVALID', $attemptsLeft === null ? [] : ['attempts_left' => $attemptsLeft]);
     }
 
+    // La cuenta tiene MFA y no llegó ni el código de la aplicación ni uno de recuperación
+    public static function codeRequired(): RuleViolationException
+    {
+        return new RuleViolationException('MFA_CODE_REQUIRED');
+    }
+
     // Era un código correcto, pero ya se usó: hay que esperar el siguiente
     public static function codeAlreadyUsed(): RuleViolationException
     {

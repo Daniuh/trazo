@@ -70,6 +70,9 @@ export async function completeMfa(page: Page, email: string): Promise<void> {
     await setUpMfa(page, email)
     await page.getByRole('button', { name: 'Continuar' }).click()
   }
+
+  // Hasta salir del segundo paso: navegar antes cortaría la verificación y la sesión no quedaría guardada
+  await page.waitForURL((url) => !['/ingresar', '/ingresar/verificar', '/configurar-mfa'].includes(url.pathname))
 }
 
 // Configura el MFA en la pantalla: toma la clave que se muestra, escribe el código y confirma que guardó los códigos

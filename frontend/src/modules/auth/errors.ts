@@ -24,6 +24,18 @@ const messages: MessageCatalog = {
   MFA_SETUP_NOT_STARTED: 'La configuración no está en curso. Vuelve a empezarla desde el primer paso.',
   MFA_REQUIRED_BY_POLICY: 'Tu rol exige la verificación en dos pasos, así que no se puede desactivar.',
   MFA_NOT_PENDING: 'Ya ingresaste: no hay ningún código pendiente por verificar.',
+  MFA_CODE_REQUIRED:
+    'Tu cuenta tiene la verificación en dos pasos: escribe el código de tu aplicación o uno de tus códigos de recuperación.',
+
+  // Recuperar y cambiar la contraseña
+  PASSWORD_RESET_CODE_INVALID:
+    'El código no es correcto o ya venció. Revisa el último correo que te enviamos o pide un código nuevo.',
+  PASSWORD_RESET_EXPIRED:
+    'Pasó demasiado tiempo o el código ya se usó. Pide un código nuevo para cambiar tu contraseña.',
+  PASSWORD_BREACHED:
+    'Esta contraseña aparece en filtraciones conocidas o es de las más usadas. Elige una distinta, por ejemplo varias palabras que solo tú relaciones.',
+  CURRENT_PASSWORD_INVALID: 'La contraseña actual no es correcta.',
+  PASSWORD_SAME_AS_CURRENT: 'La contraseña nueva debe ser distinta de la actual.',
   [MFA_CHALLENGE_EXPIRED]:
     'Pasó demasiado tiempo desde que escribiste tu contraseña. Vuelve a ingresar para continuar.',
 }

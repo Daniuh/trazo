@@ -71,6 +71,11 @@ export const useSessionStore = defineStore('session', () => {
     await refresh()
   }
 
+  // La sesión actual sigue abierta; la API cierra las demás
+  async function changePassword(current: string, password: string, confirmation: string): Promise<void> {
+    await authApi.changePassword(current, password, confirmation)
+  }
+
   async function refresh(): Promise<void> {
     user.value = await authApi.me()
   }
@@ -119,6 +124,7 @@ export const useSessionStore = defineStore('session', () => {
     confirmMfaSetup,
     regenerateRecoveryCodes,
     disableMfa,
+    changePassword,
     refresh,
     restore,
     logout,

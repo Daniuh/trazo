@@ -6,10 +6,19 @@ import { ApiError, httpEvents, tokenStore } from '@/shared/http'
 import type { SessionUser } from '../domain/session'
 import { authApi } from '../infrastructure/authApi'
 import { CONNECTION_ROUTE, installAuthGuard, LOGIN_ROUTE, SESSION_EXPIRED_REASON } from './authGuard'
+import { useRecoveryStore } from './useRecoveryStore'
 import { useSessionStore } from './useSessionStore'
 
 vi.mock('../infrastructure/authApi', () => ({
-  authApi: { login: vi.fn(), logout: vi.fn(), me: vi.fn(), verifyMfa: vi.fn() },
+  authApi: {
+    login: vi.fn(),
+    logout: vi.fn(),
+    me: vi.fn(),
+    verifyMfa: vi.fn(),
+    forgotPassword: vi.fn(),
+    verifyResetCode: vi.fn(),
+    resetPassword: vi.fn(),
+  },
 }))
 
 const api = vi.mocked(authApi)
@@ -168,5 +177,25 @@ describe('authGuard', () => {
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe(LOGIN_ROUTE))
 
     expect(router.currentRoute.value.query).toMatchObject({ motivo: SESSION_EXPIRED_REASON, volver: '/incidentes' })
+  })
+})
+
+describe('useRecoveryStore', () => {
+  it('guarda el correo, cambia el código por el pase y lo usa una sola vez para la contraseña nueva', async () => {
+    api.verifyResetCode.mockResolvedValue({ ticket: 'P1', mfaRequired: true })
+    const recovery = useRecoveryStore()
+
+    await recovery.request('a@trazo.test')
+    await recovery.verify('123456')
+    expect(api.verifyResetCode).toHaveBeenCalledWith('a@trazo.test', '123456')
+    expect(recovery.mfaRequired).toBe(true)
+
+    const chosen = 'Cielo-Naranja-42'
+    await recovery.reset({ password: chosen, confirmation: chosen, mfaCode: '654321' })
+    expect(api.resetPassword).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'a@trazo.test', ticket: 'P1', mfaCode: '654321' }),
+    )
+    expect(recovery.ticket).toBeNull()
+    expect(recovery.email).toBe('')
   })
 })

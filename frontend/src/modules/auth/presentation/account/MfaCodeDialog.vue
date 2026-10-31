@@ -51,25 +51,28 @@ async function submit(): Promise<void> {
 
 <template>
   <QDialog v-model="open">
-    <form
-      class="mfa-code-dialog"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="title"
-      novalidate
-      @submit.prevent="submit"
-    >
-      <h2 class="mfa-code-dialog__title">{{ title }}</h2>
-      <p class="mfa-code-dialog__message">{{ message }}</p>
-      <AppAlert v-if="error">{{ error }}</AppAlert>
-      <AppCodeField v-model="code" label="Código de la aplicación" :error="fieldError" autofocus />
-      <div class="mfa-code-dialog__actions">
-        <AppButton variant="secondary" :disabled="working" @click="open = false">Cancelar</AppButton>
-        <AppButton type="submit" :variant="danger ? 'danger' : 'primary'" :loading="working">{{
-          confirmLabel
-        }}</AppButton>
-      </div>
-    </form>
+    <!-- Quasar solo deja hacer clic en un div hijo directo del diálogo: el formulario va dentro -->
+    <div>
+      <form
+        class="mfa-code-dialog"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="title"
+        novalidate
+        @submit.prevent="submit"
+      >
+        <h2 class="mfa-code-dialog__title">{{ title }}</h2>
+        <p class="mfa-code-dialog__message">{{ message }}</p>
+        <AppAlert v-if="error">{{ error }}</AppAlert>
+        <AppCodeField v-model="code" label="Código de la aplicación" :error="fieldError" autofocus />
+        <div class="mfa-code-dialog__actions">
+          <AppButton variant="secondary" :disabled="working" @click="open = false">Cancelar</AppButton>
+          <AppButton type="submit" :variant="danger ? 'danger' : 'primary'" :loading="working">{{
+            confirmLabel
+          }}</AppButton>
+        </div>
+      </form>
+    </div>
   </QDialog>
 </template>
 

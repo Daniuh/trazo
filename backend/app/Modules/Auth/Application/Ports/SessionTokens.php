@@ -17,4 +17,7 @@ interface SessionTokens
     public function issueChallenge(int $userId, LoginStep $step): IssuedSession;
 
     public function revoke(int $tokenId): void;
+
+    // Cierra todas las sesiones de la persona, salvo la indicada (la de quien hace el cambio)
+    public function revokeAll(int $userId, ?int $exceptTokenId = null): void;
 }

@@ -1,4 +1,4 @@
-<!-- Mi cuenta: datos de la persona y su verificación en dos pasos (activarla, regenerar códigos de recuperación y
+<!-- Mi cuenta: datos de la persona, cambiar la contraseña y su verificación en dos pasos (activarla, regenerar códigos de recuperación y
      desactivarla si su rol no la exige). Una columna en celular y tablet; dos en portátil y monitor.
      Documentado en docs/frontend/auth.md -->
 <script setup lang="ts">
@@ -12,6 +12,7 @@ import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import { useFeedback } from '@/shared/ui/feedback/useFeedback'
 import { useSessionStore } from '../../application/useSessionStore'
 import RecoveryCodesPanel from '../mfa/RecoveryCodesPanel.vue'
+import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import MfaCodeDialog from './MfaCodeDialog.vue'
 
 const session = useSessionStore()
@@ -23,6 +24,7 @@ const roles = computed(() => user.value?.roles.map((role) => role.name).join(', 
 const mfa = computed(() => user.value?.mfa)
 
 const regenerating = ref(false)
+const changingPassword = ref(false)
 const disabling = ref(false)
 const newCodes = ref<string[]>([])
 
@@ -45,16 +47,27 @@ function setUp(): void {
     <h1 class="account__title">Mi cuenta</h1>
 
     <div class="account__grid">
-      <AppCard title="Tus datos">
-        <dl class="account__data">
-          <dt>Nombre</dt>
-          <dd>{{ user.name }}</dd>
-          <dt>Correo</dt>
-          <dd>{{ user.email }}</dd>
-          <dt>Rol</dt>
-          <dd>{{ roles }}</dd>
-        </dl>
-      </AppCard>
+      <div class="account__column">
+        <AppCard title="Tus datos">
+          <dl class="account__data">
+            <dt>Nombre</dt>
+            <dd>{{ user.name }}</dd>
+            <dt>Correo</dt>
+            <dd>{{ user.email }}</dd>
+            <dt>Rol</dt>
+            <dd>{{ roles }}</dd>
+          </dl>
+        </AppCard>
+
+        <AppCard title="Contraseña">
+          <div class="account__mfa">
+            <p class="account__detail">Al cambiarla cerramos tus sesiones en otros equipos.</p>
+            <div class="account__actions">
+              <AppButton variant="secondary" icon="lock" @click="changingPassword = true">Cambiar contraseña</AppButton>
+            </div>
+          </div>
+        </AppCard>
+      </div>
 
       <AppCard title="Verificación en dos pasos">
         <template #actions>
@@ -114,6 +127,10 @@ function setUp(): void {
       </AppCard>
     </div>
 
+    <ChangePasswordDialog
+      v-model="changingPassword"
+      @changed="notify('Tu contraseña cambió. Cerramos tus sesiones en otros equipos.')"
+    />
     <MfaCodeDialog
       v-model="regenerating"
       title="Generar códigos nuevos"
@@ -148,9 +165,11 @@ function setUp(): void {
   line-height: $line-height-tight;
 }
 
-.account__grid {
+.account__grid,
+.account__column {
   display: grid;
   gap: $space-4;
+  align-content: start;
 }
 
 .account__data {

@@ -23,6 +23,24 @@ export const publicRoutes: RouteRecordRaw[] = [
     meta: { public: true },
   },
   {
+    path: '/recuperar',
+    name: 'password-forgot',
+    component: () => import('./presentation/password/ForgotPasswordPage.vue'),
+    meta: { public: true },
+  },
+  {
+    path: '/recuperar/codigo',
+    name: 'password-code',
+    component: () => import('./presentation/password/ResetCodePage.vue'),
+    meta: { public: true },
+  },
+  {
+    path: '/recuperar/nueva',
+    name: 'password-new',
+    component: () => import('./presentation/password/NewPasswordPage.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/sin-conexion',
     name: CONNECTION_ROUTE,
     component: () => import('./presentation/ConnectionErrorPage.vue'),

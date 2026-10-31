@@ -5,6 +5,8 @@ declare(strict_types=1);
 // Reglas de arquitectura: si alguien rompe la separación de capas, estas pruebas fallan.
 // Documentado en docs/arquitectura/capas.md
 
+use App\Modules\Auth\Infrastructure\HibpBreachedPasswords;
+
 arch('todo el código usa tipos estrictos')
     ->expect('App')
     ->toUseStrictTypes();
@@ -15,7 +17,8 @@ arch('no quedan funciones de depuración')
 
 arch('buenas prácticas de PHP')->preset()->php();
 
-arch('sin funciones inseguras')->preset()->security();
+// Única excepción: Have I Been Pwned indexa por SHA-1 y su consulta anónima lo exige. No protege ni guarda nada con él
+arch('sin funciones inseguras')->preset()->security()->ignoring(HibpBreachedPasswords::class);
 
 arch('el entorno solo se lee desde config/')
     ->expect('env')
