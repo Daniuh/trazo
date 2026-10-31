@@ -8,7 +8,8 @@ export interface NavItem {
   icon: IconName
   to: RouteLocationRaw
   order: number
-  permission?: string
+  // Con una lista, basta con tener uno de los permisos (p. ej. cualquiera de las dos pestañas de la auditoría)
+  permission?: string | string[]
   // Solo se marca activa en su ruta exacta (el inicio, que contiene a todas las demás)
   exact?: boolean
 }
@@ -31,5 +32,8 @@ export const navigation: NavItem[] = [...appItems, ...moduleItems].sort((a, b) =
 
 // Ocultar una entrada es solo comodidad: la API rechaza igual lo que no corresponde
 export function visibleNavigation(can: (permission: string) => boolean): NavItem[] {
-  return navigation.filter((item) => !item.permission || can(item.permission))
+  return navigation.filter((item) => {
+    if (!item.permission) return true
+    return Array.isArray(item.permission) ? item.permission.some(can) : can(item.permission)
+  })
 }

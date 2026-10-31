@@ -36,7 +36,7 @@ it('se puede ejecutar varias veces sin duplicar nada', function (): void {
     expect(tableCounts())->toBe($first)
         ->and($first)->toMatchArray([
             'priorities' => 4, 'statuses' => 6, 'status_transitions' => 9,
-            'activity_types' => 7, 'roles' => 5, 'permissions' => 29,
+            'activity_types' => 7, 'roles' => 5, 'permissions' => 30,
         ]);
 });
 
@@ -63,16 +63,16 @@ it('aplica la matriz de permisos por rol, con su nivel', function (): void {
     $this->seed(DatabaseSeeder::class);
 
     // El super admin tiene todo salvo el dashboard propio, que ya cubre dashboard.view.any
-    expect(permissionsOf('super_admin'))->toHaveCount(28)->not->toContain('dashboard.view.own')
+    expect(permissionsOf('super_admin'))->toHaveCount(29)->not->toContain('dashboard.view.own')
         ->and(permissionsOf('requester'))->toBe([
             'dashboard.view.own', 'incidents.create', 'incidents.update.own', 'incidents.view.own',
         ])
         ->and(permissionsOf('agent'))->toContain('incidents.take', 'incidents.status.assigned')
         ->not->toContain('incidents.assign', 'incidents.view.any')
-        ->and(permissionsOf('supervisor'))->toContain('incidents.assign', 'audit.view')
-        ->not->toContain('system.logs.view', 'users.view')
+        ->and(permissionsOf('supervisor'))->toContain('incidents.assign', 'audit.incidents.view')
+        ->not->toContain('system.logs.view', 'users.view', 'audit.admin.view')
         // Restablecer accesos queda solo para el super admin, salvo que se le conceda a una persona
-        ->and(permissionsOf('admin'))->toContain('users.create', 'users.roles.assign', 'users.permissions.grant')
+        ->and(permissionsOf('admin'))->toContain('users.create', 'users.roles.assign', 'users.permissions.grant', 'audit.admin.view')
         ->not->toContain('users.mfa.reset', 'users.access.reset', 'roles.manage', 'system.logs.view')
         ->and(Role::query()->orderBy('level')->pluck('level', 'code')->all())->toBe([
             'requester' => 20, 'agent' => 40, 'supervisor' => 60, 'admin' => 80, 'super_admin' => 100,

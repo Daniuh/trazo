@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+// Qué parte del historial de incidentes se pide: rango, quién hizo el cambio, tipos, incidente y desde dónde seguir.
+// Las personas llegan por ULID, los tipos por código y el incidente por su código INC-000123.
+// Documentado en docs/backend/audit.md
+
+namespace App\Modules\Audit\Application\Data;
+
+use App\Modules\Audit\Domain\AuditCursor;
+use App\Modules\Audit\Domain\AuditPeriod;
+
+final readonly class IncidentAuditCriteria
+{
+    /**
+     * @param  list<string>  $types
+     */
+    public function __construct(
+        public AuditPeriod $period,
+        public ?string $actor,
+        public array $types,
+        public ?string $incident,
+        public ?AuditCursor $cursor,
+        public int $perPage,
+    ) {}
+}

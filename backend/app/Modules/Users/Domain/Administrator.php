@@ -23,6 +23,14 @@ final readonly class Administrator
         return in_array($permission, $this->permissions, true);
     }
 
+    /**
+     * @return list<string>
+     */
+    public function permissions(): array
+    {
+        return $this->permissions;
+    }
+
     // La cima de la jerarquía administra a todos, incluso a sus pares; nunca a sí misma
     public function isRoot(): bool
     {

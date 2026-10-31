@@ -13,7 +13,7 @@ use App\Modules\Users\Domain\UserAccess;
 use App\Modules\Users\Domain\UserAction;
 use App\Modules\Users\Domain\UserDenial;
 
-const ADMIN_PERMISSIONS = ['users.view', 'users.create', 'users.update', 'users.activate', 'users.roles.assign', 'users.permissions.grant', 'audit.view'];
+const ADMIN_PERMISSIONS = ['users.view', 'users.create', 'users.update', 'users.activate', 'users.roles.assign', 'users.permissions.grant', 'audit.admin.view'];
 const ROOT_PERMISSIONS = [...ADMIN_PERMISSIONS, 'users.mfa.reset', 'users.access.reset', 'roles.manage'];
 
 function admin(int $level = 80, array $permissions = ADMIN_PERMISSIONS, int $id = 1): Administrator
@@ -86,23 +86,23 @@ describe('cambio de permisos', function (): void {
     $role = ['incidents.create', 'incidents.view.own', 'incidents.update.own'];
 
     it('lo que difiere del rol queda como concedido o quitado, y dice qué cambió', function () use ($role): void {
-        $change = PermissionChange::between($role, $role, ['incidents.create', 'incidents.view.own', 'audit.view']);
+        $change = PermissionChange::between($role, $role, ['incidents.create', 'incidents.view.own', 'audit.admin.view']);
 
-        expect($change->grants)->toBe(['audit.view'])
+        expect($change->grants)->toBe(['audit.admin.view'])
             ->and($change->denies)->toBe(['incidents.update.own'])
-            ->and($change->added)->toBe(['audit.view'])
+            ->and($change->added)->toBe(['audit.admin.view'])
             ->and($change->removed)->toBe(['incidents.update.own'])
             ->and($change->isSensitive())->toBeFalse();
     });
 
     it('volver a los permisos del rol deja sin excepciones', function () use ($role): void {
-        $change = PermissionChange::between($role, [...$role, 'audit.view'], $role);
+        $change = PermissionChange::between($role, [...$role, 'audit.admin.view'], $role);
 
-        expect($change->grants)->toBe([])->and($change->denies)->toBe([])->and($change->removed)->toBe(['audit.view']);
+        expect($change->grants)->toBe([])->and($change->denies)->toBe([])->and($change->removed)->toBe(['audit.admin.view']);
     });
 
     it('nadie concede lo que no tiene, salvo la cima; quitar sí se puede', function () use ($role): void {
-        $change = PermissionChange::between($role, $role, [...$role, 'incidents.view.any', 'audit.view']);
+        $change = PermissionChange::between($role, $role, [...$role, 'incidents.view.any', 'audit.admin.view']);
 
         expect($change->notGrantableBy(admin()))->toBe(['incidents.view.any'])
             ->and($change->notGrantableBy(admin(100, ROOT_PERMISSIONS)))->toBe([])

@@ -67,3 +67,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0053](0053-administracion-de-usuarios.md) | Administración de usuarios: jerarquía por nivel, permisos por persona y reautenticación |
 | [ADR-0054](0054-matriz-de-permisos-no-destructiva.md) | La matriz de permisos se siembra solo para roles y permisos nuevos |
 | [ADR-0055](0055-edicion-de-roles.md) | Edición de roles: rol de la cima bloqueado, nivel único, roles de sistema y sin correo masivo |
+| [ADR-0056](0056-auditoria-global.md) | Auditoría global: dos registros con permisos separados, alcance por jerarquía y paginación por cursor |

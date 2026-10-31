@@ -30,7 +30,7 @@ async function createRole(page: Page, code: string, name: string, level: number)
   await page.getByRole('textbox', { name: 'Nivel' }).fill(String(level))
   await page.getByRole('combobox', { name: /Copiar permisos de/ }).click()
   await page.getByRole('option', { name: 'Solicitante' }).click()
-  await page.getByRole('checkbox', { name: 'Ver auditoría global' }).click()
+  await page.getByRole('checkbox', { name: 'Ver la auditoría de administración' }).click()
   await expectAccessible(page)
   await page.getByRole('button', { name: 'Crear rol' }).click()
 
@@ -46,7 +46,7 @@ test('crear un rol copiando permisos, editarlo y eliminarlo', async ({ page, req
 
   await createRole(page, code, `Rol E2E ${info.project.name}`, level)
   await expect(page.getByRole('checkbox', { name: 'Crear incidentes' })).toBeChecked()
-  await expect(page.getByRole('checkbox', { name: 'Ver auditoría global' })).toBeChecked()
+  await expect(page.getByRole('checkbox', { name: 'Ver la auditoría de administración' })).toBeChecked()
   await expectAccessible(page)
 
   await page.getByRole('textbox', { name: 'Nombre' }).fill(`Rol E2E ${info.project.name} editado`)

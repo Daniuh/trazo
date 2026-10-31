@@ -33,7 +33,7 @@ function roleBody(array $overrides = []): array
         'code' => 'soporte_n2',
         'name' => 'Soporte nivel 2',
         'level' => 50,
-        'permissions' => ['incidents.view.own', 'incidents.create', 'incidents.update.own', 'audit.view'],
+        'permissions' => ['incidents.view.own', 'incidents.create', 'incidents.update.own', 'audit.admin.view'],
         'mfa_required' => true,
         'grace_logins' => 1,
         ...$overrides,
@@ -127,17 +127,17 @@ it('el rol de la cima no se edita ni se elimina', function (): void {
 });
 
 it('editar un rol cambia de verdad los permisos de sus personas y limpia sus excepciones sobrantes', function (): void {
-    grantTo('agente2@trazo.test', 'audit.view');
+    grantTo('agente2@trazo.test', 'audit.incidents.view');
     grantTo('agente1@trazo.test', 'incidents.take', 'deny');
     roleAdminAs('superadmin@trazo.test');
     $agent = $this->getJson('/api/v1/roles/agent')->json('data');
 
-    $permissions = [...array_diff($agent['permissions'], ['incidents.take']), 'audit.view'];
+    $permissions = [...array_diff($agent['permissions'], ['incidents.take']), 'audit.incidents.view'];
     $this->patchJson('/api/v1/roles/agent', [
         'name' => 'Agente', 'level' => 40, 'permissions' => array_values($permissions), 'mfa_required' => true, 'grace_logins' => 1,
     ])->assertOk();
 
-    expect(permissionsNowOf('agente3@trazo.test'))->toContain('audit.view')->not->toContain('incidents.take')
+    expect(permissionsNowOf('agente3@trazo.test'))->toContain('audit.incidents.view')->not->toContain('incidents.take')
         // El concedido que el rol ya trae y el quitado que el rol ya no trae sobran
         ->and(DB::table('user_permissions')->count())->toBe(0);
 });

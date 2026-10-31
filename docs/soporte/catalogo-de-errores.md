@@ -95,6 +95,17 @@ Después de recuperar la contraseña se cierran todas las sesiones abiertas; des
 
 Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; no se les envía correo. Cada creación, edición o eliminación queda registrada con quién la hizo.
 
+## Auditoría
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Escribe el código del incidente, por ejemplo INC-000123 o solo 123. | El filtro de incidente no tiene forma de código | Corregirlo o tocar "Quitar el código" |
+| No pudimos seguir cargando la lista. Vuelve a cargarla desde el principio. | El enlace para seguir la lista no era válido (por ejemplo, se alteró a mano) | Tocar "Reintentar" o recargar la página |
+
+- **"No hay registros en los últimos 30 días":** sin fechas, la auditoría muestra solo los últimos 30 días. Para ver lo anterior, elegir un rango más amplio.
+- **Alguien no ve la pestaña de Incidentes o la de Administración:** cada una tiene su permiso. El Supervisor ve la de incidentes y el Administrador la de administración. El Super admin ve las dos, y cualquiera de ellas se puede conceder a una persona puntual.
+- **Un administrador no encuentra una acción:** solo ve lo que hizo y lo que toca a personas o roles por debajo de su nivel. Lo demás lo ve el Super admin.
+
 ## Incidentes
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |

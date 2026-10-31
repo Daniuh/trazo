@@ -4,6 +4,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { auditLocation } from '@/modules/audit/application/auditLink'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { incidentListLocation } from '@/modules/incidents/application/listLink'
 import { useCatalogStore } from '@/modules/incidents/application/useCatalogStore'
@@ -50,6 +51,13 @@ const pendingLink = computed(() => {
   if (!user.value || !session.can('incidents.view.any')) return null
   const pending = incidentCatalogs.catalogs?.statuses.filter((status) => status.isPending).map((status) => status.code)
   return incidentListLocation({ assignee: [user.value.id], status: pending ?? [] })
+})
+
+// Lo que hizo la persona en la auditoría: la administración desde aquí, o sus cambios en incidentes
+const activityLink = computed(() => {
+  if (!user.value) return null
+  if (session.can('audit.admin.view')) return auditLocation('admin', { actor: user.value.id })
+  return session.can('audit.incidents.view') ? auditLocation('incidents', { actor: user.value.id }) : null
 })
 
 onMounted(() => {
@@ -164,6 +172,7 @@ const resetAccess = () =>
           <AppBadge :tone="statusTone(user)">{{ statusLabel(user) }}</AppBadge>
           <AppBadge tone="neutral">{{ user.role?.name ?? 'Sin rol' }}</AppBadge>
         </div>
+        <RouterLink v-if="activityLink" class="user-detail__link" :to="activityLink">Ver su actividad</RouterLink>
       </header>
 
       <AppAlert v-if="user.isSelf" tone="info">
@@ -249,7 +258,8 @@ const resetAccess = () =>
   gap: $space-4;
 }
 
-.user-detail__back {
+.user-detail__back,
+.user-detail__link {
   align-self: flex-start;
   color: $color-primary;
   font-size: $font-size-sm;

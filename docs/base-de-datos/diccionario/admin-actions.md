@@ -44,10 +44,11 @@ Catálogo de tipos de acción.
 | `(user_id, created_at)` | Qué hizo cada administrador |
 | `(admin_action_type_id, created_at)` | Acciones de un tipo (auditoría) |
 | `target_role_id` | Cambios de un rol |
+| `created_at` | Auditoría de administración sin filtros, de lo más reciente a lo más antiguo |
 
 ## Dónde está en el código
 
-- Migraciones: [`000026`](../../../backend/database/migrations/2026_10_24_000026_create_admin_action_types_table.php), [`000027`](../../../backend/database/migrations/2026_10_24_000027_create_admin_actions_table.php) y [`000030` (SET NULL al eliminar un rol)](../../../backend/database/migrations/2026_10_24_000030_null_role_in_admin_actions_on_delete.php)
+- Migraciones: [`000026`](../../../backend/database/migrations/2026_10_24_000026_create_admin_action_types_table.php), [`000027`](../../../backend/database/migrations/2026_10_24_000027_create_admin_actions_table.php) , [`000030` (SET NULL al eliminar un rol)](../../../backend/database/migrations/2026_10_24_000030_null_role_in_admin_actions_on_delete.php) y [`000032` (índice por fecha)](../../../backend/database/migrations/2026_10_24_000032_add_audit_indexes.php)
 - Catálogo: [`AdminActionTypeSeeder.php`](../../../backend/database/seeders/AdminActionTypeSeeder.php)
 - Escritura: [`DatabaseAdminLog.php`](../../../backend/app/Modules/Users/Infrastructure/DatabaseAdminLog.php)
-- Explicación funcional: [Módulo Users](../../backend/users.md)
+- Explicación funcional: [Módulo Users](../../backend/users.md) y, para leerlo, [Módulo Audit](../../backend/audit.md)

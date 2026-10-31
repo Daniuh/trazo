@@ -40,7 +40,7 @@ test('crear una cuenta, darle un permiso adicional y desactivarla', async ({ pag
   expect(welcome).not.toMatch(/contraseña es/i)
 
   await page.getByRole('button', { name: 'Editar permisos' }).click()
-  await page.getByRole('checkbox', { name: 'Ver auditoría global' }).click()
+  await page.getByRole('checkbox', { name: 'Ver la auditoría de administración' }).click()
   await expectAccessible(page)
   await page.getByRole('button', { name: 'Guardar permisos' }).click()
   await expect(page.getByText('Permisos de Agente con 1 cambio.')).toBeVisible()
