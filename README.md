@@ -2,19 +2,231 @@
 
 Sistema de gestión de solicitudes e incidentes: creación y seguimiento de casos, prioridades, control del ciclo de vida, filtros avanzados e indicadores, preparado para operar con grandes volúmenes de datos.
 
-> Proyecto en construcción. Las instrucciones de instalación, variables de entorno, migraciones, seeders y credenciales de prueba se completan a medida que cada parte queda lista.
+| Parte | Tecnología |
+|---|---|
+| API | PHP 8.4, Laravel 13, Sanctum |
+| Interfaz | Vue 3, Quasar, TypeScript |
+| Datos | MySQL 8.4, Redis 8.4 |
+| Ejecución | Docker Compose, Nginx |
 
-## Estructura
+## Contenido
+
+1. [Requisitos](#requisitos)
+2. [Instalación](#instalación)
+3. [Credenciales de prueba](#credenciales-de-prueba)
+4. [Variables de entorno](#variables-de-entorno)
+5. [Migraciones](#migraciones)
+6. [Seeders](#seeders)
+7. [Pruebas](#pruebas)
+8. [Servicios y puertos](#servicios-y-puertos)
+9. [Actualizar](#actualizar)
+10. [Detener y limpiar](#detener-y-limpiar)
+11. [Problemas frecuentes](#problemas-frecuentes)
+12. [Documentación](#documentación)
+
+## Requisitos
+
+- **Docker** con Compose v2 (Docker Desktop en Windows y macOS, o Docker Engine en Linux).
+- **Git.**
+- Unos **4 GB de memoria libres** para los contenedores.
+- Los puertos **8088** (aplicación) y **8025** (correo de prueba) libres. Si están ocupados, se cambian con una variable (ver [Problemas frecuentes](#problemas-frecuentes)).
+
+No hace falta instalar PHP, Composer, Node ni MySQL en el equipo: todo corre dentro de los contenedores.
+
+## Instalación
+
+```bash
+git clone <url-del-repositorio> trazo
+cd trazo
+docker compose up -d
+```
+
+Eso es todo. La primera vez tarda unos minutos, porque construye las imágenes, instala las dependencias y carga los datos de prueba. Las siguientes veces arranca en segundos.
+
+Cuando termine, abrir **http://localhost:8088** e ingresar con cualquiera de las [credenciales de prueba](#credenciales-de-prueba).
+
+Para ver si todo está listo:
+
+```bash
+docker compose ps
+```
+
+Los servicios deben aparecer como `healthy` (el worker y el scheduler, como `running`). `init` no aparece: prepara la base de datos y termina; se ve con `docker compose ps -a` como `exited (0)`.
+
+**No hace falta crear un `.env`.** Los valores por defecto sirven para correr en local. Solo si se quiere cambiar algo (un puerto, el volumen de datos de prueba), se copia `.env.example` a `.env` y se ajusta.
+
+## Credenciales de prueba
+
+Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
+
+| Correo | Rol | Qué puede hacer |
+|---|---|---|
+| `superadmin@trazo.test` | Super admin | Todos los permisos. Además de lo del supervisor, administrará usuarios, auditoría y sistema cuando esas secciones estén listas |
+| `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado y ver el resumen general |
+| `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
+| `solicitante1@trazo.test`<br>`solicitante2@trazo.test`<br>`solicitante3@trazo.test` | Solicitante | Crear incidentes, seguir los suyos y editarlos mientras siguen en estado Abierto |
+
+Estos usuarios **solo existen fuera de producción**: el seeder no los crea cuando `APP_ENV=production`.
+
+> Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Es el comportamiento esperado.
+
+## Variables de entorno
+
+Están todas en [`.env.example`](.env.example), con su valor por defecto para local.
+
+| Variable | Por defecto | Para qué sirve |
+|---|---|---|
+| `TRAZO_HTTP_PORT` | `8088` | Puerto del equipo donde se publica la aplicación |
+| `TRAZO_MAIL_UI_PORT` | `8025` | Puerto del buzón de correo de prueba (Mailpit), solo en local |
+| `APP_ENV` | `local` | Entorno: `local` o `production` |
+| `APP_URL` | `http://localhost:8088` | Dirección pública de la aplicación |
+| `APP_KEY` | vacía | Clave de cifrado de Laravel. En local se genera sola y se guarda en un volumen. **En producción es obligatoria** |
+| `SESSION_MAX_MINUTES` | `480` | Duración máxima de una sesión (8 horas) |
+| `SESSION_IDLE_MINUTES` | `60` | La sesión se cierra tras este tiempo sin uso |
+| `SEED_INCIDENTS` | `600` | Incidentes de prueba que se cargan (la prueba técnica pide al menos 500) |
+| `DB_DATABASE`, `DB_USERNAME` | `trazo` | Base de datos y usuario de MySQL |
+| `DB_PASSWORD`, `DB_ROOT_PASSWORD` | `*_local_only` | Contraseñas de MySQL. **Solo para local**: en producción se definen otras |
+| `REDIS_PASSWORD` | `trazo_local_only` | Contraseña de Redis. **Solo para local** |
+| `MAIL_HOST`, `MAIL_PORT` | `mailpit`, `1025` | Servidor de correo. En local los correos llegan a Mailpit |
+| `MAIL_USERNAME`, `MAIL_PASSWORD` | vacías | Credenciales del servidor de correo (solo en producción) |
+| `MAIL_FROM_ADDRESS` | `no-reply@trazo.local` | Remitente de los correos |
+
+El resto de la configuración (conexiones a MySQL y Redis, colas, caché) está fija en [`docker-compose.yml`](docker-compose.yml), porque no cambia entre equipos. El repositorio es público: ningún secreto real se guarda en él.
+
+## Migraciones
+
+**Se ejecutan solas.** Cada vez que se levanta el stack, el servicio `init` corre las migraciones pendientes antes de que arranque la API. Si alguna falla, la API no arranca y el error queda en `docker compose logs init`.
+
+Comandos útiles:
+
+```bash
+# Ver qué migraciones están aplicadas
+docker compose exec app php artisan migrate:status
+
+# Aplicar migraciones pendientes a mano
+docker compose exec app php artisan migrate
+```
+
+Cada tabla tiene su migración y su ficha en el [diccionario de datos](docs/base-de-datos/index.md). Las migraciones solo agregan: nunca se edita una que ya se aplicó.
+
+## Seeders
+
+**También se ejecutan solos**, justo después de las migraciones. Son idempotentes: se pueden correr muchas veces sin duplicar nada ni pisar lo que alguien haya cambiado.
+
+| Seeder | Qué carga |
+|---|---|
+| `IncidentCatalogSeeder` | Prioridades, estados y sus transiciones permitidas, y tipos de actividad del historial |
+| `AccessControlSeeder` | Roles, permisos y qué permisos tiene cada rol |
+| `DashboardWidgetSeeder` | Los widgets del dashboard con sus tamaños |
+| `DemoUserSeeder` | Los 8 usuarios de prueba (no en producción) |
+| `IncidentVolumeSeeder` | 600 incidentes de prueba con su historial completo (no en producción) |
+
+Los incidentes de prueba cumplen lo que pide la prueba técnica: **más de 500, de varios usuarios y con todos los estados y prioridades.** Llegan a lo largo de los últimos 60 días, como en una mesa de ayuda real: lo reciente sigue abierto, lo antiguo ya se atendió y algunos quedaron vencidos. Cada uno trae su historial (creación, asignación y cambios de estado). Una prueba automática verifica todo esto.
+
+Comandos útiles:
+
+```bash
+# Volver a correr los seeders (agrega solo lo que falta)
+docker compose exec app php artisan db:seed
+
+# Empezar de cero: BORRA TODOS LOS DATOS y vuelve a cargar los de prueba
+docker compose exec app php artisan migrate:fresh --seed
+
+# Cargar más volumen, por ejemplo 100.000 incidentes (alrededor de un minuto)
+docker compose exec -e SEED_INCIDENTS=100000 app php artisan db:seed --class=IncidentVolumeSeeder
+```
+
+Más detalle en [Seeders](docs/base-de-datos/seeders.md) y en [Rendimiento](docs/base-de-datos/rendimiento.md), donde están las mediciones con 100.000 incidentes.
+
+## Pruebas
+
+**API** (Pest, dentro del contenedor y contra una base aparte, `trazo_test`):
+
+```bash
+# Solo las pruebas
+docker compose exec app composer test
+
+# Pruebas, estilo (Pint) y análisis estático (Larastan nivel 8)
+docker compose exec app composer check
+```
+
+**Interfaz** (requiere Node 24 en el equipo):
+
+```bash
+cd frontend
+npm ci
+
+# Tipos, lint, estilos y pruebas unitarias
+npm run check
+
+# Pruebas de extremo a extremo en las cuatro vistas, con revisión de accesibilidad.
+# Necesitan el stack levantado y, la primera vez, los navegadores de Playwright: npx playwright install chromium
+npm run test:e2e
+```
+
+La [estrategia de pruebas](docs/calidad/estrategia-de-pruebas.md) explica qué cubre cada una.
+
+## Servicios y puertos
+
+| Dirección | Qué es |
+|---|---|
+| http://localhost:8088 | La aplicación |
+| http://localhost:8088/api/v1/... | La API que usa la interfaz |
+| http://localhost:8025 | Mailpit: buzón donde llegan los correos en local |
+
+Solo el gateway publica un puerto. MySQL y Redis viven en una red interna, sin acceso desde fuera. El detalle de cada contenedor está en [Docker](docs/operacion/docker.md).
+
+## Actualizar
+
+Después de traer cambios del repositorio, levantar el stack reconstruyendo las imágenes, por si cambiaron sus archivos o las dependencias. Las migraciones y los seeders nuevos se aplican solos al arrancar.
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+## Detener y limpiar
+
+```bash
+# Detener (los datos se conservan)
+docker compose stop
+
+# Detener y quitar los contenedores (los datos se conservan)
+docker compose down
+
+# Quitar también los datos: la base, la caché y la clave generada
+docker compose down -v
+```
+
+Estos comandos solo afectan a Trazo: todos sus contenedores, redes y volúmenes llevan el prefijo `trazo`.
+
+## Problemas frecuentes
+
+**El puerto 8088 u 8025 ya está en uso.** Crear un `.env` con otro puerto y volver a levantar:
+
+```bash
+cp .env.example .env
+# editar TRAZO_HTTP_PORT (y APP_URL con el mismo puerto) o TRAZO_MAIL_UI_PORT
+docker compose up -d
+```
+
+**La primera carga tarda o la página muestra "No pudimos cargar Trazo".** La API todavía está preparando la base de datos. Esperar a que `docker compose ps` muestre `app` como `healthy` y pulsar "Reintentar".
+
+**Algo no arranca.** Revisar el registro del servicio, por ejemplo `docker compose logs init` o `docker compose logs app`.
+
+## Documentación
+
+La carpeta [`docs/`](docs/index.md) explica el producto y cada decisión técnica.
+
+- [Índice general](docs/index.md)
+- [Arquitectura](docs/arquitectura/index.md)
+- [Registro de decisiones](docs/decisiones/index.md): cada elección con sus alternativas y por qué se descartaron
+- [Mejoras aplicadas](docs/mejoras/aplicadas.md) y [propuestas](docs/mejoras/propuestas.md): lo que va más allá de la prueba técnica
+- [Flujo de trabajo con Git](docs/operacion/flujo-de-trabajo.md)
 
 | Carpeta | Contenido |
 |---|---|
 | [`backend/`](backend/) | API REST en Laravel |
-| [`frontend/`](frontend/) | SPA en Vue 3 + Quasar |
+| [`frontend/`](frontend/) | Interfaz en Vue 3 + Quasar |
+| [`docker/`](docker/) | Imágenes y configuración de los contenedores |
 | [`docs/`](docs/index.md) | Documentación funcional y técnica |
-
-## Documentación
-
-- [Índice general](docs/index.md)
-- [Registro de decisiones](docs/decisiones/index.md)
-- [Mejoras aplicadas](docs/mejoras/aplicadas.md) y [propuestas](docs/mejoras/propuestas.md)
-- [Flujo de trabajo con Git](docs/operacion/flujo-de-trabajo.md)
