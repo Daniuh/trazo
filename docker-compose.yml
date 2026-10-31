@@ -87,6 +87,41 @@ services:
       resources:
         limits: { cpus: "1.0", memory: 768M }
 
+  # Respaldo diario de la base con la misma imagen de MySQL: volcado sin bloquear la app, comprimido y cifrado.
+  # Usa el usuario de la app (no root) y solo la red interna. Documentado en docs/operacion/respaldos.md
+  backup:
+    image: mysql:8.4.11
+    entrypoint: ["bash", "/usr/local/bin/trazo-backup"]
+    command: ["schedule"]
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: mysql
+      DB_DATABASE: ${DB_DATABASE:-trazo}
+      DB_USERNAME: ${DB_USERNAME:-trazo}
+      DB_PASSWORD: ${DB_PASSWORD:-trazo_local_only}
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-}
+      BACKUP_AT: ${BACKUP_AT:-03:00}
+      BACKUP_TIMEZONE: ${BACKUP_TIMEZONE:-America/Bogota}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - ./docker/mysql/backup.sh:/usr/local/bin/trazo-backup:ro
+      - backups:/backups
+      - backup-key:/run/backup-key
+    depends_on:
+      mysql: { condition: service_healthy }
+    # Sano mientras el último respaldo tenga menos de 26 horas; al arrancar sin respaldo reciente hace uno
+    healthcheck:
+      test: ["CMD", "bash", "/usr/local/bin/trazo-backup", "check"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 10m
+    networks: [data]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 256M }
+
   redis:
     image: redis:8.4.7-alpine
     command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
@@ -215,3 +250,5 @@ volumes:
   mysql-data: {}
   redis-data: {}
   app-key: {}
+  backups: {}
+  backup-key: {}

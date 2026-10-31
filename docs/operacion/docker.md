@@ -32,11 +32,13 @@ flowchart LR
   G -->|/ws| V[reverb · websockets]
   W -->|avisos| V
   I[init · migraciones] --> M
-  A -->|SMTP| P[mailpit]
+  B[backup · respaldo diario] --> M
+  W -->|SMTP| P[mailpit]
 
   subgraph data [red interna data]
     M
     R
+    B
   end
 ```
 
@@ -51,8 +53,10 @@ flowchart LR
 | `frontend` | `trazo/web` | En local, Vite con recarga en caliente. En producción, el build servido por Nginx sin root. |
 | `mysql` | MySQL 8.4 | Base de datos (`trazo` y `trazo_test` para pruebas) |
 | `redis` | Redis 8.4 | Caché (base 1), colas (base 0) y contadores de seguridad: límites de frecuencia y bloqueos del login (base 2) |
+| `backup` | MySQL 8.4 | Respaldo diario de la base, comprimido y cifrado, con 7 días de historia ([Respaldos](respaldos.md)) |
 | `mailpit` | Mailpit | Buzón de correo local (solo en local) |
 | `zap` | OWASP ZAP 2.16 | Escaneo de seguridad. Perfil opcional: no arranca con `up -d`; se corre a mano ([ZAP](../seguridad/zap.md)) |
+| `phpdoc` | phpDocumentor 3.10 | Documentación de funciones del backend. Perfil opcional `docs`, sin red ([ADR-0065](../decisiones/0065-documentacion-de-funciones.md)) |
 
 ## Archivos
 
@@ -65,6 +69,7 @@ flowchart LR
 | `docker/frontend/` | Imagen del frontend y su servidor estático |
 | `docker/nginx/` | Configuración del gateway y cabeceras de seguridad |
 | `docker/mysql/init/` | Creación de la base de pruebas en el primer arranque |
+| `docker/mysql/backup.sh` | Respaldo diario y restauración ([Respaldos](respaldos.md)) |
 
 ## Decisiones de diseño
 
@@ -98,13 +103,15 @@ El gateway vuelve a consultar el DNS interno de Docker (`resolver 127.0.0.11` y 
 - Vite corre con un límite de 1 GB de memoria (el Nginx de producción usa 128 MB).
 - En Windows y macOS los cambios de archivos montados no llegan al contenedor como eventos, así que Vite los revisa por sondeo (`VITE_USE_POLLING`).
 - Mientras Vite arranca (unos segundos), el gateway puede responder 502: basta con recargar.
+- Al arrancar, Vite compila el layout y todas las pantallas (`server.warmup`), así la primera visita a cada una no espera ([ADR-0067](../decisiones/0067-pantallas-precompiladas-en-desarrollo.md)).
 
 ## Llave de cifrado (`APP_KEY`)
 
-La llave cifra datos sensibles, como los secretos del MFA; si se pierde, esos datos no se pueden recuperar.
+La llave cifra datos sensibles, como los secretos del MFA y los correos que esperan en la cola. Si se pierde, esos datos no se pueden recuperar.
 
-- **En local** se genera sola la primera vez y se guarda en el volumen `trazo_app-key`. No hay que hacer nada.
+- **En local** se genera sola la primera vez y se guarda en el volumen `trazo_app-key`. No hay que hacer nada. Los comandos que entran con `docker compose exec` (sin pasar por el arranque del contenedor) la leen de ese mismo volumen ([ADR-0066](../decisiones/0066-llave-de-la-app-sin-entrypoint.md)).
 - **En producción** debe definirse en el entorno del servidor y respaldarse. Si falta, los contenedores se niegan a arrancar.
+- **Antes de cambiarla**, hay que esperar a que la cola esté vacía (Sistema → Salud). Los correos pendientes se cifraron con la llave anterior y el worker ya no podría leerlos ([ADR-0062](../decisiones/0062-correos-cifrados-en-la-cola.md)).
 
 ## Convivencia con otros proyectos
 
@@ -128,6 +135,8 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 | Pruebas del back con cobertura | `docker compose exec app composer coverage` (PCOV viene solo en la imagen de desarrollo) |
 | Vaciar los límites de frecuencia y bloqueos (solo desarrollo) | `docker compose exec app php artisan trazo:reset-limits` |
 | Escanear con ZAP | Ver [Escaneo con OWASP ZAP](../seguridad/zap.md) |
+| Ver o hacer respaldos | Ver [Respaldos](respaldos.md) |
+| Generar la documentación de funciones del back | `docker compose --profile docs run --rm phpdoc` (queda en `docs-build/backend`) |
 
 ## Dónde está en el código
 
@@ -135,6 +144,7 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 - [`docker/php/Dockerfile`](../../docker/php/Dockerfile), [`entrypoint.sh`](../../docker/php/entrypoint.sh), [`dev-init.sh`](../../docker/php/dev-init.sh) y [`healthcheck.sh`](../../docker/php/healthcheck.sh)
 - [`docker/nginx/gateway.conf`](../../docker/nginx/gateway.conf) y [`snippets/security-headers.conf`](../../docker/nginx/snippets/security-headers.conf)
 - [`docker/frontend/Dockerfile`](../../docker/frontend/Dockerfile)
-- [`docker/mysql/init/01-test-database.sh`](../../docker/mysql/init/01-test-database.sh)
+- [`docker/mysql/init/01-test-database.sh`](../../docker/mysql/init/01-test-database.sh) y [`docker/mysql/backup.sh`](../../docker/mysql/backup.sh)
+- [`backend/config/app.php`](../../backend/config/app.php): lectura de la `APP_KEY` del volumen
 - Decisiones: [ADR-0025](../decisiones/0025-docker.md) y [ADR-0038](../decisiones/0038-versiones-del-stack.md)
 - Validación en el CI: [Integración continua](integracion-continua.md)

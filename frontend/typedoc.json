@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Trazo · Frontend",
+  "entryPointStrategy": "expand",
+  "entryPoints": ["src/shared", "src/modules/*/domain", "src/modules/*/application", "src/modules/*/infrastructure"],
+  "exclude": ["**/*.spec.ts", "src/shared/testing/**"],
+  "tsconfig": "tsconfig.docs.json",
+  "out": "../docs-build/frontend",
+  "readme": "none",
+  "disableSources": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "treatWarningsAsErrors": true,
+  "validation": { "notExported": false, "invalidLink": true, "notDocumented": false }
+}

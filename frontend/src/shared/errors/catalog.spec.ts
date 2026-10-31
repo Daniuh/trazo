@@ -31,6 +31,19 @@ describe('catálogo de errores', () => {
     expect(messageFor(httpError('CODIGO_NUEVO', { traceId: 'XYZ' }))).toContain('XYZ')
   })
 
+  it('no pide un código de soporte cuando la falla no trae uno', () => {
+    for (const code of ['UNKNOWN_ERROR', 'CODIGO_NUEVO', 'INTERNAL_ERROR']) {
+      const message = messageFor(new ApiError('network', code))
+
+      expect(message).toBe(generalMessages.UNKNOWN_ERROR)
+      expect(message).not.toMatch(/código|\{traceId\}/)
+    }
+  })
+
+  it('explica que hay que recargar cuando una pantalla no se pudo descargar', () => {
+    expect(messageFor(new ApiError('network', 'SCREEN_LOAD_FAILED'))).toContain('Recarga la página')
+  })
+
   it('permite a cada módulo registrar sus códigos de negocio', () => {
     registerErrorMessages({ INVALID_STATUS_TRANSITION: 'No puedes pasar de {from} a {to}.' })
 

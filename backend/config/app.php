@@ -99,7 +99,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    // En producción llega por el entorno. En local, si un comando entra sin pasar por el entrypoint (docker compose
+    // exec), se lee del volumen donde el entrypoint la generó. Documentado en docs/operacion/docker.md
+    'key' => env('APP_KEY') ?: (is_readable($keyFile = (string) env('APP_KEY_FILE', '/run/trazo/app-key'))
+        ? trim((string) file_get_contents($keyFile))
+        : null),
 
     'previous_keys' => [
         ...array_filter(

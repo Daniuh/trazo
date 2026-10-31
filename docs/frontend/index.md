@@ -62,6 +62,9 @@ Desde `frontend/` (o dentro del contenedor):
 | `npm run format` | Corrige formato |
 | `npm test` | Pruebas con Vitest |
 | `npm run check` | Tipos, lint y pruebas; debe pasar antes de fusionar a `dev` |
+| `npm run docs:ts` | Documentación de funciones con TypeDoc, en `docs-build/frontend/` (fuera de Git) |
+
+TypeDoc documenta los `.ts` de `shared` y de las capas `domain`, `application` e `infrastructure` de cada módulo. Compila con su propio `tsconfig.docs.json`, que trata los `.vue` como componentes genéricos porque `tsc` no los entiende ([ADR-0065](../decisiones/0065-documentacion-de-funciones.md)).
 
 ## Documentos relacionados
 
@@ -76,3 +79,4 @@ Desde `frontend/` (o dentro del contenedor):
 
 - [`frontend/src/app/`](../../frontend/src/app/) y [`frontend/src/shared/`](../../frontend/src/shared/)
 - [`frontend/vite.config.ts`](../../frontend/vite.config.ts), [`eslint.config.js`](../../frontend/eslint.config.js) y [`stylelint.config.js`](../../frontend/stylelint.config.js)
+- [`frontend/typedoc.json`](../../frontend/typedoc.json), [`tsconfig.docs.json`](../../frontend/tsconfig.docs.json) y [`typedoc/vue-shim.d.ts`](../../frontend/typedoc/vue-shim.d.ts): documentación de funciones

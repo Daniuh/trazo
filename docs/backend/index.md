@@ -66,8 +66,19 @@ Se ejecutan dentro del contenedor (`docker compose exec app composer <comando>`)
 | `composer analyse` | Análisis estático con Larastan (nivel 8) |
 | `composer check` | Las tres revisiones juntas; debe pasar antes de fusionar a `dev` |
 
+## Documentación de funciones
+
+Las clases y funciones se documentan con PHPDoc en el código. phpDocumentor las convierte en un sitio navegable:
+
+```bash
+docker compose --profile docs run --rm phpdoc
+```
+
+El resultado queda en `docs-build/backend/` (fuera de Git). El CI lo genera en cada PR y falla si algún PHPDoc tiene errores ([ADR-0065](../decisiones/0065-documentacion-de-funciones.md)).
+
 ## Dónde está en el código
 
 - [`backend/app/Modules/`](../../backend/app/Modules/)
 - [`backend/bootstrap/app.php`](../../backend/bootstrap/app.php) y [`backend/routes/api.php`](../../backend/routes/api.php)
 - [`backend/composer.json`](../../backend/composer.json): comandos de calidad.
+- [`backend/phpdoc.dist.xml`](../../backend/phpdoc.dist.xml): configuración de phpDocumentor.

@@ -72,3 +72,10 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0058](0058-exportacion-en-la-practica.md) | Exportación en la práctica: CSV para Excel en español, tope de filas y registro en la auditoría |
 | [ADR-0059](0059-sistema-en-la-practica.md) | Sistema en la práctica: salud medida desde la app, eventos agrupados y acciones con reautenticación |
 | [ADR-0060](0060-pasada-de-calidad.md) | Pasada de calidad: CSP estricta, CORS cerrado, contrato OpenAPI, ZAP y cobertura exigida |
+| [ADR-0061](0061-entrega-verificada-desde-cero.md) | Entrega verificada desde cero: clon limpio, rutas largas en Windows, volumen de `node_modules` y carga diferida estricta |
+| [ADR-0062](0062-correos-cifrados-en-la-cola.md) | Correos cifrados en la cola: el contenido de cada correo pendiente o fallido es ilegible sin la clave de la aplicación |
+| [ADR-0063](0063-pantalla-que-no-se-descarga.md) | Pantalla que no se descarga: aviso global con "Recargar", mensaje propio y ningún código de soporte inexistente |
+| [ADR-0064](0064-respaldo-diario-de-mysql.md) | Respaldo diario de MySQL: servicio propio, volcado consistente, cifrado y firmado, siete días de historia |
+| [ADR-0065](0065-documentacion-de-funciones.md) | Documentación de funciones: phpDocumentor en su imagen oficial y TypeDoc, generadas bajo demanda y en el CI |
+| [ADR-0066](0066-llave-de-la-app-sin-entrypoint.md) | La configuración lee la `APP_KEY` del volumen local cuando no llega por el entorno |
+| [ADR-0067](0067-pantallas-precompiladas-en-desarrollo.md) | Vite precompila el layout y las pantallas al arrancar, para que la primera visita no espere |

@@ -1,5 +1,6 @@
 // Flujo crítico de incidentes en las cuatro vistas: crear, encontrarlo en el listado, cambiar su estado, y
-// accesibilidad de cada pantalla. Documentado en docs/calidad/estrategia-de-pruebas.md
+// accesibilidad de cada pantalla. En portátil, el aviso cuando la pantalla no se descarga.
+// Documentado en docs/calidad/estrategia-de-pruebas.md
 import { expect, test } from '@playwright/test'
 import { expectAccessible, signInAs } from './support'
 
@@ -27,6 +28,27 @@ test('crear, encontrar en el listado y cambiar el estado', async ({ page }, info
   await page.goto(`/incidentes?search=${encodeURIComponent(title)}`)
   await expect(page.getByText(title)).toBeVisible()
   await expectAccessible(page)
+})
+
+test('si una pantalla no se descarga, el menú avisa y "Recargar" la abre', async ({ page }, info) => {
+  test.skip(info.project.name !== 'portatil', 'Basta una vista')
+  await signInAs(page, 'supervisor@trazo.test')
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+
+  // Como si se hubiera publicado una versión nueva: el archivo de la pantalla ya no existe
+  const screenFile = /IncidentListPage[^/]*\.(vue|js)/
+  await page.route(screenFile, (route) => route.abort())
+  await page.getByRole('navigation').getByRole('link', { name: 'Incidentes' }).click()
+
+  const notice = page.getByText('No pudimos cargar esta pantalla')
+  await expect(notice).toBeVisible()
+  await expectAccessible(page)
+
+  await page.unroute(screenFile)
+  await page.getByRole('button', { name: 'Recargar' }).click()
+  await expect(page).toHaveURL(/\/incidentes$/)
+  await expect(page.getByRole('heading', { level: 1, name: 'Incidentes' })).toBeVisible()
 })
 
 test('los filtros viven en la URL y se pueden quitar', async ({ page }) => {

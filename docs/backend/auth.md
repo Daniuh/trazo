@@ -167,7 +167,7 @@ TOTP estándar (RFC 6238): 6 dígitos que cambian cada 30 segundos, compatibles 
 - **Códigos de recuperación:** 8, de 10 caracteres sin letras que se confunden (`ABCDE-FGHJK`). Se guarda solo su hash SHA-256: son aleatorios y largos (unos 50 bits), así que no necesitan un hash lento. Cada uno sirve una vez y se aceptan con minúsculas, espacios o sin guion.
 
 ### Avisos por correo
-Se envía un aviso, por la cola y en texto plano, cuando se activa o desactiva el MFA, cuando se usa un código de recuperación, cuando se generan códigos nuevos y cuando cambia la contraseña. Dice qué pasó, cuándo (hora de Colombia) y qué hacer si no fue la persona. No lleva enlaces ni datos sensibles. En local llega a Mailpit (`http://localhost:8025`).
+Se envía un aviso, por la cola (cifrado, como todo correo; [ADR-0062](../decisiones/0062-correos-cifrados-en-la-cola.md)) y en texto plano, cuando se activa o desactiva el MFA, cuando se usa un código de recuperación, cuando se generan códigos nuevos y cuando cambia la contraseña. Dice qué pasó, cuándo (hora de Colombia) y qué hacer si no fue la persona. No lleva enlaces ni datos sensibles. En local llega a Mailpit (`http://localhost:8025`).
 
 ### Registro en el log
 Solo lo que puede ser un ataque o un problema: un ingreso con código de recuperación (con cuántos quedan) y un ingreso cortado por intentos fallidos. Los códigos incorrectos aislados no se registran.

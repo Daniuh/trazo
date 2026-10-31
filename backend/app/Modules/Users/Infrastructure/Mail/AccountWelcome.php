@@ -3,17 +3,19 @@
 declare(strict_types=1);
 
 // Correo de bienvenida a una cuenta nueva: cómo crear la contraseña e ingresar. No lleva contraseñas ni enlaces con
-// códigos: la persona pide su propio código desde la pantalla de ingreso. Sale por la cola. Documentado en docs/backend/users.md
+// códigos: la persona pide su propio código desde la pantalla de ingreso. Sale por la cola, cifrado.
+// Documentado en docs/backend/users.md
 
 namespace App\Modules\Users\Infrastructure\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-final class AccountWelcome extends Mailable implements ShouldQueue
+final class AccountWelcome extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 

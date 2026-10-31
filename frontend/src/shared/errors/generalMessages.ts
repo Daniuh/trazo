@@ -19,5 +19,9 @@ export const generalMessages: MessageCatalog = {
   SERVER_UNREACHABLE:
     'El servidor de Trazo no está respondiendo en este momento. Vuelve a intentarlo en unos minutos; si sigue igual, avisa a soporte.',
   REQUEST_CANCELED: 'La acción se canceló antes de terminar.',
-  UNKNOWN_ERROR: 'No pudimos completar la acción. Si se repite, comparte este código con soporte: {traceId}.',
+  SCREEN_LOAD_FAILED:
+    'No pudimos cargar esta pantalla. Puede que haya una versión nueva de Trazo o que se haya cortado la conexión. Recarga la página para continuar.',
+  // Sin código de soporte: la falla no llegó al servidor, así que no hay nada que buscar en los logs
+  UNKNOWN_ERROR: 'No pudimos completar la acción. Inténtalo de nuevo; si se repite, avisa a soporte.',
+  UNKNOWN_ERROR_TRACED: 'No pudimos completar la acción. Si se repite, comparte este código con soporte: {traceId}.',
 }

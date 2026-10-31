@@ -15,6 +15,7 @@ use App\Modules\Shared\Infrastructure\DatabaseAdminLog;
 use App\Modules\Shared\Infrastructure\LaravelSupport;
 use App\Modules\Users\Infrastructure\UserPermissions;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole() && $this->app->environment('local', 'testing')) {
             $this->commands([ResetLimitsCommand::class]);
         }
+
+        // Fuera de producción, cargar una relación sin with() lanza una excepción: un N+1 nuevo no pasa las pruebas
+        Model::preventLazyLoading(! $this->app->isProduction());
 
         // Límite general de la API: por usuario si hay sesión, por IP si no. Configurable solo para pruebas de carga
         // o escaneos locales; en producción se queda en 120

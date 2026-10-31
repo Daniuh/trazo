@@ -25,6 +25,9 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 | El servidor tardó demasiado en responder… | La respuesta superó el tiempo de espera | Reintentar; si se repite, revisar la salud del sistema |
 | El servidor de Trazo no está respondiendo en este momento… | El gateway respondió 502 o 504: la API está caída, reiniciándose o no contesta | Reintentar en unos minutos; si sigue, revisar que la API esté arriba (salud del sistema) |
 | No pudimos procesar la solicitud… / Esta acción no está disponible… | Petición mal formada o método no permitido (poco habitual) | Recargar la página; si se repite, reportar con el código |
+| No pudimos cargar esta pantalla. Puede que haya una versión nueva de Trazo o que se haya cortado la conexión… (con el botón **Recargar**) | El navegador no pudo descargar la pantalla. Lo más común: se publicó una versión nueva mientras la persona tenía Trazo abierto. También pasa si se cortó la conexión justo al cambiar de pantalla | Pulsar **Recargar**: abre la pantalla que se buscaba con la versión nueva. Si se repite, revisar la conexión |
+| No pudimos completar la acción. Inténtalo de nuevo; si se repite, avisa a soporte. | Falla inesperada en el navegador, sin llegar al servidor: no hay código para buscar en los logs | Pedir qué estaba haciendo, en qué pantalla y con qué navegador, y tratar de reproducirlo |
+| No pudimos completar la acción. Si se repite, comparte este código con soporte: X | El servidor respondió con un código que esta versión de la pantalla no conoce (por ejemplo, tras una actualización) | Pedir el código y buscarlo en los logs; recargar la página suele resolverlo |
 
 ## Inicio de sesión
 

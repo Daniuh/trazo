@@ -99,12 +99,10 @@ export async function setUpMfa(page: Page, email: string): Promise<void> {
   await page.getByLabel('Ya guardé mis códigos de recuperación').check()
 }
 
-// WCAG 2.1 nivel AA, el estándar que sigue el sistema de diseño
-export async function expectAccessible(page: Page): Promise<void> {
-  // Una lista que se está recargando se atenúa (aria-busy) y axe la mediría con poco contraste: se espera a que termine
+// Espera a que la pantalla quede quieta: ninguna lista recargándose (se atenúa con aria-busy) y ninguna animación en
+// curso (un diálogo que aparece tiene opacidad parcial). Las animaciones infinitas, como la de carga, no cuentan
+async function settle(page: Page): Promise<void> {
   await expect(page.locator('section[aria-busy="true"]')).toHaveCount(0)
-  // Un diálogo o un aviso que todavía está apareciendo tiene opacidad parcial y axe lo mide con poco contraste:
-  // se espera a que terminen las animaciones (las infinitas, como la de carga, no cuentan)
   await page.waitForFunction(() =>
     document
       .getAnimations()
@@ -113,10 +111,39 @@ export async function expectAccessible(page: Page): Promise<void> {
           animation.playState !== 'running' || animation.effect?.getComputedTiming().iterations === Infinity,
       ),
   )
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
-  const summary = results.violations.map(
-    (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`,
-  )
+}
+
+// Marca si alguna lista se puso a recargar mientras axe medía (por ejemplo, al reconectarse el tiempo real)
+async function watchBusy(page: Page): Promise<() => Promise<boolean>> {
+  await page.evaluate(() => {
+    const flags = window as unknown as { __trazoBusySeen?: boolean; __trazoBusyObserver?: MutationObserver }
+    flags.__trazoBusyObserver?.disconnect()
+    flags.__trazoBusySeen = false
+    flags.__trazoBusyObserver = new MutationObserver(() => {
+      if (document.querySelector('section[aria-busy="true"]')) flags.__trazoBusySeen = true
+    })
+    flags.__trazoBusyObserver.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-busy'],
+    })
+  })
+  return () => page.evaluate(() => (window as unknown as { __trazoBusySeen?: boolean }).__trazoBusySeen === true)
+}
+
+// WCAG 2.1 nivel AA, el estándar que sigue el sistema de diseño. Si una lista se recargó durante la medición, se mide
+// de nuevo: el contraste de una lista atenuada no es el real
+export async function expectAccessible(page: Page): Promise<void> {
+  let summary: string[] = []
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await settle(page)
+    const busyDuring = await watchBusy(page)
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
+    summary = results.violations.map(
+      (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`,
+    )
+    if (!(await busyDuring())) break
+  }
 
   expect(summary, 'Problemas de accesibilidad').toEqual([])
 }

@@ -122,7 +122,7 @@ flowchart LR
 ## Registro y avisos
 
 - **Registro en `admin_actions`:** cada cambio queda con quien lo hizo, el tipo, la persona o el rol afectado, los valores anteriores y nuevos, la IP y el navegador.
-- **Avisos por correo** (en la cola, texto plano, `Mail/AccountNotice` y `Mail/AccountWelcome`): bienvenida, rol cambiado, permisos cambiados, cuenta activada o desactivada, MFA restablecido, acceso restablecido y correo cambiado. Este último va a la dirección anterior.
+- **Avisos por correo** (en la cola y cifrados, [ADR-0062](../decisiones/0062-correos-cifrados-en-la-cola.md); texto plano, `Mail/AccountNotice` y `Mail/AccountWelcome`): bienvenida, rol cambiado, permisos cambiados, cuenta activada o desactivada, MFA restablecido, acceso restablecido y correo cambiado. Este último va a la dirección anterior.
 - **No revelar qué correos existen:** las peticiones de la administración revisan el permiso **antes** de validar (`ChecksPermission`), así nadie sin permiso averigua si un correo existe por el error de "en uso".
 
 ## Errores
