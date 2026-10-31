@@ -2,7 +2,7 @@
 # Documentado en docs/operacion/docker.md
 
 FROM mlocati/php-extension-installer:2.12.3 AS ext-installer
-FROM composer:2 AS composer
+FROM composer:2.10.3 AS composer
 
 # Base común: PHP-FPM con las extensiones que necesita Laravel
 FROM php:8.4.26-fpm-alpine AS base

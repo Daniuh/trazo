@@ -124,3 +124,4 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 - [`docker/frontend/Dockerfile`](../../docker/frontend/Dockerfile)
 - [`docker/mysql/init/01-test-database.sh`](../../docker/mysql/init/01-test-database.sh)
 - Decisiones: [ADR-0025](../decisiones/0025-docker.md) y [ADR-0038](../decisiones/0038-versiones-del-stack.md)
+- Validación en el CI: [Integración continua](integracion-continua.md)

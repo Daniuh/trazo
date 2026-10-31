@@ -52,3 +52,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0038](0038-versiones-del-stack.md) | Versiones del stack |
 | [ADR-0039](0039-quasar-como-plugin-de-vite.md) | Quasar integrado como plugin de Vite |
 | [ADR-0040](0040-axios.md) | Axios como base del cliente HTTP |
+| [ADR-0041](0041-ci-con-el-stack-de-docker.md) | El CI prueba el backend dentro del stack de Docker |

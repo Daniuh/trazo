@@ -31,7 +31,7 @@ Una prueba de entorno garantiza que las pruebas corren en `testing` y contra `tr
 |---|---|
 | Antes de cada commit | Formato (Pint) sobre los archivos PHP modificados |
 | Antes de fusionar a `dev` | `composer check`: formato, análisis estático y todas las pruebas |
-| En el CI (cuando el repositorio esté publicado) | Todo lo anterior en cada Pull Request |
+| En el CI (cuando el repositorio esté publicado) | Todo lo anterior en cada Pull Request, dentro del mismo stack de Docker. Ver [Integración continua](../operacion/integracion-continua.md). |
 
 ## Frontend
 

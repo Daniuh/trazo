@@ -46,6 +46,7 @@ Este anexo reúne lo que Trazo incorpora más allá de lo solicitado. Ninguna de
 | Mejora | Por qué | Decisión |
 |---|---|---|
 | CI/CD con promoción de la misma imagen | Producción ejecuta exactamente lo que se probó | [ADR-0034](../decisiones/0034-ci-cd.md) |
+| CI sobre el mismo stack de Docker, Dependabot y Gitleaks antes de cada commit | El CI prueba lo mismo que se ejecuta, y ningún secreto llega al historial público | [ADR-0041](../decisiones/0041-ci-con-el-stack-de-docker.md) |
 | Pruebas de arquitectura, autorización, N+1 y E2E en 4 vistas | Las reglas del proyecto se verifican solas | [ADR-0031](../decisiones/0031-estrategia-de-pruebas.md) |
 | Escaneo OWASP ZAP como perfil opcional de Docker | Cualquiera puede auditar la seguridad | [ADR-0032](../decisiones/0032-calidad-estatica.md) |
 | Respaldo diario y límites de recursos por contenedor | Recuperación ante fallos y convivencia con otros servicios | [ADR-0026](../decisiones/0026-despliegue.md) |

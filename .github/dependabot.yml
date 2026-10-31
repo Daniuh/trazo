@@ -1,0 +1,43 @@
+# Actualizaciones automáticas de dependencias: abre PRs semanales hacia dev, agrupados por ecosistema.
+# Cada PR pasa por el mismo CI que cualquier cambio. Documentado en docs/operacion/integracion-continua.md
+version: 2
+
+updates:
+  - package-ecosystem: composer
+    directory: /backend
+    target-branch: dev
+    schedule: { interval: weekly, day: monday }
+    commit-message: { prefix: build, include: scope }
+    open-pull-requests-limit: 5
+    groups:
+      backend-minor:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directories: [/frontend, /]
+    target-branch: dev
+    schedule: { interval: weekly, day: monday }
+    commit-message: { prefix: build, include: scope }
+    open-pull-requests-limit: 5
+    groups:
+      frontend-minor:
+        update-types: [minor, patch]
+
+  # Imágenes base de los Dockerfile y las del compose (MySQL, Redis, Nginx, Mailpit)
+  - package-ecosystem: docker
+    directories: [/docker/php, /docker/frontend]
+    target-branch: dev
+    schedule: { interval: weekly, day: monday }
+    commit-message: { prefix: build, include: scope }
+
+  - package-ecosystem: docker-compose
+    directory: /
+    target-branch: dev
+    schedule: { interval: weekly, day: monday }
+    commit-message: { prefix: build, include: scope }
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule: { interval: weekly, day: monday }
+    commit-message: { prefix: ci, include: scope }

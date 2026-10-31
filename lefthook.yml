@@ -16,6 +16,9 @@ pre-commit:
       root: frontend/
       glob: "*.{scss,vue}"
       run: npx stylelint {staged_files}
+    # El repositorio es público: ningún secreto debe llegar ni siquiera al historial local
+    secrets:
+      run: node scripts/git/scan-secrets.mjs
 
 commit-msg:
   commands:
