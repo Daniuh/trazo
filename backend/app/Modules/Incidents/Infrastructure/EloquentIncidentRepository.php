@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 // Incidentes con Eloquent. La lectura trae catálogos y personas en una sola pasada (eager loading),
-// y cada escritura comprueba la versión en el mismo UPDATE. Documentado en docs/backend/incidents.md
+// y cada escritura comprueba la versión en el mismo UPDATE y avisa del cambio (IncidentChanged).
+// Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Infrastructure;
 
 use App\Modules\Incidents\Application\Data\IncidentRecord;
+use App\Modules\Incidents\Application\Events\IncidentChanged;
 use App\Modules\Incidents\Application\Ports\IncidentRepository;
 use App\Modules\Incidents\Domain\Exceptions\IncidentExceptions;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
@@ -54,6 +56,7 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
         ]);
 
         $incident->forceFill(['code' => sprintf(self::CODE_FORMAT, $incident->id)])->saveQuietly();
+        event(new IncidentChanged($incident->id));
 
         return $incident->ulid;
     }
@@ -68,15 +71,19 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
         if ($updated === 0) {
             throw IncidentExceptions::versionConflict();
         }
+
+        event(new IncidentChanged($incident->id));
     }
 
     public function delete(IncidentRecord $incident): void
     {
         Incident::query()->whereKey($incident->id)->delete();
+        event(new IncidentChanged($incident->id));
     }
 
     public function restore(IncidentRecord $incident): void
     {
         Incident::onlyTrashed()->whereKey($incident->id)->restore();
+        event(new IncidentChanged($incident->id));
     }
 }

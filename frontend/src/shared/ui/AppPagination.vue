@@ -155,11 +155,7 @@ const sizeOptions = computed(() => props.perPageOptions.map((size) => ({ label: 
 
 // La etiqueta del tamaño solo la leen los lectores de pantalla; el texto de cada opción ya lo dice
 .app-pagination__size :deep(.app-field__label) {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
+  @include visually-hidden;
 }
 
 @include laptop {

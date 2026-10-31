@@ -109,6 +109,16 @@ describe('cliente HTTP', () => {
     expect(onMaintenance).toHaveBeenCalledOnce()
   })
 
+  it('da un código claro cuando responde el gateway y no la API (502 o 504 con página HTML)', async () => {
+    const { client } = setup({ status: 502, data: '<html>Bad Gateway</html>' }, { status: 504, data: '' })
+
+    const badGateway = (await client.post('/incidents', {}).catch((e: unknown) => e)) as ApiError
+    const timeout = (await client.post('/incidents', {}).catch((e: unknown) => e)) as ApiError
+
+    expect(badGateway.code).toBe('SERVER_UNREACHABLE')
+    expect(timeout.code).toBe('SERVER_UNREACHABLE')
+  })
+
   it('lee Retry-After en un 429', async () => {
     const { client } = setup({ status: 429, data: { code: 'TOO_MANY_REQUESTS' }, headers: { 'retry-after': '30' } })
 

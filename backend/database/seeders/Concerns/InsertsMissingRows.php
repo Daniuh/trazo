@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 trait InsertsMissingRows
 {
     /**
-     * @param  list<array<string, scalar>>  $rows
+     * @param  list<array<string, scalar|null>>  $rows
      */
     private function insertMissing(string $table, string $key, array $rows): void
     {

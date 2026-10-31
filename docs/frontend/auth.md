@@ -28,6 +28,7 @@ flowchart TD
 ```
 
 - **Al recargar la página** queda el token en `sessionStorage`, pero no el usuario: la guarda lo pide a `GET /auth/me` antes de mostrar la ruta.
+- **Si esa consulta falla por otra razón** (sin conexión, mantenimiento o el servidor tardó demasiado), la sesión **no** se borra: solo la API puede decir que ya no vale. La guarda lleva a `/sin-conexion`, que dice qué pasó con el mensaje del catálogo y ofrece "Reintentar", volviendo a la página que se pedía.
 - **Si la API responde `UNAUTHENTICATED`** en cualquier momento (sesión vencida, inactiva o revocada), el cliente HTTP borra el token. La guarda lleva al login con un aviso visible y recuerda la página para volver.
 - **Cerrar sesión** revoca el token en la API. Si la API no responde, igual se borra en el navegador, y el token vence solo.
 
@@ -72,7 +73,9 @@ Después del login se vuelve a la página indicada en `?volver=`, solo si es una
 | application | `useSessionStore.ts` | Estado de la sesión (Pinia): ingresar, recuperar, cerrar |
 | application | `authGuard.ts` | Guarda de rutas y reacción a la sesión vencida |
 | presentation | `LoginPage.vue` | Pantalla de login |
-| — | `errors.ts`, `routes.ts` | Mensajes del módulo y ruta pública `/ingresar` |
+| presentation | `ConnectionErrorPage.vue` | Aviso de sin conexión con "Reintentar" |
+| presentation | `AuthPanel.vue` | Marco común de las pantallas sin sesión: logo, título y tarjeta centrada desde tablet |
+| — | `errors.ts`, `routes.ts` | Mensajes del módulo y rutas públicas `/ingresar` y `/sin-conexion` |
 
 ## Dónde está en el código
 
@@ -81,4 +84,4 @@ Después del login se vuelve a la página indicada en `?volver=`, solo si es una
 - [`frontend/src/app/navigation.ts`](../../frontend/src/app/navigation.ts): filtrado del menú por permisos.
 - [`frontend/src/app/router/index.ts`](../../frontend/src/app/router/index.ts) y [`frontend/src/app/bootstrap.ts`](../../frontend/src/app/bootstrap.ts): guarda de rutas y registro de mensajes.
 - Pruebas: archivos `*.spec.ts` dentro del módulo.
-- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md) y [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md)
+- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md), [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md) y [ADR-0049](../decisiones/0049-sesion-sin-conexion.md)

@@ -5,7 +5,7 @@ import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { ApiError, httpEvents, tokenStore } from '@/shared/http'
 import type { SessionUser } from '../domain/session'
 import { authApi } from '../infrastructure/authApi'
-import { installAuthGuard, LOGIN_ROUTE, SESSION_EXPIRED_REASON } from './authGuard'
+import { CONNECTION_ROUTE, installAuthGuard, LOGIN_ROUTE, SESSION_EXPIRED_REASON } from './authGuard'
 import { useSessionStore } from './useSessionStore'
 
 vi.mock('../infrastructure/authApi', () => ({
@@ -27,6 +27,7 @@ function buildRouter(): Router {
     history: createMemoryHistory(),
     routes: [
       { path: '/ingresar', name: LOGIN_ROUTE, component: Blank, meta: { public: true } },
+      { path: '/sin-conexion', name: CONNECTION_ROUTE, component: Blank, meta: { public: true } },
       { path: '/', name: 'home', component: Blank },
       { path: '/incidentes', name: 'incidents', component: Blank },
     ],
@@ -62,7 +63,7 @@ describe('useSessionStore', () => {
     tokenStore.set('T1')
     api.me.mockResolvedValue(user)
 
-    expect(await useSessionStore().restore()).toBe(true)
+    expect(await useSessionStore().restore()).toBe('signed-in')
     expect(useSessionStore().user).toEqual(user)
   })
 
@@ -70,8 +71,17 @@ describe('useSessionStore', () => {
     tokenStore.set('T1')
     api.me.mockRejectedValue(new ApiError('http', 'UNAUTHENTICATED', { status: 401 }))
 
-    expect(await useSessionStore().restore()).toBe(false)
+    expect(await useSessionStore().restore()).toBe('signed-out')
     expect(tokenStore.get()).toBeNull()
+  })
+
+  it('conserva el token si la API no responde o está en mantenimiento', async () => {
+    tokenStore.set('T1')
+    api.me.mockRejectedValue(new ApiError('timeout', 'TIMEOUT'))
+
+    expect(await useSessionStore().restore()).toBe('unreachable')
+    expect(tokenStore.get()).toBe('T1')
+    expect(useSessionStore().connectionError?.code).toBe('TIMEOUT')
   })
 
   it('cierra la sesión local aunque la API no responda', async () => {
@@ -105,6 +115,22 @@ describe('authGuard', () => {
 
     await router.push('/ingresar')
     expect(router.currentRoute.value.name).toBe('home')
+  })
+
+  it('si no puede comprobar la sesión avisa sin conexión en vez de mandar al login', async () => {
+    tokenStore.set('T1')
+    api.me.mockRejectedValue(new ApiError('http', 'SERVICE_UNAVAILABLE', { status: 503 }))
+    const router = buildRouter()
+
+    await router.push('/incidentes')
+
+    expect(router.currentRoute.value.name).toBe(CONNECTION_ROUTE)
+    expect(router.currentRoute.value.query.volver).toBe('/incidentes')
+    expect(tokenStore.get()).toBe('T1')
+
+    api.me.mockResolvedValue(user)
+    await router.replace('/incidentes')
+    expect(router.currentRoute.value.name).toBe('incidents')
   })
 
   it('cuando la sesión vence vuelve al login con el aviso', async () => {

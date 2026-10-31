@@ -16,8 +16,6 @@ type ModuleRoutes = { default?: RouteRecordRaw[]; publicRoutes?: RouteRecordRaw[
 const modules = Object.values(import.meta.glob<ModuleRoutes>('../../modules/*/routes.ts', { eager: true }))
 
 const shellRoutes: RouteRecordRaw[] = [
-  // Provisional hasta que exista el dashboard
-  { path: '', name: 'home', component: () => import('../pages/HomePage.vue') },
   ...modules.flatMap((module) => module.default ?? []),
   ...(import.meta.env.DEV
     ? [{ path: 'guia-visual', name: 'design-guide', component: () => import('../pages/DesignGuidePage.vue') }]

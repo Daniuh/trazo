@@ -34,16 +34,17 @@ No hay `updated_by`: quién modificó qué ya queda en `incident_activities`, y 
 
 | Índice | Consulta que atiende |
 |---|---|
-| `(status_id, priority_id)` | Filtros combinados y conteos del dashboard |
+| `(status_id, priority_id, deleted_at, created_by, assigned_to)` | Filtros combinados y conteo del dashboard por estado y prioridad, sin leer la tabla (también para quien solo ve lo suyo) |
 | `(status_id, due_date, deleted_at)` | Conteo de vencidos, resuelto solo con el índice |
 | `(priority_id)` | Filtro por prioridad (y su FK) |
-| `(assigned_to, status_id)` | Filtro por asignado y "mis incidentes" |
+| `(assigned_to, status_id, due_date, deleted_at, created_by)` | Filtro por asignado, "asignados a mí", "sin asignar" y carga por agente, sin leer la tabla |
 | `(created_by)` | "Creados por mí" (y su FK) |
 | `(due_date, deleted_at)` | Rango y orden por vencimiento; conteo general solo con el índice |
-| `(created_at)` | Rango y orden por creación, orden por defecto |
+| `(created_at, deleted_at)` | Rango y orden por creación (orden por defecto); creados por día |
+| `(resolved_at, deleted_at)` | Resueltos por día (tendencia del dashboard) |
 | `FULLTEXT (title, description)` | Búsqueda por texto (palabras de 3 o más letras) |
 
-Los índices están validados con `EXPLAIN` sobre 100.000 registros: ver [Rendimiento del listado](../rendimiento.md).
+Los índices están validados con `EXPLAIN` sobre 100.000 registros: ver [Rendimiento](../rendimiento.md).
 
 ## Dónde está en el código
 

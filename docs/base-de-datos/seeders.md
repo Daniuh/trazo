@@ -22,6 +22,10 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
 | `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
 
+## Catálogo de widgets
+
+`DashboardWidgetSeeder` carga los 10 widgets del dashboard con sus topes, su tamaño original y el permiso que exige cada uno (ver [diccionario](diccionario/dashboard.md)). Como los demás catálogos, agrega los que faltan por su `code` y nunca pisa los ajustes de los existentes. El `sort_order` va de diez en diez para poder intercalar widgets nuevos.
+
 ## Usuarios de demostración
 
 | Correo | Rol |
@@ -39,9 +43,11 @@ La contraseña de todos es `Trazo.Demo.2026` (variable `DEMO_USER_PASSWORD`), qu
 
 - **Idempotente:** completa hasta llegar al volumen pedido. Si ya hay 600 o más, no hace nada.
 - **Datos coherentes y en español:**
-  - Estados y prioridades repartidos con pesos realistas.
-  - Lo pendiente nace dentro de su ventana de resolución, así que solo una parte queda vencida (cerca de un tercio).
-  - Lo resuelto y lo cerrado tiene fecha de resolución.
+  - **Flujo parejo, como una mesa de ayuda real:** los incidentes llegan a lo largo de los últimos 60 días y su estado depende de la edad. Lo que todavía está dentro de su tiempo de resolución sigue abierto. Lo más viejo ya se atendió (resuelto, cerrado o cancelado), salvo un 2 % que quedó atascado y vencido.
+  - Por eso la tendencia del dashboard muestra creados y resueltos parecidos cada día (en 30 días, unos 280 creados y 215 resueltos), y no un pico artificial.
+  - Con 600 incidentes quedan unos 50 pendientes, de los que cerca del 40 % está vencido.
+  - Prioridades repartidas con pesos realistas; el vencimiento va del 80 % al 160 % del tiempo de resolución de la prioridad.
+  - Lo resuelto y lo cerrado tiene fecha de resolución, nunca en el futuro.
   - Las asignaciones van solo a personas que atienden incidentes.
 - **Siempre los mismos datos:** usa una semilla fija, así cada máquina obtiene el mismo resultado.
 - **Rápido:** inserta por lotes de 1.000 sin Eloquent. 100.000 incidentes tardan unos 20 segundos.

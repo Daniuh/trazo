@@ -64,6 +64,20 @@ Inter Variable, autoalojada (sin servicios de terceros), con tres pesos: 400, 50
 
 Escala de 4 px (`$space-1` a `$space-7`: 4, 8, 12, 16, 24, 32 y 48). Radios de 8 px en controles, 10 px en tarjetas y redondo completo en etiquetas. El área táctil mínima es de 44 px (`$touch-target`).
 
+### Dashboard y gráficos
+
+| Token | Valor | Uso |
+|---|---|---|
+| `$dashboard-row-height` | 4,5 rem | Alto de una fila de la grilla de 12 columnas (portátil y monitor) |
+| `$chart-bar-height` | 0,625 rem | Grosor de las barras horizontales |
+| `$chart-label-width` | 7 rem | Columna de nombres en las barras |
+| `$chart-donut-size` | 8 rem | Diámetro de la dona |
+| `$chart-columns-height` | 8 rem | Alto de las columnas de la tendencia |
+
+## Accesibilidad
+
+`accessibility.scss` reúne las utilidades compartidas. `@include visually-hidden` oculta un texto a la vista y lo deja para los lectores de pantalla (etiquetas de campos que ya se entienden por su contenido, tablas de datos de los gráficos). Es la única definición: ningún componente repite esas reglas.
+
 ## Conexión con Quasar
 
 `src/design/theme/quasar-variables.scss` asigna los tokens a las variables de Quasar (`$primary`, `$negative`, tipografía, radios y breakpoints). No define valores propios: si cambia un token, Quasar cambia con él. `global.scss` aplica la fuente, el fondo, el foco visible y la preferencia de reducir movimiento.

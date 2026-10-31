@@ -16,8 +16,17 @@ export const ClientErrorCode = {
   Network: 'NETWORK_ERROR',
   Timeout: 'TIMEOUT',
   Canceled: 'REQUEST_CANCELED',
+  // El servidor de Trazo no contestó y respondió el que está delante (gateway): 502 o 504 sin cuerpo de la API
+  ServerUnreachable: 'SERVER_UNREACHABLE',
   Unknown: 'UNKNOWN_ERROR',
 } as const
+
+// Respuestas que no traen el formato de error de la API, según su estado HTTP
+const STATUS_WITHOUT_BODY: Record<number, string> = {
+  502: ClientErrorCode.ServerUnreachable,
+  503: 'SERVICE_UNAVAILABLE',
+  504: ClientErrorCode.ServerUnreachable,
+}
 
 interface ProblemBody {
   code?: string
@@ -72,10 +81,12 @@ export function toApiError(error: unknown): ApiError {
   const response = error.response
   if (!response) return new ApiError('network', ClientErrorCode.Network)
 
-  const body = (response.data ?? {}) as ProblemBody
+  // Una página HTML del gateway llega como texto: solo un objeto puede traer el código de la API
+  const body = (typeof response.data === 'object' && response.data !== null ? response.data : {}) as ProblemBody
   const retryAfter = Number(response.headers['retry-after'])
+  const code = body.code ?? STATUS_WITHOUT_BODY[response.status] ?? ClientErrorCode.Unknown
 
-  return new ApiError('http', body.code ?? ClientErrorCode.Unknown, {
+  return new ApiError('http', code, {
     status: response.status,
     params: body.params,
     fieldErrors: body.errors,

@@ -1,0 +1,12 @@
+// Utilidades de accesibilidad compartidas por los componentes.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+// Oculta un texto a la vista pero lo deja para los lectores de pantalla
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

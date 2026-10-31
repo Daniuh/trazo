@@ -12,6 +12,8 @@ x-laravel-dev: &laravel-dev
     LOG_LEVEL: debug
   volumes:
     - ./backend:/var/www/html
+    # Las dependencias viven en un volumen de Docker: leerlas desde la carpeta de Windows hace lento cada arranque de PHP
+    - vendor:/var/www/html/vendor
     - app-key:/run/trazo
 
 services:
@@ -65,3 +67,6 @@ services:
     deploy:
       resources:
         limits: { cpus: "0.25", memory: 128M }
+
+volumes:
+  vendor: {}

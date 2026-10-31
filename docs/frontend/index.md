@@ -22,7 +22,7 @@ frontend/src/
 │   ├── layout/          → estructura común (encabezado, menú, contenido)
 │   ├── navigation.ts    → reúne el menú de todos los módulos
 │   └── pages/           → páginas globales (404 y guía visual en desarrollo)
-├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth e incidents)
+├── modules/<módulo>/    → una carpeta por funcionalidad (hoy: auth, incidents y dashboard)
 │   ├── domain/          → tipos y reglas puras
 │   ├── application/     → casos de uso (composables y stores)
 │   ├── infrastructure/  → repositorios de la API y mappers
@@ -65,6 +65,7 @@ Desde `frontend/` (o dentro del contenedor):
 - [Cliente HTTP y errores](http-y-errores.md)
 - [Módulo de sesión](auth.md)
 - [Módulo de incidentes](incidents.md)
+- [Módulo de dashboard](dashboard.md)
 - Sistema de diseño: [tokens](sistema-de-diseno/tokens.md), [responsive](sistema-de-diseno/responsive.md), [componentes](sistema-de-diseno/componentes.md), [íconos](sistema-de-diseno/iconos.md), [marca](sistema-de-diseno/marca.md) y [layout](sistema-de-diseno/layout.md)
 - Decisiones: [ADR-0003](../decisiones/0003-frontend-modular.md), [ADR-0039](../decisiones/0039-quasar-como-plugin-de-vite.md) y [ADR-0040](../decisiones/0040-axios.md)
 
