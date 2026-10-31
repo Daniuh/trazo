@@ -20,6 +20,7 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | `IncidentCatalogSeeder` | Prioridades, estados, transiciones y tipos de actividad | Todos |
 | `AccessControlSeeder` | Roles, permisos y la matriz inicial | Todos |
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
+| `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
 
 ## Usuarios de demostración
 
@@ -32,7 +33,21 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 
 La contraseña de todos es `Trazo.Demo.2026` (variable `DEMO_USER_PASSWORD`), que cumple la política de 12 o más caracteres. Si un usuario ya existe, el seeder no cambia su contraseña.
 
-Los incidentes de prueba (500 o más, con volumen configurable) se agregan junto con el módulo de incidentes.
+## Incidentes de demostración
+
+`IncidentVolumeSeeder` carga **600 incidentes** por defecto (la prueba pide al menos 500). El volumen se cambia con la variable `SEED_INCIDENTS`, y nunca se cargan en producción.
+
+- **Idempotente:** completa hasta llegar al volumen pedido. Si ya hay 600 o más, no hace nada.
+- **Datos coherentes y en español:**
+  - Estados y prioridades repartidos con pesos realistas.
+  - Lo pendiente nace dentro de su ventana de resolución, así que solo una parte queda vencida (cerca de un tercio).
+  - Lo resuelto y lo cerrado tiene fecha de resolución.
+  - Las asignaciones van solo a personas que atienden incidentes.
+- **Siempre los mismos datos:** usa una semilla fija, así cada máquina obtiene el mismo resultado.
+- **Rápido:** inserta por lotes de 1.000 sin Eloquent. 100.000 incidentes tardan unos 20 segundos.
+- Cada incidente tiene su registro "creado" en el historial y su código `INC-000123`.
+
+En las pruebas automáticas el volumen es 0: cada prueba crea los incidentes que necesita.
 
 ## Dónde está en el código
 

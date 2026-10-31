@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-// Endpoints de incidentes: crear, ver, editar, eliminar y restaurar. Cada uno delega en su caso de uso.
+// Endpoints de incidentes: listar, crear, ver, editar, eliminar y restaurar. Cada uno delega en su caso de uso.
 // Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http;
 
 use App\Modules\Incidents\Application\CreateIncident;
+use App\Modules\Incidents\Application\Data\IncidentRecord;
 use App\Modules\Incidents\Application\DeleteIncident;
 use App\Modules\Incidents\Application\IncidentGate;
+use App\Modules\Incidents\Application\ListIncidents;
 use App\Modules\Incidents\Application\UpdateIncident;
 use App\Modules\Incidents\Domain\IncidentAction;
 use App\Modules\Incidents\Http\Requests\IncidentRequest;
+use App\Modules\Incidents\Http\Requests\ListIncidentsRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,6 +26,17 @@ final readonly class IncidentController
         private RequestActor $requests,
         private IncidentResource $resource,
     ) {}
+
+    public function index(ListIncidentsRequest $request, ListIncidents $list): JsonResponse
+    {
+        $actor = $this->requests->actor($request);
+        $page = $list->handle($actor, $request->criteria());
+
+        return new JsonResponse([
+            'data' => array_map(fn (IncidentRecord $incident): array => $this->resource->summary($incident, $actor), $page->items),
+            'meta' => ['page' => $page->page, 'per_page' => $page->perPage, 'total' => $page->total, 'last_page' => $page->lastPage()],
+        ]);
+    }
 
     public function store(IncidentRequest $request, CreateIncident $create): JsonResponse
     {

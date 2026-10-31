@@ -9,6 +9,9 @@ return [
     // Contraseña de los usuarios de demostración (solo fuera de producción). Cumple la política de 12+ caracteres.
     'demo_user_password' => env('DEMO_USER_PASSWORD', 'Trazo.Demo.2026'),
 
+    // Incidentes de demostración que se cargan fuera de producción (la prueba pide al menos 500)
+    'seed_incidents' => (int) env('SEED_INCIDENTS', 600),
+
     'auth' => [
         // Una sesión sin uso durante este tiempo se cierra sola
         'idle_minutes' => (int) env('SESSION_IDLE_MINUTES', 60),

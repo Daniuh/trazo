@@ -109,11 +109,11 @@ it('tiene los índices pensados para filtros, orden y búsqueda', function (): v
 
     expect($indexes->values()->all())->toContain(
         'status_id,priority_id',
-        'status_id,due_date',
+        'status_id,due_date,deleted_at',
         'assigned_to,status_id',
         'priority_id',
         'created_by',
-        'due_date',
+        'due_date,deleted_at',
         'created_at',
         'title,description',
     );

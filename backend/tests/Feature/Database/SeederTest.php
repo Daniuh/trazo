@@ -9,6 +9,7 @@ use App\Modules\Users\Infrastructure\Models\Role;
 use App\Modules\Users\Infrastructure\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoUserSeeder;
+use Database\Seeders\IncidentVolumeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -91,4 +92,20 @@ it('volver a sembrar no gasta valores del autoincremental de los catálogos', fu
 
     // Si el seeder hubiera intentado insertar filas existentes, el siguiente id habría saltado
     expect($next())->toBe($before + 1);
+});
+
+it('carga el volumen de incidentes pedido, coherente y sin duplicar al repetir', function (): void {
+    config(['trazo.seed_incidents' => 60]);
+
+    $this->seed(IncidentVolumeSeeder::class);
+    $this->seed(IncidentVolumeSeeder::class);
+
+    $incidents = DB::table('incidents')->join('statuses', 'statuses.id', '=', 'incidents.status_id')
+        ->get(['incidents.code', 'incidents.resolved_at', 'statuses.code as status']);
+
+    expect($incidents)->toHaveCount(60)
+        ->and($incidents->pluck('code')->every(fn (string $code): bool => preg_match('/^INC-\d{6}$/', $code) === 1))->toBeTrue()
+        ->and($incidents->whereIn('status', ['resolved', 'closed'])->whereNull('resolved_at'))->toBeEmpty()
+        ->and($incidents->whereIn('status', ['open', 'in_progress', 'on_hold'])->whereNotNull('resolved_at'))->toBeEmpty()
+        ->and(DB::table('incident_activities')->count())->toBe(60);
 });

@@ -17,6 +17,7 @@ Gestiona el ciclo de vida de los incidentes. **Todas las reglas viven aquí:** q
 |---|---|---|---|
 | `GET` | `/catalogs` | Prioridades y estados con sus transiciones (con `ETag`) | Sesión |
 | `GET` | `/incidents/assignees` | Personas a las que se puede asignar | `incidents.assign` |
+| `GET` | `/incidents` | Listado paginado, con orden, búsqueda y filtros (ver abajo) | Sesión; cada persona ve lo suyo |
 | `POST` | `/incidents` | Crear (acepta `Idempotency-Key`) | `incidents.create` |
 | `GET` | `/incidents/{id}` | Detalle con `actions` y `next_statuses` | Verlo |
 | `PUT` | `/incidents/{id}` | Editar título, descripción, prioridad y vencimiento | Ver la tabla de reglas |
@@ -55,6 +56,33 @@ Todas las rutas van bajo `/api/v1` y exigen sesión. `{id}` es el ULID del incid
 - **`actions`** indica qué puede hacer esta persona con este incidente, ahora. El front muestra u oculta botones solo con esto.
 - **`next_statuses`** son los estados a los que esta persona puede llevarlo. Si no puede cambiar el estado, viene vacío.
 - **`is_overdue`** se calcula en el back: el estado es pendiente y el vencimiento ya pasó.
+
+## Listado
+
+```
+GET /api/v1/incidents?page=2&per_page=20&sort=-due_date&search=impresora
+    &filter[status]=open,in_progress&filter[priority]=high,critical
+    &filter[assignee]=none,01m5…&filter[creator]=01m5…
+    &filter[created_from]=2026-10-01T00:00:00Z&filter[due_to]=2026-10-31T23:59:59Z
+    &filter[overdue]=1&filter[deleted]=1
+```
+
+| Parámetro | Detalle |
+|---|---|
+| `page`, `per_page` | Página (desde 1) y tamaño: 20 por defecto, máximo 100 |
+| `sort` | `created_at` (por defecto, descendente), `due_date`, `updated_at`, `priority`, `status` o `code`. Con `-` delante, descendente. Siempre se desempata por id |
+| `search` | Al menos una palabra de 3 letras; cada palabra es obligatoria y se busca por prefijo en el título y la descripción. Un código (`INC-123`) se busca exacto |
+| `filter[status]`, `filter[priority]` | Códigos del catálogo, separados por comas |
+| `filter[assignee]` | ULIDs separados por comas; `none` agrega "sin asignar" |
+| `filter[creator]` | ULID de quien lo reportó |
+| `filter[created_from]`, `filter[created_to]`, `filter[due_from]`, `filter[due_to]` | Fechas ISO 8601 (inclusive) |
+| `filter[overdue]` | `1`: solo pendientes con el vencimiento pasado |
+| `filter[deleted]` | `1`: solo eliminados. Requiere `incidents.restore` (si no, 403) |
+
+- **Respuesta:** `data` trae una versión liviana de cada incidente (sin descripción ni estados siguientes, pero con `actions` e `is_overdue`). `meta` trae `page`, `per_page`, `total` y `last_page`.
+- **Errores de validación:** `OUT_OF_RANGE` (tamaño de página), `INVALID_OPTION` (orden), `SEARCH_TOO_SHORT` (búsqueda) e `INVALID_REFERENCE` (código de catálogo inexistente).
+- **Visibilidad:** la misma regla del detalle (`VisibilityScope`), aplicada en SQL; una prueba compara ambos resultados para cada persona. Ver [ADR-0044](../decisiones/0044-listado-de-incidentes.md).
+- **Rendimiento:** todo responde en menos de 100 ms con 100.000 incidentes; ver [Rendimiento del listado](../base-de-datos/rendimiento.md).
 
 ## Reglas de acceso
 
@@ -122,9 +150,9 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 
 | Capa | Piezas |
 |---|---|
-| Domain | `IncidentAccess` (quién puede qué), `IncidentRules` (vencimiento, vencido, resolución), `Actor`, `IncidentState`, `StatusFlags`, `Denial`, `IncidentExceptions` |
-| Application | Casos de uso `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `RequestContext`); puertos |
-| Infrastructure | `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `LaravelSupport` (hora y transacciones), `IncidentServiceProvider` |
+| Domain | `IncidentAccess` (quién puede qué), `VisibilityScope` (qué ve cada uno), `IncidentSort`, `IncidentRules` (vencimiento, vencido, resolución), `Actor`, `IncidentState`, `StatusFlags`, `Denial`, `IncidentExceptions` |
+| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `RequestContext`); puertos |
+| Infrastructure | `EloquentIncidentList` e `IncidentFilters` (listado), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `LaravelSupport` (hora y transacciones), `IncidentServiceProvider` |
 | Http | `IncidentController`, `IncidentWorkflowController`, `CatalogController`, `IncidentRequest`, `WorkflowRequest`, `IncidentResource`, `RequestActor` |
 
 ## Dónde está en el código
@@ -133,4 +161,4 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 - [`backend/app/Modules/Users/Infrastructure/UserPermissions.php`](../../backend/app/Modules/Users/Infrastructure/UserPermissions.php): permisos efectivos de una persona.
 - Pruebas: [`tests/Unit/Incidents/`](../../backend/tests/Unit/Incidents/) y [`tests/Feature/Incidents/`](../../backend/tests/Feature/Incidents/)
 - Tablas: [incidents](../base-de-datos/diccionario/incidents.md), [incident_activities](../base-de-datos/diccionario/incident-activities.md) y [catálogos](../base-de-datos/diccionario/catalogos.md)
-- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0021](../decisiones/0021-permisos-granulares.md), [ADR-0037](../decisiones/0037-idempotencia.md) y [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md)
+- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0021](../decisiones/0021-permisos-granulares.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md) y [ADR-0044](../decisiones/0044-listado-de-incidentes.md)
