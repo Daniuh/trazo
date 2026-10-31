@@ -118,6 +118,8 @@ Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; n
 | Esta persona no puede recibir incidentes… | La persona elegida se desactivó o su rol ya no atiende incidentes | Elegir a otra persona de la lista |
 | Tu incidente se está creando… | El mismo envío llegó dos veces muy seguidas | Esperar unos segundos; no se crea duplicado |
 | No pudimos confirmar el envío… / No pudimos procesar el envío… | Problema con la clave de idempotencia (poco habitual) | Recargar la página e intentarlo de nuevo |
+| Con estos filtros salen 60.000 incidentes y el máximo por archivo es 50.000… | La exportación pasa del tope de filas | Acotar los filtros (por ejemplo, un rango de fechas) y exportar por partes |
+| Hiciste demasiados intentos seguidos. Espera… (al exportar) | Más de 5 exportaciones en un minuto | Esperar el tiempo indicado |
 
 ## Dashboard
 

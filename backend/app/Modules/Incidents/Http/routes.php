@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::prefix('incidents')->group(function (): void {
         // Va antes de {incident} para que "assignees" no se lea como un identificador
         Route::get('assignees', [CatalogController::class, 'assignees']);
+        Route::get('export', [IncidentController::class, 'export'])->middleware('throttle:export');
 
         Route::get('/', [IncidentController::class, 'index']);
         Route::post('/', [IncidentController::class, 'store'])->middleware(EnsureIdempotency::class);

@@ -154,3 +154,17 @@ describe('cliente HTTP', () => {
     expect(requests).toHaveLength(3)
   })
 })
+
+describe('descargas', () => {
+  it('lee el error que llega como archivo para conservar el código de la API', async () => {
+    const body = new Blob([JSON.stringify({ code: 'EXPORT_TOO_LARGE', params: { total: 60000, max: 50000 } })], {
+      type: 'application/problem+json',
+    })
+    const { client } = setup({ status: 422, data: body })
+
+    const error = (await client.get('/incidents/export', { responseType: 'blob' }).catch((e: unknown) => e)) as ApiError
+
+    expect(error.code).toBe('EXPORT_TOO_LARGE')
+    expect(error.params).toEqual({ total: 60000, max: 50000 })
+  })
+})

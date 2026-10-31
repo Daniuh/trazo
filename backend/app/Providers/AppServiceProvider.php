@@ -7,8 +7,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Modules\Shared\Application\Ports\AdminLog;
 use App\Modules\Shared\Application\Ports\Clock;
 use App\Modules\Shared\Application\Ports\Transaction;
+use App\Modules\Shared\Infrastructure\DatabaseAdminLog;
 use App\Modules\Shared\Infrastructure\LaravelSupport;
 use App\Modules\Users\Infrastructure\UserPermissions;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -28,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Los permisos de cada usuario se consultan una sola vez por petición, aunque varios módulos los pidan
         $this->app->scoped(UserPermissions::class);
+        // Los tipos de acción se leen una vez por petición; registran la administración y la exportación
+        $this->app->scoped(AdminLog::class, DatabaseAdminLog::class);
     }
 
     public function boot(): void

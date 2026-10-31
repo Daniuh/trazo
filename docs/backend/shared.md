@@ -64,8 +64,22 @@ Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay se
 | `Transaction` | Application | Varias escrituras como una sola: o se guardan todas o ninguna |
 | `RequestContext` | Application | Desde dónde se hizo un cambio (IP y navegador), para los registros de auditoría |
 | `LaravelSupport` | Infrastructure | Implementa `Clock` y `Transaction` sobre Laravel; se conecta en `AppServiceProvider` |
+| `AdminLog`, `AdminActionType` | Application | Registro de acciones administrativas en `admin_actions`, con su tipo del catálogo |
+| `DatabaseAdminLog` | Infrastructure | Implementa `AdminLog`; lee los tipos una vez por petición |
+| `SessionSignals` | Application | Avisa en vivo que la sesión de alguien cambió ([Realtime](realtime.md)) |
 
-Vivían en el módulo de incidentes; al necesitarlos también Usuarios y el Dashboard, se movieron aquí para que ningún módulo dependa de otro por algo tan general.
+`Clock`, `Transaction` y `RequestContext` vivían en el módulo de incidentes; al necesitarlos también Usuarios y el Dashboard, se movieron aquí para que ningún módulo dependa de otro por algo tan general. `AdminLog` vivía en Usuarios y se movió cuando la exportación de incidentes también tuvo que dejar constancia ([ADR-0058](../decisiones/0058-exportacion-en-la-practica.md)); la fase de sistema registrará ahí sus acciones.
+
+## Descarga en CSV
+
+`CsvDownload` (capa Http) arma una descarga en CSV que se escribe por partes, sin juntar las filas en memoria:
+
+- UTF-8 con BOM y punto y coma como separador, para que el Excel en español la abra bien.
+- Celdas entre comillas solo cuando hace falta, y líneas terminadas en `\r\n`.
+- `CsvDownload::cell` neutraliza la inyección de fórmulas: si una celda empieza por `=`, `+`, `-`, `@`, tabulador o salto de línea, le antepone un apóstrofo.
+- Sin caché (`Cache-Control: no-store`).
+
+La usa la [exportación de incidentes](incidents.md#exportación); cada módulo decide sus columnas y su formato.
 
 ## Dónde está en el código
 
@@ -74,5 +88,6 @@ Vivían en el módulo de incidentes; al necesitarlos también Usuarios y el Dash
 - [`Http/Errors/ValidationErrorFormatter.php`](../../backend/app/Modules/Shared/Http/Errors/ValidationErrorFormatter.php): reglas de validación a códigos.
 - [`Http/Middleware/AssignRequestId.php`](../../backend/app/Modules/Shared/Http/Middleware/AssignRequestId.php) y [`ForceJsonResponse.php`](../../backend/app/Modules/Shared/Http/Middleware/ForceJsonResponse.php).
 - [`Domain/EmailAddress.php`](../../backend/app/Modules/Shared/Domain/EmailAddress.php) y [`app/Providers/AppServiceProvider.php`](../../backend/app/Providers/AppServiceProvider.php).
-- [`Application/Ports/`](../../backend/app/Modules/Shared/Application/Ports/), [`Application/Data/RequestContext.php`](../../backend/app/Modules/Shared/Application/Data/RequestContext.php) y [`Infrastructure/LaravelSupport.php`](../../backend/app/Modules/Shared/Infrastructure/LaravelSupport.php).
+- [`Application/Ports/`](../../backend/app/Modules/Shared/Application/Ports/), [`Application/Data/RequestContext.php`](../../backend/app/Modules/Shared/Application/Data/RequestContext.php), [`Application/AdminActionType.php`](../../backend/app/Modules/Shared/Application/AdminActionType.php), [`Infrastructure/LaravelSupport.php`](../../backend/app/Modules/Shared/Infrastructure/LaravelSupport.php) y [`Infrastructure/DatabaseAdminLog.php`](../../backend/app/Modules/Shared/Infrastructure/DatabaseAdminLog.php).
+- [`Http/CsvDownload.php`](../../backend/app/Modules/Shared/Http/CsvDownload.php): descarga en CSV.
 - Pruebas: [`tests/Feature/Shared/`](../../backend/tests/Feature/Shared/).

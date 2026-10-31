@@ -36,6 +36,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 |---|---|
 | Comentarios en incidentes | Conversación sobre cada caso |
 | Exportación `.xlsx` nativa | Formato con estilos para Excel |
+| Exportaciones grandes en segundo plano | Superar el tope de 50.000 filas: el archivo se arma en la cola y se avisa cuando está listo ([ADR-0058](../decisiones/0058-exportacion-en-la-practica.md)) |
+| Exportar la auditoría | Llevar los registros a otra herramienta; requiere decidir qué hacer con la IP y el navegador |
 | Modo oscuro | Los tokens ya lo permiten |
 | Internacionalización | Los mensajes ya viven en un catálogo único |
 | Atajos de teclado | Mayor velocidad para usuarios frecuentes |

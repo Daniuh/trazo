@@ -132,3 +132,37 @@ describe('textos de los cambios', () => {
     ])
   })
 })
+
+describe('exportaciones', () => {
+  const withPeople = { ...catalog, people: [{ id: 'p1', name: 'Laura Gómez' }] }
+
+  it('muestra cuántas filas salieron y con qué filtros', () => {
+    const entry = adminEntry('incidents_exported', {
+      rows: 1234,
+      criteria: {
+        search: 'impresora',
+        status: [{ code: 'open', name: 'Abierto' }],
+        assignee: ['p1'],
+        unassigned: true,
+        overdue: true,
+      },
+    })
+
+    expect(changeRows(entry, withPeople)).toEqual([
+      { label: 'Filas exportadas', value: '1.234' },
+      { label: 'Búsqueda', value: '«impresora»' },
+      { label: 'Estado', value: 'Abierto' },
+      { label: 'Asignado a', value: 'Laura Gómez, Sin asignar' },
+      { label: 'Solo vencidos', value: 'Sí' },
+    ])
+    expect(changeSummary(entry, withPeople)).toBe('Filas exportadas: 1.234 (+4)')
+    expect(targetText(entry)).toBe('Incidentes')
+  })
+
+  it('aclara cuando se exportó sin filtros', () => {
+    expect(changeRows(adminEntry('incidents_exported', { rows: 3, criteria: [] }), catalog)).toEqual([
+      { label: 'Filas exportadas', value: '3' },
+      { label: 'Filtros', value: 'Ninguno: todo lo que la persona podía ver' },
+    ])
+  })
+})

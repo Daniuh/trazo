@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Endpoints de incidentes: listar, crear, ver, editar, eliminar y restaurar. Cada uno delega en su caso de uso.
+// Endpoints de incidentes: listar, exportar, crear, ver, editar, eliminar y restaurar. Cada uno delega en su caso de uso.
 // Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http;
@@ -10,6 +10,7 @@ namespace App\Modules\Incidents\Http;
 use App\Modules\Incidents\Application\CreateIncident;
 use App\Modules\Incidents\Application\Data\IncidentRecord;
 use App\Modules\Incidents\Application\DeleteIncident;
+use App\Modules\Incidents\Application\ExportIncidents;
 use App\Modules\Incidents\Application\IncidentGate;
 use App\Modules\Incidents\Application\ListIncidents;
 use App\Modules\Incidents\Application\UpdateIncident;
@@ -19,6 +20,7 @@ use App\Modules\Incidents\Http\Requests\ListIncidentsRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final readonly class IncidentController
 {
@@ -36,6 +38,12 @@ final readonly class IncidentController
             'data' => array_map(fn (IncidentRecord $incident): array => $this->resource->summary($incident, $actor), $page->items),
             'meta' => ['page' => $page->page, 'per_page' => $page->perPage, 'total' => $page->total, 'last_page' => $page->lastPage()],
         ]);
+    }
+
+    // Mismos filtros, búsqueda y orden del listado; la página no aplica
+    public function export(ListIncidentsRequest $request, ExportIncidents $export, IncidentCsv $csv): StreamedResponse
+    {
+        return $csv->download($export->handle($this->requests->actor($request), $request->criteria(), $this->requests->context($request)));
     }
 
     public function store(IncidentRequest $request, CreateIncident $create): JsonResponse

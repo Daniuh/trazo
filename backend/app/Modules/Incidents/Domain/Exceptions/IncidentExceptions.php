@@ -36,6 +36,12 @@ final class IncidentExceptions
         return new ConflictException('INVALID_STATUS_TRANSITION', ['from' => $from, 'to' => $to]);
     }
 
+    // La exportación pasa del tope: hay que acotar los filtros
+    public static function exportTooLarge(int $total, int $max): RuleViolationException
+    {
+        return new RuleViolationException('EXPORT_TOO_LARGE', ['total' => $total, 'max' => $max]);
+    }
+
     public static function invalidAssignee(): RuleViolationException
     {
         return new RuleViolationException('INVALID_ASSIGNEE');

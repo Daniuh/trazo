@@ -62,4 +62,12 @@ return [
         'workload_limit' => 8,
     ],
 
+    // Exportación de incidentes en CSV. Documentado en docs/backend/incidents.md
+    'export' => [
+        // Más filas que esto se rechazan: hay que acotar los filtros
+        'max_rows' => (int) env('EXPORT_MAX_ROWS', 50000),
+        // Filas que se leen de la base por cada bloque mientras se escribe el archivo
+        'chunk_size' => 1000,
+    ],
+
 ];

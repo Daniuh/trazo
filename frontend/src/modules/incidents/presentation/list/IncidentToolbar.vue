@@ -1,11 +1,15 @@
-<!-- Barra del listado. Portátil y monitor: búsqueda, estado, prioridad, asignado y "Más filtros".
-     Celular y tablet: búsqueda, "Filtros (n)" (abre el panel) y "Ordenar por". Documentado en docs/frontend/incidents.md -->
+<!-- Barra del listado. Portátil y monitor: búsqueda, estado, prioridad, asignado, "Más filtros" y "Exportar" (solo el ícono en portátil).
+     Celular y tablet: búsqueda, "Filtros (n)" (abre el panel), "Ordenar por" y ⋯ con "Exportar CSV".
+     Exportar solo aparece con el permiso. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { QMenu } from 'quasar'
 import { computed, ref, watch } from 'vue'
+import AppActionMenu from '@/shared/ui/AppActionMenu.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
+import AppIcon from '@/shared/ui/AppIcon.vue'
 import AppSelect from '@/shared/ui/form/AppSelect.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
+import type { MenuItem } from '@/shared/ui/menu'
 import { useViewport } from '@/shared/ui/useViewport'
 import type { FilterOption } from '../../application/useListFilterOptions'
 import {
@@ -29,11 +33,15 @@ const props = defineProps<{
   assignees: FilterOption[]
   myId: string | null
   canSeeDeleted: boolean
+  // Exportar: solo con el permiso; sin resultados queda desactivado
+  canExport: boolean
+  exporting: boolean
+  total: number
   countFor: (draft: ListCriteria) => Promise<number | null>
 }>()
-const emit = defineEmits<{ change: [changes: Partial<ListCriteria>] }>()
+const emit = defineEmits<{ change: [changes: Partial<ListCriteria>]; export: [] }>()
 
-const { isLaptopUp } = useViewport()
+const { isLaptopUp, isDesktop } = useViewport()
 const sheetOpen = ref(false)
 const search = ref(props.criteria.search)
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -66,6 +74,15 @@ const sortModel = computed({
     emit('change', { sort: raw.replace(/^-/, '') as SortField, descending: raw.startsWith('-') })
   },
 })
+
+const exportItems = computed<MenuItem[]>(() => [
+  {
+    key: 'export',
+    label: props.exporting ? 'Exportando…' : 'Exportar CSV',
+    icon: 'download',
+    disabled: props.total === 0 || props.exporting,
+  },
+])
 
 function applySheet(draft: ListCriteria): void {
   emit('change', draft)
@@ -107,13 +124,31 @@ function applySheet(draft: ListCriteria): void {
           </div>
         </QMenu>
       </AppButton>
+      <!-- En portátil no cabe con texto en la misma fila: queda el ícono, con su nombre para lectores y al pasar el cursor -->
+      <AppButton
+        v-if="canExport"
+        class="incident-toolbar__more"
+        variant="secondary"
+        icon="download"
+        :loading="exporting"
+        :disabled="total === 0"
+        :aria-label="isDesktop ? undefined : 'Exportar'"
+        :title="isDesktop ? undefined : 'Exportar CSV'"
+        @click="emit('export')"
+      >
+        <template v-if="isDesktop">{{ exporting ? 'Exportando…' : 'Exportar' }}</template>
+      </AppButton>
     </template>
 
-    <div v-else class="incident-toolbar__compact">
+    <div v-else class="incident-toolbar__compact" :class="{ 'incident-toolbar__compact--menu': canExport }">
       <AppButton variant="secondary" icon="filter" @click="sheetOpen = true">
         Filtros{{ filterCount > 0 ? ` (${filterCount})` : '' }}
       </AppButton>
       <AppSelect v-model="sortModel" class="incident-toolbar__sort" label="Ordenar por" :options="SORT_CHOICES" />
+      <AppButton v-if="canExport" variant="secondary" :loading="exporting" aria-label="Más opciones del listado">
+        <AppIcon v-if="!exporting" name="more" />
+        <AppActionMenu :items="exportItems" label="Más opciones del listado" align="right" @select="emit('export')" />
+      </AppButton>
       <IncidentFiltersSheet
         v-model:open="sheetOpen"
         :criteria="criteria"
@@ -149,6 +184,11 @@ function applySheet(draft: ListCriteria): void {
   grid-template-columns: auto 1fr;
   align-items: end;
   gap: $space-2;
+}
+
+// Con el menú ⋯ (exportar) al final de la fila
+.incident-toolbar__compact--menu {
+  grid-template-columns: auto 1fr auto;
 }
 
 // La etiqueta "Ordenar por" queda para lectores de pantalla; el texto del selector ya lo explica

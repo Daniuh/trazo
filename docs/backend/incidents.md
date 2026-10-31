@@ -18,6 +18,7 @@ Gestiona el ciclo de vida de los incidentes. **Todas las reglas viven aquí:** q
 | `GET` | `/catalogs` | Prioridades y estados con sus transiciones (con `ETag`) | Sesión |
 | `GET` | `/incidents/assignees` | Personas a las que se puede asignar: cuentas activas con el permiso `incidents.status.assigned`, por su rol o concedido a la persona ([permisos por persona](users.md#permisos-por-persona)) | `incidents.assign` |
 | `GET` | `/incidents` | Listado paginado, con orden, búsqueda y filtros (ver abajo) | Sesión; cada persona ve lo suyo |
+| `GET` | `/incidents/export` | Lo mismo del listado, sin página, en un archivo CSV ([Exportación](#exportación)) | `incidents.export`; 5 por minuto |
 | `POST` | `/incidents` | Crear (acepta `Idempotency-Key`) | `incidents.create` |
 | `GET` | `/incidents/{id}` | Detalle con `actions` y `next_statuses` | Verlo |
 | `PUT` | `/incidents/{id}` | Editar título, descripción, prioridad y vencimiento | Ver la tabla de reglas |
@@ -84,6 +85,21 @@ GET /api/v1/incidents?page=2&per_page=20&sort=-due_date&search=impresora
 - **Visibilidad:** la misma regla del detalle (`VisibilityScope`), aplicada en SQL; una prueba compara ambos resultados para cada persona. Ver [ADR-0044](../decisiones/0044-listado-de-incidentes.md).
 - **Rendimiento:** validado con `EXPLAIN` sobre 100.000 incidentes. La mayoría de los escenarios responde en menos de 100 ms; los dos que pueden superarlo con la máquina cargada están anotados en [Rendimiento](../base-de-datos/rendimiento.md).
 
+## Exportación
+
+`GET /api/v1/incidents/export` recibe los mismos parámetros del listado (salvo `page` y `per_page`) y responde un archivo CSV que se va escribiendo por partes. Detalles y alternativas en el [ADR-0058](../decisiones/0058-exportacion-en-la-practica.md).
+
+- **Quién:** con `incidents.export` (Supervisor y Super admin, o concedido a la persona). Para exportar eliminados también hace falta `incidents.restore`. Lo que sale es exactamente lo que la persona ve en el listado con esos filtros, en el mismo orden.
+- **Tope:** 50.000 filas (`EXPORT_MAX_ROWS`). Se cuentan antes de empezar; si se pasa, responde 422 `EXPORT_TOO_LARGE` con `params.total` y `params.max`.
+- **Límite:** 5 exportaciones por minuto por persona (`throttle:export`), además del general de la API.
+- **Archivo:** `incidentes-AAAA-MM-DD-HHMM.csv` (hora del negocio), `text/csv; charset=UTF-8`, sin caché.
+  - UTF-8 con BOM y punto y coma como separador, para que el Excel en español lo abra en columnas y con tildes.
+  - Columnas: Código, Título, Estado, Prioridad, Creado por, Asignado a ("Sin asignar" si nadie), Creado, Vencimiento, Resuelto (vacío si no) y Vencido (Sí/No). La descripción no va.
+  - Fechas `AAAA-MM-DD HH:MM` en `BUSINESS_TIMEZONE`, con el desfase en el encabezado: "Creado (UTC-05:00)".
+  - Una celda que empiece por `=`, `+`, `-`, `@`, tabulador o salto de línea lleva un apóstrofo delante: Excel la muestra como texto en lugar de ejecutarla.
+- **Registro:** cada exportación queda en `admin_actions` (tipo `incidents_exported`) con el número de filas y los filtros usados, y aparece en [Auditoría](audit.md). Se anota al pedirla, antes de escribir el archivo.
+- **Memoria:** las filas se leen en bloques de 1.000 (`trazo.export.chunk_size`) con solo las columnas del archivo. Medido en el Docker local con 50.000 filas: 7,9 MB en 2,1 s, con el proceso estable en 28 MB (2 MB más que en reposo); con 100.000 filas el pico es el mismo.
+
 ## Reglas de acceso
 
 | Acción | Quién | Además |
@@ -139,6 +155,7 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 | `VERSION_CONFLICT` | 409 | Otra persona guardó un cambio desde que lo abrió |
 | `INVALID_ASSIGNEE` | 422 | La persona no existe, está inactiva o no atiende incidentes |
 | `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_IN_PROGRESS` | 409 | Ver [Idempotencia](../api/idempotencia.md) |
+| `EXPORT_TOO_LARGE` | 422 | La exportación pasa del tope de filas (`params.total`, `params.max`) |
 
 ## Rendimiento
 
@@ -151,9 +168,9 @@ Los nombres se guardan tal como estaban en ese momento, para que el historial se
 | Capa | Piezas |
 |---|---|
 | Domain | `IncidentAccess` (quién puede qué), `VisibilityScope` (qué ve cada uno), `IncidentSort`, `IncidentRules` (vencimiento, vencido, resolución), `Actor`, `IncidentState`, `StatusFlags`, `Denial`, `IncidentExceptions` |
-| Application | Casos de uso `ListIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`); evento `IncidentChanged`; puertos |
-| Infrastructure | `EloquentIncidentList`, `IncidentFilters` y `VisibilitySql` (listado y visibilidad en SQL), `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `IncidentServiceProvider`. La hora y las transacciones vienen de [Shared](shared.md#puertos-que-comparten-los-módulos) |
-| Http | `IncidentController`, `IncidentWorkflowController`, `CatalogController`, `IncidentRequest`, `WorkflowRequest`, `IncidentResource`, `RequestActor` |
+| Application | Casos de uso `ListIncidents`, `ExportIncidents`, `CreateIncident`, `UpdateIncident`, `ChangeIncidentStatus`, `AssignIncident`, `DeleteIncident` (eliminar y restaurar); `IncidentGate` (carga y autoriza); datos (`IncidentRecord`, `IncidentInput`, `Person`, `PriorityInfo`, `IncidentExport`, `IncidentExportRow`); evento `IncidentChanged`; puertos (entre ellos `IncidentExportQuery`) |
+| Infrastructure | `EloquentIncidentList`, `EloquentIncidentExport`, `IncidentFilters` (visibilidad, filtros y orden que comparten el listado y la exportación) y `VisibilitySql`, `EloquentIncidentRepository`, `IncidentMapper`, `EloquentIncidentCatalog`, `EloquentAssigneeDirectory`, `EloquentActivityLog`, `EloquentActivityReader`, `IncidentServiceProvider`. La hora y las transacciones vienen de [Shared](shared.md#puertos-que-comparten-los-módulos) |
+| Http | `IncidentController`, `IncidentWorkflowController`, `CatalogController`, `IncidentRequest`, `WorkflowRequest`, `IncidentResource`, `IncidentCsv` (forma del archivo exportado), `RequestActor` |
 
 ## Aviso de cambios
 
@@ -161,7 +178,7 @@ Cada escritura del repositorio (crear, editar, cambiar de estado, asignar, elimi
 
 ## Visibilidad en SQL
 
-`VisibilitySql` es la traducción a SQL de `VisibilityScope`. La usan el listado y el dashboard, así ambos cuentan exactamente lo mismo.
+`VisibilitySql` es la traducción a SQL de `VisibilityScope`. La usan el listado, la exportación y el dashboard, así todos cuentan exactamente lo mismo.
 
 ## Dónde está en el código
 
@@ -169,4 +186,5 @@ Cada escritura del repositorio (crear, editar, cambiar de estado, asignar, elimi
 - [`backend/app/Modules/Users/Infrastructure/UserPermissions.php`](../../backend/app/Modules/Users/Infrastructure/UserPermissions.php): permisos efectivos de una persona.
 - Pruebas: [`tests/Unit/Incidents/`](../../backend/tests/Unit/Incidents/) y [`tests/Feature/Incidents/`](../../backend/tests/Feature/Incidents/)
 - Tablas: [incidents](../base-de-datos/diccionario/incidents.md), [incident_activities](../base-de-datos/diccionario/incident-activities.md) y [catálogos](../base-de-datos/diccionario/catalogos.md)
-- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0021](../decisiones/0021-permisos-granulares.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md) y [ADR-0044](../decisiones/0044-listado-de-incidentes.md)
+- Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0021](../decisiones/0021-permisos-granulares.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md), [ADR-0044](../decisiones/0044-listado-de-incidentes.md) y [ADR-0058](../decisiones/0058-exportacion-en-la-practica.md)
+- Exportación: [`ExportIncidents`](../../backend/app/Modules/Incidents/Application/ExportIncidents.php), [`EloquentIncidentExport`](../../backend/app/Modules/Incidents/Infrastructure/EloquentIncidentExport.php), [`IncidentCsv`](../../backend/app/Modules/Incidents/Http/IncidentCsv.php) y [`CsvDownload`](../../backend/app/Modules/Shared/Http/CsvDownload.php); pruebas en [`ExportIncidentsTest.php`](../../backend/tests/Feature/Incidents/ExportIncidentsTest.php)

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-// Registro de lo que hace la administración (tabla admin_actions). Documentado en docs/backend/users.md
+// Registro de lo que hace la administración (tabla admin_actions). Documentado en docs/backend/shared.md
 
-namespace App\Modules\Users\Application\Ports;
+namespace App\Modules\Shared\Application\Ports;
 
+use App\Modules\Shared\Application\AdminActionType;
 use App\Modules\Shared\Application\Data\RequestContext;
-use App\Modules\Users\Application\AdminActionType;
 
 interface AdminLog
 {

@@ -57,6 +57,8 @@ Cualquier falla llega a la app con la misma forma, sin importar si vino de la AP
 
 Si la respuesta no trae el formato de error de la API (por ejemplo, una página HTML del gateway porque la API está caída), el código sale del estado: 502 y 504 dan `SERVER_UNREACHABLE` y 503 da `SERVICE_UNAVAILABLE`. Así la persona ve un mensaje claro en lugar de uno genérico.
 
+**Descargas.** Una petición con `responseType: 'blob'` (la exportación) recibe también el error como archivo. Antes de armar el `ApiError`, el cliente lee ese archivo si es JSON, y así se conserva el código de la API (`EXPORT_TOO_LARGE`, `TOO_MANY_REQUESTS`…). El archivo bueno se guarda con `saveFile` (`shared/download/saveFile.ts`), con el nombre que propone el servidor en `Content-Disposition` (`filenameFrom`). Con el token en la cabecera no sirve un enlace directo, y un token en la URL quedaría en el historial y en los logs.
+
 ## Sesión vencida
 
 Solo el código `UNAUTHENTICATED` cierra la sesión en el navegador. Un 401 con otro código, como `INVALID_CREDENTIALS` en el login, lo maneja la pantalla que hizo la petición. Si no fuera así, una contraseña mal escrita se trataría como una sesión vencida.
@@ -69,7 +71,7 @@ Solo el código `UNAUTHENTICATED` cierra la sesión en el navegador. Un 401 con 
 - `fieldMessageFor(fieldError)` / `fieldMessagesFor(error)`: mensaje junto a cada campo del formulario.
 - `registerErrorMessages({...})`: registra códigos de negocio. Cada módulo los declara en `modules/<módulo>/errors.ts` y el arranque de la app los registra solos.
 
-Las plantillas pueden usar `{traceId}` (código de soporte) y `{wait}`, la espera de `Retry-After` en texto natural ("30 segundos", "5 minutos", "1 hora").
+Las plantillas pueden usar `{traceId}` (código de soporte) y `{wait}`, la espera de `Retry-After` en texto natural ("30 segundos", "5 minutos", "1 hora"). Cualquier otro parámetro numérico se muestra con separador de miles ("50.000").
 
 Los mensajes de campo no repiten el nombre del campo porque se muestran a su lado. Un código desconocido nunca deja la pantalla en blanco: muestra un mensaje útil con el código de soporte. La lista completa de mensajes está en el [catálogo de errores](../soporte/catalogo-de-errores.md).
 
@@ -95,5 +97,6 @@ La usan los listados de incidentes y de usuarios.
 - [`shared/http/apiError.ts`](../../frontend/src/shared/http/apiError.ts): normalización de errores.
 - [`shared/http/tokenStore.ts`](../../frontend/src/shared/http/tokenStore.ts) y [`events.ts`](../../frontend/src/shared/http/events.ts).
 - [`shared/errors/`](../../frontend/src/shared/errors/): catálogo, mensajes y `formatWait`.
+- [`shared/download/saveFile.ts`](../../frontend/src/shared/download/saveFile.ts): guardar un archivo descargado.
 - [`shared/listing/useRouteList.ts`](../../frontend/src/shared/listing/useRouteList.ts), [`shared/listing/useCursorList.ts`](../../frontend/src/shared/listing/useCursorList.ts), [`shared/routing/queryValues.ts`](../../frontend/src/shared/routing/queryValues.ts) y [`shared/validation/email.ts`](../../frontend/src/shared/validation/email.ts).
 - Pruebas: archivos `*.spec.ts` junto a cada uno.

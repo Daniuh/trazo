@@ -26,6 +26,7 @@ class AdminActionTypeSeeder extends Seeder
         'role_created' => 'Rol creado',
         'role_updated' => 'Rol editado',
         'role_deleted' => 'Rol eliminado',
+        'incidents_exported' => 'Incidentes exportados',
     ];
 
     public function run(): void
