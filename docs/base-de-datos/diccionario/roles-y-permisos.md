@@ -20,7 +20,8 @@ El control de acceso es propio, sin relaciones polimórficas. El código siempre
 | `id` | SMALLINT UNSIGNED | PK | |
 | `code` | VARCHAR(60) | UNIQUE, NOT NULL | `requester`, `agent`, `supervisor`, `admin`, `super_admin` |
 | `name` | VARCHAR(80) | NOT NULL | Nombre visible |
-| `level` | TINYINT UNSIGNED | NOT NULL, CHECK `BETWEEN 1 AND 100` | Nivel en la jerarquía: solo se administra a quien tiene un nivel menor. 100 es la cima (Super admin) |
+| `level` | TINYINT UNSIGNED | NOT NULL, UNIQUE, CHECK `BETWEEN 1 AND 100` | Nivel en la jerarquía: solo se administra a quien tiene un nivel menor. 100 es la cima (Super admin). Único, para que el orden nunca sea ambiguo |
+| `is_system` | BOOLEAN | NOT NULL, por defecto `false` | Uno de los cinco roles base: no se elimina (sí se edita) |
 | `created_at`, `updated_at` | TIMESTAMP | | |
 
 ## permissions
@@ -81,11 +82,11 @@ PK `(user_id, permission_id)`, e índices en `permission_id` y `granted_by`. Una
 | `system.logs.view`, `system.health.view`, `system.actions.execute` | | | | | ✓ |
 | **Nivel** | 20 | 40 | 60 | 80 | 100 |
 
-Es la matriz con la que nace cada rol. Después la administración la puede ajustar, y volver a sembrar no la revierte ([ADR-0054](../../decisiones/0054-matriz-de-permisos-no-destructiva.md)).
+Es la matriz con la que nace cada rol base. Después la administración la puede ajustar desde la pantalla de roles (y crear roles nuevos entre los niveles), y volver a sembrar no la revierte ([ADR-0054](../../decisiones/0054-matriz-de-permisos-no-destructiva.md)).
 
 ## Dónde está en el código
 
-- Migraciones: [`000002`](../../../backend/database/migrations/2026_10_21_000002_create_roles_table.php) a [`000005`](../../../backend/database/migrations/2026_10_21_000005_create_user_role_table.php), [`000023` (nivel)](../../../backend/database/migrations/2026_10_24_000023_add_level_to_roles.php), [`000025` (user_permissions)](../../../backend/database/migrations/2026_10_24_000025_create_user_permissions_table.php) y [`000028` (quita `users.manage`)](../../../backend/database/migrations/2026_10_24_000028_remove_users_manage_permission.php)
+- Migraciones: [`000002`](../../../backend/database/migrations/2026_10_21_000002_create_roles_table.php) a [`000005`](../../../backend/database/migrations/2026_10_21_000005_create_user_role_table.php), [`000023` (nivel)](../../../backend/database/migrations/2026_10_24_000023_add_level_to_roles.php), [`000025` (user_permissions)](../../../backend/database/migrations/2026_10_24_000025_create_user_permissions_table.php), [`000028` (quita `users.manage`)](../../../backend/database/migrations/2026_10_24_000028_remove_users_manage_permission.php) y [`000029` (roles de sistema y nivel único)](../../../backend/database/migrations/2026_10_24_000029_add_is_system_and_unique_level_to_roles.php)
 - Modelos: [`Role.php`](../../../backend/app/Modules/Users/Infrastructure/Models/Role.php) y [`Permission.php`](../../../backend/app/Modules/Users/Infrastructure/Models/Permission.php)
 - Permisos efectivos: [`UserPermissions.php`](../../../backend/app/Modules/Users/Infrastructure/UserPermissions.php) y [`PermissionSql.php`](../../../backend/app/Modules/Users/Infrastructure/PermissionSql.php)
 - Matriz: [`AccessControlSeeder.php`](../../../backend/database/seeders/AccessControlSeeder.php)

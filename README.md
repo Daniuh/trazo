@@ -61,7 +61,7 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 
 | Correo | Rol | Qué puede hacer |
 |---|---|---|
-| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera y, cuando estén listas, auditoría y sistema |
+| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera, crear y editar roles y, cuando estén listas, auditoría y sistema |
 | `admin@trazo.test` | Administrador | Crear y administrar a las personas por debajo de su nivel: datos, rol, permisos por persona, activar y desactivar. Ve la auditoría y sus propios incidentes |
 | `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado y ver el resumen general |
 | `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
@@ -94,6 +94,12 @@ En el menú **Usuarios** (Super admin y Administrador):
 - **Jerarquía:** cada quien administra solo a las personas por debajo de su rol. El Administrador no toca a otro Administrador ni al Super admin.
 - **Permisos por persona:** en la ficha de cada persona, "Editar permisos" concede uno adicional o quita uno de su rol, sin crear roles nuevos.
 - **Acciones delicadas:** dar un rol o un permiso de administración, o restablecer la verificación en dos pasos o el acceso de alguien, piden el código de **tu** aplicación de autenticación. Por eso, quien administra debe tenerla activa.
+
+En el menú **Roles** (Super admin):
+
+- **Crear un rol:** código (no cambia después), nombre, nivel único entre 1 y 99, permisos (se pueden copiar de otro rol) y si exige la verificación en dos pasos.
+- **Editar:** los cambios aplican de inmediato a todas las personas con ese rol; antes de guardar se muestra a cuántas afecta. El rol Super admin no se edita.
+- **Eliminar:** solo un rol creado que nadie tenga. Los cinco roles base no se eliminan.
 
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 

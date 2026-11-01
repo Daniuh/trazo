@@ -40,7 +40,7 @@ backend/
 | Auth | Login, sesión, MFA y recuperación y cambio de contraseña listos | [Auth](auth.md) |
 | Incidents | CRUD, estados, asignación, historial y listado listos | [Incidents](incidents.md) |
 | Dashboard | Widgets, métricas y diseño por persona listos | [Dashboard](dashboard.md) |
-| Users | Administración de personas, jerarquía y permisos por persona listos; edición de roles pendiente | [Users](users.md) |
+| Users | Administración de personas y de roles, jerarquía y permisos por persona listos | [Users](users.md) |
 | System | Pendiente | — |
 
 ## Cómo se agrega un módulo

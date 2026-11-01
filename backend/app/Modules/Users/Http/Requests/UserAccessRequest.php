@@ -25,7 +25,7 @@ final class UserAccessRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = ['code' => ['nullable', 'string', 'digits:6']];
+        $rules = ['mfa_code' => ['nullable', 'string', 'digits:6']];
 
         return match ($this->route()?->getName()) {
             'users.role' => [...$rules, 'role' => ['required', 'string', Rule::exists('roles', 'code')]],
@@ -51,8 +51,8 @@ final class UserAccessRequest extends FormRequest
         return array_values(array_map('strval', (array) $this->input('permissions', [])));
     }
 
-    public function code(): ?string
+    public function mfaCode(): ?string
     {
-        return $this->filled('code') ? $this->string('code')->toString() : null;
+        return $this->filled('mfa_code') ? $this->string('mfa_code')->toString() : null;
     }
 }

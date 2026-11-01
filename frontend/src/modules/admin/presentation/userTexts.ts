@@ -44,3 +44,12 @@ export const USER_SORT_CHOICES: { label: string; value: string }[] = [
   { label: 'Ingresaron hace poco', value: '-last_login_at' },
   { label: 'Creadas hace poco', value: '-created_at' },
 ]
+
+// "Obligatoria · 1 de gracia" (ingresos en que se puede posponer) u "Opcional"
+export function mfaPolicyText(policy: { required: boolean; graceLogins: number }): string {
+  if (!policy.required) return 'Opcional'
+  if (policy.graceLogins === 0) return 'Obligatoria'
+  return `Obligatoria · ${policy.graceLogins} de gracia`
+}
+
+export const membersText = (members: number) => (members === 1 ? '1 persona' : `${members} personas`)

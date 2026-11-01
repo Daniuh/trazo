@@ -23,6 +23,9 @@ class AdminActionTypeSeeder extends Seeder
         'user_permissions_changed' => 'Permisos de usuario cambiados',
         'user_mfa_reset' => 'Verificación en dos pasos restablecida',
         'user_access_reset' => 'Acceso de usuario restablecido',
+        'role_created' => 'Rol creado',
+        'role_updated' => 'Rol editado',
+        'role_deleted' => 'Rol eliminado',
     ];
 
     public function run(): void

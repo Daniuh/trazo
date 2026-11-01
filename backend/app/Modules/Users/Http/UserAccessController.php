@@ -29,14 +29,14 @@ final readonly class UserAccessController
     {
         $admin = $this->requests->admin($request);
 
-        return $this->respond($change->handle($admin, $user, $request->role(), $request->code(), $this->requests->context($request)), $admin);
+        return $this->respond($change->handle($admin, $user, $request->role(), $request->mfaCode(), $this->requests->context($request)), $admin);
     }
 
     public function permissions(UserAccessRequest $request, string $user, ChangeUserPermissions $change): JsonResponse
     {
         $admin = $this->requests->admin($request);
 
-        return $this->respond($change->handle($admin, $user, $request->permissions(), $request->code(), $this->requests->context($request)), $admin);
+        return $this->respond($change->handle($admin, $user, $request->permissions(), $request->mfaCode(), $this->requests->context($request)), $admin);
     }
 
     public function activate(UserAccessRequest $request, string $user, ChangeUserStatus $change): JsonResponse
@@ -57,14 +57,14 @@ final readonly class UserAccessController
     {
         $admin = $this->requests->admin($request);
 
-        return $this->respond($reset->resetMfa($admin, $user, $request->code(), $this->requests->context($request)), $admin);
+        return $this->respond($reset->resetMfa($admin, $user, $request->mfaCode(), $this->requests->context($request)), $admin);
     }
 
     public function resetAccess(UserAccessRequest $request, string $user, ResetUserAccess $reset): JsonResponse
     {
         $admin = $this->requests->admin($request);
 
-        return $this->respond($reset->resetAccess($admin, $user, $request->code(), $this->requests->context($request)), $admin);
+        return $this->respond($reset->resetAccess($admin, $user, $request->mfaCode(), $this->requests->context($request)), $admin);
     }
 
     private function respond(UserRecord $user, Administrator $admin): JsonResponse

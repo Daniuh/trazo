@@ -21,6 +21,15 @@ const messages: MessageCatalog = {
   REAUTHENTICATION_UNAVAILABLE:
     'Para hacer este cambio necesitas tener activa la verificación en dos pasos. Actívala desde Mi cuenta y vuelve a intentarlo.',
   REAUTHENTICATION_LOCKED: 'Escribiste varios códigos incorrectos seguidos. Espera {wait} y vuelve a intentarlo.',
+
+  // Roles
+  ROLE_OUTRANKED: 'Este rol está en tu nivel o por encima, así que no lo puedes cambiar.',
+  ROLE_LOCKED: 'El rol Super admin tiene siempre todos los permisos, así que no se edita ni se elimina.',
+  ROLE_SYSTEM: 'Este es uno de los roles base de Trazo, así que no se puede eliminar. Sí puedes editarlo.',
+  ROLE_IN_USE: 'Hay personas con este rol. Cámbiales el rol antes de eliminarlo.',
+  ROLE_LEVEL_NOT_ALLOWED: 'Elige un nivel por debajo del tuyo: como máximo {max}.',
+  ROLE_CODE_FORMAT:
+    'Usa solo letras minúsculas sin tildes, números y guion bajo, empezando por una letra (por ejemplo, soporte_n2).',
 }
 
 export default messages

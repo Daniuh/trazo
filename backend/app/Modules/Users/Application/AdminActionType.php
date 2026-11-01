@@ -17,4 +17,7 @@ enum AdminActionType: string
     case UserPermissionsChanged = 'user_permissions_changed';
     case UserMfaReset = 'user_mfa_reset';
     case UserAccessReset = 'user_access_reset';
+    case RoleCreated = 'role_created';
+    case RoleUpdated = 'role_updated';
+    case RoleDeleted = 'role_deleted';
 }

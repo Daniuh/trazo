@@ -48,7 +48,7 @@ final class UserRequest extends FormRequest
             'name' => ['required', 'string', 'min:2', 'max:120'],
             'email' => ['required', 'string', 'email:rfc', 'max:191', $unique],
             'role' => $creating ? ['required', 'string', Rule::exists('roles', 'code')] : ['prohibited'],
-            'code' => $creating ? ['nullable', 'string', 'digits:6'] : ['prohibited'],
+            'mfa_code' => $creating ? ['nullable', 'string', 'digits:6'] : ['prohibited'],
         ];
     }
 
@@ -67,8 +67,8 @@ final class UserRequest extends FormRequest
         return $this->string('email')->toString();
     }
 
-    public function code(): ?string
+    public function mfaCode(): ?string
     {
-        return $this->filled('code') ? $this->string('code')->toString() : null;
+        return $this->filled('mfa_code') ? $this->string('mfa_code')->toString() : null;
     }
 }

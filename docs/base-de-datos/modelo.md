@@ -53,7 +53,9 @@ Toda referencia es una clave foránea real; no hay relaciones polimórficas. La 
 | `user_role.role_id`, `role_permission.permission_id` | RESTRICT | No se borra un rol o permiso en uso |
 | `user_permissions.user_id` → `users` | CASCADE | La excepción es parte de la cuenta |
 | `user_permissions.permission_id`, `user_permissions.granted_by` | RESTRICT | No se borra un permiso en uso ni a quien dio la excepción |
-| `admin_actions` → `users`, `admin_action_types`, `roles` | RESTRICT | El registro de la administración es inmutable |
+| `admin_actions` → `users`, `admin_action_types` | RESTRICT | El registro de la administración es inmutable |
+| `admin_actions.target_role_id` → `roles` | SET NULL | Un rol creado se puede eliminar; su historial queda sin enlace, con el código y el nombre en el detalle |
+| `mfa_policies.role_id` → `roles` | CASCADE | La política es parte del rol |
 
 Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`BIGINT`, `SMALLINT` o `TINYINT` sin signo).
 

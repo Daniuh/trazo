@@ -56,6 +56,13 @@ export async function signInAs(page: Page, email: string): Promise<void> {
   await page.addInitScript(([key, value]) => window.sessionStorage.setItem(key, value), [SESSION_KEY, token] as const)
 }
 
+// Cabecera para llamar a la API como esa persona (después de signInAs), p. ej. para limpiar datos de una prueba
+export function authHeaderOf(email: string): Record<string, string> {
+  const token = tokens.get(email)
+  if (!token) throw new Error(`${email} todavía no inició sesión en esta prueba`)
+  return { Authorization: `Bearer ${token}` }
+}
+
 // Después de enviar el formulario de login: termina el segundo paso como lo haría la persona en la pantalla
 export async function completeMfa(page: Page, email: string): Promise<void> {
   await page.waitForURL((url) => url.pathname !== '/ingresar')

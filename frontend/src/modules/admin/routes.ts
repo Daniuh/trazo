@@ -17,6 +17,17 @@ const routes: RouteRecordRaw[] = [
     name: 'user-detail',
     component: () => import('./presentation/UserDetailPage.vue'),
   },
+  { path: 'administracion/roles', name: 'roles', component: () => import('./presentation/RoleListPage.vue') },
+  {
+    path: 'administracion/roles/nuevo',
+    name: 'role-create',
+    component: () => import('./presentation/RoleFormPage.vue'),
+  },
+  {
+    path: 'administracion/roles/:code',
+    name: 'role-detail',
+    component: () => import('./presentation/RoleFormPage.vue'),
+  },
 ]
 
 export default routes

@@ -18,7 +18,7 @@ Catálogo de tipos de acción.
 | Columna | Tipo | Restricciones | Descripción |
 |---|---|---|---|
 | `id` | TINYINT UNSIGNED | PK | |
-| `code` | VARCHAR(40) | UNIQUE, NOT NULL | `user_created`, `user_updated`, `user_activated`, `user_deactivated`, `user_role_changed`, `user_permissions_changed`, `user_mfa_reset`, `user_access_reset` |
+| `code` | VARCHAR(40) | UNIQUE, NOT NULL | `user_created`, `user_updated`, `user_activated`, `user_deactivated`, `user_role_changed`, `user_permissions_changed`, `user_mfa_reset`, `user_access_reset`, `role_created`, `role_updated`, `role_deleted` |
 | `name` | VARCHAR(80) | NOT NULL | Nombre visible |
 | `created_at`, `updated_at` | TIMESTAMP | | |
 
@@ -30,7 +30,7 @@ Catálogo de tipos de acción.
 | `user_id` | BIGINT UNSIGNED | FK → `users.id`, RESTRICT | Quien hizo la acción |
 | `admin_action_type_id` | TINYINT UNSIGNED | FK → `admin_action_types.id`, RESTRICT | Qué hizo |
 | `target_user_id` | BIGINT UNSIGNED | NULL, FK → `users.id`, RESTRICT | Persona afectada, si la hay |
-| `target_role_id` | SMALLINT UNSIGNED | NULL, FK → `roles.id`, RESTRICT | Rol afectado, si lo hay (edición de roles) |
+| `target_role_id` | SMALLINT UNSIGNED | NULL, FK → `roles.id`, SET NULL | Rol afectado, si lo hay. Al eliminar un rol su historial queda sin enlace; el código y el nombre siguen en `details` |
 | `details` | JSON | NULL | Lo que cambió, con sus valores anteriores y nuevos (p. ej. `{"role": {"from": "agent", "to": "supervisor"}}`) |
 | `ip_address` | VARCHAR(45) | NULL | Desde dónde (alcanza para IPv6) |
 | `user_agent` | VARCHAR(255) | NULL | Navegador |
@@ -47,7 +47,7 @@ Catálogo de tipos de acción.
 
 ## Dónde está en el código
 
-- Migraciones: [`000026`](../../../backend/database/migrations/2026_10_24_000026_create_admin_action_types_table.php) y [`000027`](../../../backend/database/migrations/2026_10_24_000027_create_admin_actions_table.php)
+- Migraciones: [`000026`](../../../backend/database/migrations/2026_10_24_000026_create_admin_action_types_table.php), [`000027`](../../../backend/database/migrations/2026_10_24_000027_create_admin_actions_table.php) y [`000030` (SET NULL al eliminar un rol)](../../../backend/database/migrations/2026_10_24_000030_null_role_in_admin_actions_on_delete.php)
 - Catálogo: [`AdminActionTypeSeeder.php`](../../../backend/database/seeders/AdminActionTypeSeeder.php)
 - Escritura: [`DatabaseAdminLog.php`](../../../backend/app/Modules/Users/Infrastructure/DatabaseAdminLog.php)
 - Explicación funcional: [Módulo Users](../../backend/users.md)

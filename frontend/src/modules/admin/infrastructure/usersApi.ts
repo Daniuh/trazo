@@ -103,7 +103,7 @@ export function toListParams(criteria: UserListCriteria): Record<string, string 
 }
 
 // El código de quien administra solo viaja si se pidió
-const withCode = <T extends object>(body: T, code?: string) => (code ? { ...body, code } : body)
+export const withCode = <T extends object>(body: T, code?: string) => (code ? { ...body, mfa_code: code } : body)
 
 export const usersApi = {
   async list(criteria: UserListCriteria, signal?: AbortSignal): Promise<UserPage> {
