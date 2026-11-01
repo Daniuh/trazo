@@ -65,7 +65,7 @@ flowchart LR
 | `docker-compose.yml` | Base común a todos los entornos |
 | `docker-compose.override.yml` | Local: se carga solo. Agrega Mailpit y los perfiles opcionales `zap` y `docs`, sin cambiar las imágenes. |
 | `docker-compose.dev.yml` | Modo desarrollo, opcional: monta el código, usa Vite y trae las herramientas de prueba ([Dos modos](#dos-modos)). |
-| `docker-compose.prod.yml` | Despliegue (se agrega en la fase de despliegue) |
+| `docker-compose.prod.yml` | Despliegue: secretos obligatorios, sin puertos y detrás del proxy del servidor ([despliegue](despliegue.md)) |
 | `docker/php/` | Imagen de Laravel, configuración de PHP-FPM, arranque y healthcheck |
 | `docker/frontend/` | Imagen del frontend y su servidor estático |
 | `docker/nginx/` | Configuración del gateway y cabeceras de seguridad |
