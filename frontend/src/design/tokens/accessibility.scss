@@ -1,0 +1,18 @@
+// Utilidades de accesibilidad compartidas por los componentes.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+// Oculta un texto a la vista pero lo deja para los lectores de pantalla
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// El enlace "Saltar al contenido" queda sobre el encabezado de Quasar (z-index 2000) y bajo sus diálogos (6000)
+$z-skip-link: 3000;
+
+// El dock flota sobre el contenido al nivel del encabezado: menús, paneles y avisos quedan por encima
+$z-dock: 2000;

@@ -9,7 +9,7 @@ order: 46
 # ADR-0036: Exportación en CSV
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Se menciona como deseable la exportación a Excel o CSV.
@@ -29,3 +29,6 @@ CSV generado en streaming:
 
 ## Consecuencias
 - Exportar grandes volúmenes no carga la memoria del servidor.
+
+## Cómo se construyó
+Los detalles (tope de filas, separador, columnas, protección contra fórmulas y registro en la auditoría) están en el [ADR-0058](0058-exportacion-en-la-practica.md).

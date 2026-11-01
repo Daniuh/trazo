@@ -1,5 +1,25 @@
 # Hooks de Git: revisiones rápidas antes de cada commit. El CI corre la validación completa.
-# Cada app agrega aquí sus comandos (formato y lint) a medida que se crea.
+# Pint corre en un contenedor de un solo uso con la imagen de desarrollo (la final no trae Pint), sea cual sea el modo
+# del stack. Necesita que el modo desarrollo se haya levantado al menos una vez (dependencias en el volumen trazo_vendor).
+# Documentado en docs/operacion/flujo-de-trabajo.md
+
+pre-commit:
+  commands:
+    backend-format:
+      root: backend/
+      glob: "*.php"
+      run: docker compose -p trazo -f ../docker-compose.yml -f ../docker-compose.override.yml -f ../docker-compose.dev.yml run --rm --no-deps -T app vendor/bin/pint --test {staged_files}
+    frontend-lint:
+      root: frontend/
+      glob: "*.{ts,vue,js}"
+      run: npx eslint {staged_files} && npx prettier --check {staged_files}
+    frontend-styles:
+      root: frontend/
+      glob: "*.{scss,vue}"
+      run: npx stylelint {staged_files}
+    # El repositorio es público: ningún secreto debe llegar ni siquiera al historial local
+    secrets:
+      run: node scripts/git/scan-secrets.mjs
 
 commit-msg:
   commands:

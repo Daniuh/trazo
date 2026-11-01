@@ -1,0 +1,48 @@
+# Extras locales (se cargan solos con `docker compose up`): el buzón de correo de prueba y las herramientas opcionales.
+# Las imágenes son las mismas que verá quien use Trazo; el modo desarrollo está en docker-compose.dev.yml.
+# Documentado en docs/operacion/docker.md
+
+services:
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    ports:
+      - "${TRAZO_MAIL_UI_PORT:-8025}:8025"
+    networks: [edge]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 128M }
+
+  # Escaneo de seguridad con OWASP ZAP. Perfil opcional: "docker compose up -d" no lo levanta. Se corre a mano, solo
+  # contra el stack local; los reportes quedan en ./zap-reports (fuera de Git). Documentado en docs/seguridad/zap.md
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:2.16.1
+    profiles: [zap]
+    working_dir: /zap/wrk
+    volumes:
+      - ./zap-reports:/zap/wrk:rw
+      - ./docs/api/openapi.json:/zap/openapi.json:ro
+      - ./docker/zap:/zap/config:ro
+    networks: [edge]
+    depends_on:
+      gateway: { condition: service_healthy }
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 2G }
+
+  # Documentación de funciones del backend con phpDocumentor (imagen oficial: como dependencia de Composer chocaría con
+  # las de Laravel). Perfil opcional y sin red; lee el código y escribe en ./docs-build (fuera de Git).
+  # Documentado en docs/backend/index.md
+  phpdoc:
+    image: phpdoc/phpdoc:3.10.0
+    profiles: [docs]
+    working_dir: /data/backend
+    command: ["--config", "phpdoc.dist.xml", "--no-interaction"]
+    volumes:
+      - ./backend/app:/data/backend/app:ro
+      - ./backend/phpdoc.dist.xml:/data/backend/phpdoc.dist.xml:ro
+      - ./docs-build:/data/docs-build
+    network_mode: none
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1G }

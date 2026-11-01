@@ -1,0 +1,12 @@
+# Análisis estático (Larastan). Nivel 8: tipos estrictos, nulos y retornos verificados.
+# Documentado en docs/calidad/estrategia-de-pruebas.md
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - app
+        - bootstrap/app.php
+        - routes
+    tmpDir: storage/framework/cache/phpstan

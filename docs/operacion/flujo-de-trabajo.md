@@ -43,7 +43,14 @@ Tipos permitidos: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `b
 
 ## Hooks locales
 
-Al instalar las dependencias de la raíz (`npm install`) se activan los hooks de [Lefthook](https://lefthook.dev). Hoy validan el formato del mensaje de commit; cada app suma sus revisiones de formato y lint a medida que se construye.
+Al instalar las dependencias de la raíz (`npm install`) se activan los hooks de [Lefthook](https://lefthook.dev). Revisan solo lo que cambió, para que sean rápidos; la validación completa la hace el [CI](integracion-continua.md).
+
+| Hook | Qué revisa |
+|---|---|
+| `pre-commit` | Formato del PHP modificado (Pint, dentro del contenedor), ESLint, Prettier y Stylelint del frontend, y secretos con Gitleaks |
+| `commit-msg` | Formato Conventional Commits del mensaje |
+
+Los hooks del backend y de secretos usan Docker, así que el stack o al menos Docker Desktop deben estar encendidos.
 
 ## Versiones
 
@@ -51,7 +58,7 @@ Cada llegada a `main` se etiqueta con [SemVer](https://semver.org/lang/es/) y el
 
 ## Dónde está en el código
 
-- [`lefthook.yml`](../../lefthook.yml): hooks configurados.
+- [`lefthook.yml`](../../lefthook.yml): hooks configurados, y [`scripts/git/scan-secrets.mjs`](../../scripts/git/scan-secrets.mjs) para los secretos.
 - [`scripts/git/check-commit-msg.mjs`](../../scripts/git/check-commit-msg.mjs): validación del mensaje de commit.
 - [`.github/pull_request_template.md`](../../.github/pull_request_template.md): checklist de cada PR.
 - Decisión: [ADR-0033](../decisiones/0033-flujo-git.md).

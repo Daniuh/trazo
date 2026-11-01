@@ -1,0 +1,74 @@
+// Estilos globales mínimos: fuente, fondo suave y foco visible. Todo lo demás vive en cada componente.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+@use '../tokens' as *;
+
+// Al llevar algo a la vista (foco con Tab, enlaces), el navegador deja libre el dock: nada enfocado queda tapado
+// (WCAG 2.4.11)
+html {
+  font-family: $font-family;
+  font-size: 100%;
+  scroll-padding-bottom: $dock-clearance-mobile;
+
+  @include tablet {
+    scroll-padding-bottom: $dock-clearance;
+  }
+}
+
+body {
+  background: $color-page;
+  color: $color-text;
+  font-size: $font-size-md;
+  line-height: $line-height-base;
+  -webkit-font-smoothing: antialiased;
+}
+
+// Foco visible solo con teclado, nunca al hacer clic
+:focus-visible {
+  outline: 2px solid $color-focus;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+// Notificaciones de Quasar con el estilo de Trazo (fondo oscuro, texto blanco)
+.app-notify {
+  border-radius: $radius-control;
+  background: $color-text;
+  color: $color-on-dark;
+  font-size: $font-size-sm;
+}
+
+.app-notify--error {
+  background: $color-danger;
+}
+
+// Nombres al pasar el cursor (dock, cuenta): fondo oscuro con texto blanco y letra legible. El gris de Quasar con
+// 10 px no llega al contraste AA
+.q-tooltip {
+  border-radius: $radius-control;
+  background: $color-text;
+  color: $color-on-dark;
+  font-size: $font-size-xs;
+}
+
+// Menús desplegables de Quasar: superficie suave, borde y sombra de elemento flotante (nunca blanco puro)
+.q-menu {
+  border: 1px solid $color-border;
+  border-radius: $radius-menu;
+  background: $color-surface;
+  box-shadow: $shadow-overlay;
+}
+
+// Paneles (AppSheet y el panel de AppPopupField): Quasar deja 24 px alrededor de los diálogos; los paneles van de
+// borde a borde, de arriba abajo desde la derecha y a todo lo ancho desde abajo
+.app-popup-sheet .q-dialog__inner {
+  padding: 0;
+}

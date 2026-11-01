@@ -1,0 +1,123 @@
+<!-- Pantalla de inicio de sesión, dentro del marco de las pantallas sin sesión (AuthPanel). -->
+<!-- La validación aquí es solo visual: quien decide es la API. Documentado en docs/frontend/auth.md -->
+<script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
+import { ApiError, toApiError } from '@/shared/http'
+import AppButton from '@/shared/ui/AppButton.vue'
+import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
+import AppTextField from '@/shared/ui/form/AppTextField.vue'
+import { looksLikeEmail } from '@/shared/validation/email'
+import { PASSWORD_CHANGED_REASON, SESSION_EXPIRED_REASON } from '../application/authGuard'
+import { useSessionStore } from '../application/useSessionStore'
+import { safeRedirect } from '../domain/safeRedirect'
+import type { LoginStep } from '../domain/session'
+import AuthPanel from './AuthPanel.vue'
+
+const route = useRoute()
+const router = useRouter()
+const session = useSessionStore()
+
+const form = reactive({ email: '', password: '' })
+const fieldErrors = ref<Record<string, string>>({})
+const formError = ref<string | null>(null)
+const submitting = ref(false)
+
+const sessionExpired = computed(() => route.query.motivo === SESSION_EXPIRED_REASON && !formError.value)
+const expiredMessage = messageFor(new ApiError('http', 'UNAUTHENTICATED'))
+const passwordChanged = computed(() => route.query.motivo === PASSWORD_CHANGED_REASON && !formError.value)
+
+// Revisión rápida antes de enviar, para no esperar a la API por un campo vacío
+function localErrors(): Record<string, string> {
+  const errors: Record<string, string> = {}
+  if (!form.email.trim()) errors.email = fieldMessageFor({ code: 'REQUIRED' })
+  else if (!looksLikeEmail(form.email.trim())) errors.email = fieldMessageFor({ code: 'INVALID_EMAIL' })
+  if (!form.password) errors.password = fieldMessageFor({ code: 'REQUIRED' })
+  return errors
+}
+
+// Después de la contraseña: entrar, o pasar al segundo paso del MFA (verificar o configurarlo)
+function nextRoute(step: LoginStep): RouteLocationRaw {
+  const volver = safeRedirect(route.query.volver)
+  const keep = volver ? { volver } : {}
+  if (step === 'mfa_verify') return { name: 'mfa-verify', query: keep }
+  if (step === 'mfa_setup') return { name: 'mfa-setup', query: keep }
+  if (step === 'setup_suggested') return { name: 'mfa-setup', query: { ...keep, sugerido: '1' } }
+  return volver ?? { name: 'home' }
+}
+
+async function submit(): Promise<void> {
+  // Un segundo Enter mientras se espera la respuesta no debe contar como otro intento
+  if (submitting.value) return
+  formError.value = null
+  fieldErrors.value = localErrors()
+  if (Object.keys(fieldErrors.value).length > 0) return
+
+  submitting.value = true
+  try {
+    const step = await session.login(form.email, form.password)
+    await router.replace(nextRoute(step))
+  } catch (raw) {
+    const error = toApiError(raw)
+    fieldErrors.value = fieldMessagesFor(error)
+    formError.value = error.isValidation ? null : messageFor(error)
+    form.password = ''
+  } finally {
+    submitting.value = false
+  }
+}
+</script>
+
+<template>
+  <AuthPanel title="Inicia sesión">
+    <form class="login__form" novalidate @submit.prevent="submit">
+      <AppAlert v-if="formError">{{ formError }}</AppAlert>
+      <AppAlert v-else-if="sessionExpired" tone="info">{{ expiredMessage }}</AppAlert>
+      <AppAlert v-else-if="passwordChanged" tone="info">
+        Tu contraseña cambió y cerramos tus sesiones abiertas. Ingresa con la contraseña nueva.
+      </AppAlert>
+
+      <AppTextField
+        v-model="form.email"
+        label="Correo electrónico"
+        type="email"
+        placeholder="nombre@empresa.com"
+        autocomplete="username"
+        :maxlength="191"
+        :error="fieldErrors.email"
+        autofocus
+      />
+      <AppTextField
+        v-model="form.password"
+        label="Contraseña"
+        type="password"
+        autocomplete="current-password"
+        :maxlength="255"
+        :error="fieldErrors.password"
+      />
+
+      <RouterLink class="login__forgot" :to="{ name: 'password-forgot' }">¿Olvidaste tu contraseña?</RouterLink>
+
+      <AppButton type="submit" :loading="submitting" block>Ingresar</AppButton>
+    </form>
+  </AuthPanel>
+</template>
+
+<style scoped lang="scss">
+@use '@/design/tokens' as *;
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.login__forgot {
+  align-self: flex-end;
+  margin-top: -$space-2;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+</style>

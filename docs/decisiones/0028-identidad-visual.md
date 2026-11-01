@@ -9,7 +9,7 @@ order: 38
 # ADR-0028: Identidad visual de Trazo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El producto necesita una identidad propia, sobria y profesional, vinculada a la de Psicol.

@@ -9,7 +9,7 @@ order: 18
 # ADR-0008: Estado y prioridad como tablas catálogo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Los estados y las prioridades deben poder ajustarse sin migraciones que rompan dependencias. La integridad la debe garantizar la base de datos, sin perder rendimiento.

@@ -9,7 +9,7 @@ order: 45
 # ADR-0035: Documentación en Markdown, con ADR y trazabilidad al código
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La documentación debe servir al equipo de soporte, a los directivos y al equipo técnico. Además, será la fuente de una futura web estática.

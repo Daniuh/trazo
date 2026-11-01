@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+// Guarda cada acción administrativa en admin_actions, con su tipo del catálogo. Documentado en docs/backend/shared.md
+
+namespace App\Modules\Shared\Infrastructure;
+
+use App\Modules\Shared\Application\AdminActionType;
+use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\AdminLog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use LogicException;
+
+final class DatabaseAdminLog implements AdminLog
+{
+    /** @var array<string, int>|null */
+    private ?array $types = null;
+
+    public function record(AdminActionType $type, int $adminId, ?int $targetUserId, array $details, RequestContext $context): void
+    {
+        $this->insert($type, $adminId, ['target_user_id' => $targetUserId], $details, $context);
+    }
+
+    public function recordForRole(AdminActionType $type, int $adminId, ?int $roleId, array $details, RequestContext $context): void
+    {
+        // Al eliminar un rol ya no hay a qué apuntar: el código y el nombre quedan en el detalle
+        $this->insert($type, $adminId, ['target_role_id' => $roleId], $details, $context);
+    }
+
+    /**
+     * @param  array<string, int|null>  $target
+     * @param  array<string, mixed>  $details
+     */
+    private function insert(AdminActionType $type, int $adminId, array $target, array $details, RequestContext $context): void
+    {
+        DB::table('admin_actions')->insert([
+            'user_id' => $adminId,
+            'admin_action_type_id' => $this->typeId($type),
+            ...$target,
+            'details' => $details === [] ? null : json_encode($details, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
+            'ip_address' => $context->ip,
+            'user_agent' => $context->userAgent === null ? null : Str::limit($context->userAgent, 252),
+        ]);
+    }
+
+    private function typeId(AdminActionType $type): int
+    {
+        $this->types ??= DB::table('admin_action_types')->pluck('id', 'code')->map(fn (mixed $id): int => (int) $id)->all();
+
+        return $this->types[$type->value] ?? throw new LogicException("Falta el tipo de acción {$type->value} en el catálogo");
+    }
+}

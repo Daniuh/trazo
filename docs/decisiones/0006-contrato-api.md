@@ -9,7 +9,7 @@ order: 16
 # ADR-0006: Contrato de la API: REST versionada, respuestas y errores
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El front y cualquier integración futura necesitan un contrato estable, predecible y seguro, con errores que permitan mostrar mensajes claros sin exponer detalles técnicos.
