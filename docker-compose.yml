@@ -64,7 +64,7 @@ x-laravel: &laravel
 
 services:
   mysql:
-    image: mysql:8.4.11
+    image: mysql:26.10.0
     # Configuración como parámetros: MySQL ignora archivos .cnf montados con permisos amplios (Windows/macOS)
     command:
       - --character-set-server=utf8mb4
@@ -98,7 +98,7 @@ services:
   # Respaldo diario de la base con la misma imagen de MySQL: volcado sin bloquear la app, comprimido y cifrado.
   # Usa el usuario de la app (no root) y solo la red interna. Documentado en docs/operacion/respaldos.md
   backup:
-    image: mysql:8.4.11
+    image: mysql:26.10.0
     entrypoint: ["bash", "/usr/local/bin/trazo-backup"]
     command: ["schedule"]
     environment:
