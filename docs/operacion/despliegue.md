@@ -67,7 +67,8 @@ Las migraciones son solo aditivas y corren solas en `init`. Los datos, las llave
 | Puerto publicado | 8088 (y 8025 de Mailpit) | Ninguno: entra por `trazo-proxy` |
 | Secretos | Valores "solo local" o generados en un volumen | Obligatorios en el `.env`: si falta uno, Compose no arranca |
 | Correo | Mailpit | SMTP de Gmail |
-| Usuarios de demostración e incidentes de prueba | Sí | No: solo las cuentas por rol del entorno |
+| Usuarios de demostración | Sí | No: solo las cuentas por rol del entorno |
+| Incidentes de prueba | Sí (600) | Solo con `SEED_INCIDENTS_IN_PRODUCTION=true`, repartidos entre las cuentas por rol ([ADR-0089](../decisiones/0089-incidentes-de-muestra-en-el-sitio-de-evaluacion.md)) |
 | IP del visitante | La que llega al gateway | La que pasa Caddy, solo creída si viene de `trazo-proxy` |
 | HSTS | No (HTTP) | Sí, porque Caddy avisa que la petición llegó por HTTPS |
 

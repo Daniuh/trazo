@@ -212,7 +212,7 @@ Cada tabla tiene su migración y su ficha en el [diccionario de datos](docs/base
 | `DashboardWidgetSeeder` | Los widgets del dashboard con sus tamaños |
 | `DemoUserSeeder` | Los 9 usuarios de prueba (no en producción) |
 | `AccountSetSeeder` | Cuentas por rol definidas en el entorno del servidor, si sus variables existen ([cuentas](docs/operacion/cuentas.md)) |
-| `IncidentVolumeSeeder` | 600 incidentes de prueba con su historial completo (no en producción) |
+| `IncidentVolumeSeeder` | 600 incidentes de prueba con su historial completo (en producción solo si `SEED_INCIDENTS_IN_PRODUCTION=true`) |
 
 Los incidentes de prueba cumplen lo que pide la prueba técnica: **más de 500, de varios usuarios y con todos los estados y prioridades.** Llegan a lo largo de los últimos 60 días, como en una mesa de ayuda real: lo reciente sigue abierto, lo antiguo ya se atendió y algunos quedaron vencidos. Cada uno trae su historial (creación, asignación y cambios de estado). Una prueba automática verifica todo esto.
 
