@@ -65,6 +65,8 @@ El repositorio es público, así que un secreto no puede llegar ni siquiera al h
 
 `.github/dependabot.yml` revisa cada lunes las dependencias de Composer, npm (frontend y raíz), las imágenes de los Dockerfile y del compose, y las acciones de GitHub. Abre los PR hacia `dev`, agrupa las actualizaciones menores y de parche en uno solo, y cada PR pasa por el mismo CI que cualquier cambio.
 
+En las imágenes de Docker (PHP, Node, MySQL, Redis, Nginx y Mailpit) solo propone parches dentro de la versión fijada en [ADR-0038](../decisiones/0038-versiones-del-stack.md), por ejemplo de MySQL 8.4.11 a 8.4.12. Un salto de versión, como PHP 8.5 o una versión de MySQL que no es LTS, se decide aparte, se prueba completo y se registra en un ADR.
+
 ## Reproducirlo en local
 
 Mientras el repositorio no esté publicado, estas validaciones se corren en local antes de cada fusión:
