@@ -4,7 +4,7 @@
 
 services:
   mailpit:
-    image: axllent/mailpit:v1.31.6
+    image: axllent/mailpit:v1.32.0
     ports:
       - "${TRAZO_MAIL_UI_PORT:-8025}:8025"
     networks: [edge]
