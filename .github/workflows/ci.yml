@@ -142,6 +142,10 @@ jobs:
     name: E2E
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    # En el runner la suite va mucho más rápido que en local y la misma cuenta pasa de 120 peticiones por minuto:
+    # se sube solo el límite general de la API, solo aquí. Login, MFA y el resto de límites siguen igual
+    env:
+      API_RATE_LIMIT: 600
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
