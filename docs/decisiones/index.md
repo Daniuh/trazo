@@ -100,3 +100,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0086](0086-nombres-y-apellidos.md) | Nombres y apellidos por separado, con el nombre completo calculado por la base y las listas ordenadas por apellido |
 | [ADR-0087](0087-cuentas-por-rol-desde-el-entorno.md) | Cuentas por rol (evaluación y propias) creadas desde el entorno del servidor, también en producción |
 | [ADR-0088](0088-despliegue-detras-del-proxy-existente.md) | En producción Trazo no publica puertos: el Caddy que ya existe en el servidor le pasa su subdominio por una red compartida |
+| [ADR-0089](0089-incidentes-de-muestra-en-el-sitio-de-evaluacion.md) | El sitio desplegado para la evaluación arranca con incidentes de muestra, solo con una variable explícita |

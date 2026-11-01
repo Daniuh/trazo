@@ -43,6 +43,9 @@ OWNER_EMAIL_PATTERN=
 EVALUATION_PASSWORD=
 OWNER_PASSWORD=
 
+# Incidentes de muestra en producción (sitio de evaluación): true o false
+SEED_INCIDENTS_IN_PRODUCTION=false
+
 # Contenedor del proxy de TLS del servidor, que se conecta a la red trazo-proxy al desplegar
 TRAZO_PROXY_CONTAINER=
 EOF

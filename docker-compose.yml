@@ -31,6 +31,8 @@ x-laravel: &laravel
     SESSION_MAX_MINUTES: ${SESSION_MAX_MINUTES:-480}
     SESSION_IDLE_MINUTES: ${SESSION_IDLE_MINUTES:-60}
     SEED_INCIDENTS: ${SEED_INCIDENTS:-600}
+    # En producción los incidentes de demostración solo se cargan si se pide (el sitio de evaluación)
+    SEED_INCIDENTS_IN_PRODUCTION: ${SEED_INCIDENTS_IN_PRODUCTION:-false}
     # Juegos de cuentas por rol (también en producción). Vacíos: no se crean
     EVALUATION_EMAIL_PATTERN: ${EVALUATION_EMAIL_PATTERN:-}
     EVALUATION_PASSWORD: ${EVALUATION_PASSWORD:-}
