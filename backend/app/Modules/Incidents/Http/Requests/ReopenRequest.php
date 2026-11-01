@@ -2,33 +2,21 @@
 
 declare(strict_types=1);
 
-// Validación de la reapertura: pedirla y rechazarla exigen un motivo; reabrir exige motivo y versión, y aprobar solo la
-// versión (el motivo es el de la solicitud). Documentado en docs/backend/incidents.md
+// Validación del motivo de una reapertura: lo exigen pedirla y rechazarla. Reabrir directamente suma la versión
+// (ReopenIncidentRequest) y aprobar solo pide la versión (ApproveReopenRequest). Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-final class ReopenRequest extends FormRequest
+class ReopenRequest extends FormRequest
 {
     /**
      * @return array<string, list<string>>
      */
     public function rules(): array
     {
-        $version = ['version' => ['required', 'integer', 'min:1']];
-        $reason = ['reason' => ['required', 'string', 'max:'.WorkflowRequest::NOTE_MAX]];
-
-        return match (true) {
-            $this->routeIs('incidents.reopen') => [...$version, ...$reason],
-            $this->routeIs('incidents.reopen.approve') => $version,
-            default => $reason,
-        };
-    }
-
-    public function version(): int
-    {
-        return $this->integer('version');
+        return ['reason' => ['required', 'string', 'max:'.ChangeStatusRequest::NOTE_MAX]];
     }
 
     public function reason(): string

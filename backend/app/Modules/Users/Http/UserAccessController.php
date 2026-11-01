@@ -14,6 +14,8 @@ use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\ResetUserAccess;
 use App\Modules\Users\Application\UserProfiles;
 use App\Modules\Users\Domain\Administrator;
+use App\Modules\Users\Http\Requests\ChangePermissionsRequest;
+use App\Modules\Users\Http\Requests\ChangeRoleRequest;
 use App\Modules\Users\Http\Requests\UserAccessRequest;
 use Illuminate\Http\JsonResponse;
 
@@ -25,14 +27,14 @@ final readonly class UserAccessController
         private UserProfiles $profiles,
     ) {}
 
-    public function role(UserAccessRequest $request, string $user, ChangeUserRole $change): JsonResponse
+    public function role(ChangeRoleRequest $request, string $user, ChangeUserRole $change): JsonResponse
     {
         $admin = $this->requests->admin($request);
 
         return $this->respond($change->handle($admin, $user, $request->role(), $request->mfaCode(), $this->requests->context($request)), $admin);
     }
 
-    public function permissions(UserAccessRequest $request, string $user, ChangeUserPermissions $change): JsonResponse
+    public function permissions(ChangePermissionsRequest $request, string $user, ChangeUserPermissions $change): JsonResponse
     {
         $admin = $this->requests->admin($request);
 
