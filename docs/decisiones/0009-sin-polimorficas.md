@@ -3,6 +3,7 @@ title: "ADR-0009: Sin relaciones polimórficas: toda referencia es una FK"
 description: "Sin relaciones polimórficas: toda referencia es una FK"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 19
 ---
 

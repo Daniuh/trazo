@@ -3,6 +3,7 @@ title: "ADR-0076: Conversación del incidente"
 description: "Cada incidente tiene una conversación tipo chat; quien escribió un mensaje puede borrarlo durante 5 minutos"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 86
 ---
 

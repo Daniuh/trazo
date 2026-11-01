@@ -3,6 +3,7 @@ title: "ADR-0013: Búsqueda por texto con índice FULLTEXT"
 description: "Búsqueda por texto con índice FULLTEXT"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 23
 ---
 

@@ -8,6 +8,8 @@ order: 2
 
 # ADR-NNNN: Título corto de la decisión
 
+<!-- En el frontmatter de cada ADR va `tags` con su tema: arquitectura, datos, seguridad, frontend, producto u operacion. El portal agrupa las decisiones por ese tema. -->
+
 - **Estado:** Propuesta | Aceptada | Reemplazada por ADR-NNNN
 - **Fecha:** AAAA-MM-DD
 

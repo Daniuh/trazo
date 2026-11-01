@@ -3,6 +3,7 @@ title: "ADR-0018: Recuperación de contraseña por correo y TOTP"
 description: "Recuperación de contraseña por correo y TOTP"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 28
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0068: El modo final es el que arranca por defecto"
 description: "docker compose up -d levanta las imágenes finales (rápidas); el modo desarrollo pasa a un archivo propio y opcional"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 78
 ---
 

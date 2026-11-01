@@ -3,6 +3,7 @@ title: "ADR-0058: Exportación en la práctica: CSV para Excel en español, tope
 description: "Exportación en la práctica: CSV para Excel en español, tope de filas y registro en la auditoría"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 68
 ---
 

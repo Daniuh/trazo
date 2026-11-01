@@ -3,6 +3,7 @@ title: "ADR-0014: Estrategia de crecimiento por etapas, sin particionamiento"
 description: "Estrategia de crecimiento por etapas, sin particionamiento"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 24
 ---
 

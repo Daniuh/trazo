@@ -3,6 +3,7 @@ title: "ADR-0023: Acciones de sistema dentro del alcance de la aplicación"
 description: "Acciones de sistema dentro del alcance de la aplicación"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 33
 ---
 

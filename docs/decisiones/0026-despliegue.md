@@ -3,6 +3,7 @@ title: "ADR-0026: Despliegue en VPS con el mismo docker compose"
 description: "Despliegue en VPS con el mismo docker compose"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 36
 ---
 

@@ -22,6 +22,7 @@ Trazo es un sistema de gestión de solicitudes e incidentes. Esta documentación
 | Sección | Contenido |
 |---|---|
 | [Arquitectura](arquitectura/index.md) | Visión general, capas y flujos |
+| [Flujos](flujos/index.md) | Cada flujo en carriles por actor, con sus errores y dónde está en el código |
 | [Backend](backend/index.md) | Módulos de la API |
 | [Frontend](frontend/index.md) | Módulos de la SPA y sistema de diseño |
 | [Base de datos](base-de-datos/index.md) | Modelo, diccionario de datos y crecimiento |
@@ -34,7 +35,7 @@ Trazo es un sistema de gestión de solicitudes e incidentes. Esta documentación
 
 ## Convenciones de esta documentación
 
-- Cada página empieza con metadatos (`title`, `description`, `audience`, `area`, `module`, `order`) que ordenan y filtran el contenido.
+- Cada página empieza con metadatos (`title`, `description`, `audience`, `area`, `module`, `order`) que ordenan y filtran el contenido. Los ADR llevan además `tags` con su tema.
 - Las páginas técnicas incluyen la sección **Dónde está en el código**, con enlaces a los archivos que implementan lo descrito.
 - Los diagramas se escriben en Mermaid, junto al texto, para que se actualicen en el mismo cambio que el código.
 - A nivel de función, la referencia vive en el propio código (PHPDoc y TSDoc) y se genera de forma automática.

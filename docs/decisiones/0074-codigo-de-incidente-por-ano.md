@@ -3,6 +3,7 @@ title: "ADR-0074: Código del incidente por año"
 description: "El código pasa de INC-000123 (sacado del id) a prefijo, año y consecutivo del año: TZ-26-0142"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 84
 ---
 

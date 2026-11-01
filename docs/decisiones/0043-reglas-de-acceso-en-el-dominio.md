@@ -3,6 +3,7 @@ title: "ADR-0043: Reglas de acceso a incidentes en una sola clase de dominio"
 description: "Reglas de acceso a incidentes en una sola clase de dominio"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 53
 ---
 

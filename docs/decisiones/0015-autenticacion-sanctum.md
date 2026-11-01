@@ -3,6 +3,7 @@ title: "ADR-0015: Autenticación con Laravel Sanctum y token Bearer"
 description: "Autenticación con Laravel Sanctum y token Bearer"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 25
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0077: Centro de notificaciones"
 description: "Una campana con dos pestañas (Conversaciones y Actividad) avisa a cada persona lo que pasa en sus incidentes; el perfil pasa al pie del menú lateral"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 87
 ---
 

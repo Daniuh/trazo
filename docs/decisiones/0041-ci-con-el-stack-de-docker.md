@@ -3,6 +3,7 @@ title: "ADR-0041: El CI prueba el backend dentro del stack de Docker"
 description: "El CI prueba el backend dentro del stack de Docker y audita dependencias según su alcance"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 51
 ---
 

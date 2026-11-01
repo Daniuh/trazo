@@ -3,6 +3,7 @@ title: "ADR-0024: Tiempo real con Reverb y mensajes sin datos"
 description: "Tiempo real con Reverb y mensajes sin datos"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 34
 ---
 

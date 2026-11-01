@@ -3,6 +3,7 @@ title: "ADR-0019: Cifrado en tránsito y en reposo"
 description: "Cifrado en tránsito y en reposo"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 29
 ---
 

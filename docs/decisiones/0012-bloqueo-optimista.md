@@ -3,6 +3,7 @@ title: "ADR-0012: Bloqueo optimista en incidentes"
 description: "Bloqueo optimista en incidentes"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 22
 ---
 

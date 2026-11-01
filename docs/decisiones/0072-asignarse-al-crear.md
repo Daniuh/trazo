@@ -3,6 +3,7 @@ title: "ADR-0072: Asignarse el incidente al crearlo"
 description: "Quien puede tomar incidentes marca \"Asignármelo\" al crear; solo puede elegirse a sí mismo"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 82
 ---
 

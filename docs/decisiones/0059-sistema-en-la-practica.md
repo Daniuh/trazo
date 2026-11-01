@@ -3,6 +3,7 @@ title: "ADR-0059: Sistema en la práctica: salud medida desde la app, eventos ag
 description: "Sistema en la práctica: salud medida desde la app, eventos agrupados y acciones con reautenticación"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 69
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0028: Identidad visual de Trazo"
 description: "Identidad visual de Trazo"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 38
 ---
 

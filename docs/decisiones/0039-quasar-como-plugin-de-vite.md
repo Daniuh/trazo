@@ -3,6 +3,7 @@ title: "ADR-0039: Quasar integrado como plugin de Vite"
 description: "Quasar integrado como plugin de Vite"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 49
 ---
 

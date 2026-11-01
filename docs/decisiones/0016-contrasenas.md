@@ -3,6 +3,7 @@ title: "ADR-0016: Argon2id y política de contraseñas"
 description: "Argon2id y política de contraseñas"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 26
 ---
 

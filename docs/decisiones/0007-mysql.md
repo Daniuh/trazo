@@ -3,6 +3,7 @@ title: "ADR-0007: MySQL 8.4 LTS como base de datos"
 description: "MySQL 8.4 LTS como base de datos"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 17
 ---
 

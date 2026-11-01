@@ -3,6 +3,7 @@ title: "ADR-0067: Pantallas precompiladas en desarrollo"
 description: "Vite compila al arrancar el layout y cada pantalla (server.warmup), para que la primera visita no tarde ni haga fallar la E2E"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 77
 ---
 

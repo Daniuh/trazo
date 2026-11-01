@@ -3,6 +3,7 @@ title: "ADR-0027: Diseño por tokens, mobile first y estilos por bloque de vista
 description: "Diseño por tokens, mobile first y estilos por bloque de vista"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 37
 ---
 

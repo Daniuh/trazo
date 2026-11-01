@@ -3,6 +3,7 @@ title: "ADR-0064: Respaldo diario de MySQL"
 description: "Respaldo diario de MySQL: servicio propio con la imagen de MySQL, volcado consistente, cifrado y firmado, siete días de historia"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 74
 ---
 
