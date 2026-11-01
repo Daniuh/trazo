@@ -1,7 +1,7 @@
 # Imagen del frontend: en desarrollo corre Vite; en producción sirve el build con Nginx sin root.
 # Documentado en docs/operacion/docker.md
 
-FROM node:24.22.1-alpine AS dev
+FROM node:24.22.2-alpine AS dev
 WORKDIR /app
 # Todo como el usuario sin privilegios: Vite necesita escribir su caché dentro de node_modules
 RUN chown node:node /app
