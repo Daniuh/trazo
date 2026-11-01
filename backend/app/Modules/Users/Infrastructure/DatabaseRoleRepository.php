@@ -66,6 +66,11 @@ final class DatabaseRoleRepository implements RoleRepository
         DB::table('user_permissions')->whereIn('user_id', $members)->where('effect', 'deny')->whereNotIn('permission_id', $permissions)->delete();
     }
 
+    public function memberIds(int $id): array
+    {
+        return array_values(DB::table('user_role')->where('role_id', $id)->pluck('user_id')->map(fn (mixed $userId): int => (int) $userId)->all());
+    }
+
     private function query(): Builder
     {
         return DB::table('roles')

@@ -37,6 +37,7 @@ sequenceDiagram
 | Base | `/api/v1`, mismo origen que la SPA (configurable con `VITE_API_BASE_URL`) |
 | Token | `Authorization: Bearer …`, guardado en memoria y en `sessionStorage`; nunca en `localStorage` |
 | Identificador de petición | `X-Request-Id` generado en el navegador, para cruzar un error con los logs |
+| Conexión de tiempo real | `X-Socket-ID` de la pestaña (si está conectada), para que la API no le avise de sus propios cambios (`socketId.ts`) |
 | Tiempo de espera | 15 segundos |
 | Reintentos | Solo **lecturas** (`GET`) ante fallas de red, 502 o 504; hasta 2 reintentos. Una escritura nunca se repite. |
 

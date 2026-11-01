@@ -38,6 +38,9 @@ services:
   scheduler:
     <<: *laravel-dev
 
+  reverb:
+    <<: *laravel-dev
+
   frontend:
     image: trazo/web:dev
     build:

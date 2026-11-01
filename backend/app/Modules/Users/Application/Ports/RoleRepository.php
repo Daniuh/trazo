@@ -29,4 +29,11 @@ interface RoleRepository
 
     // Quita las excepciones de sus personas que el rol vuelve innecesarias (concedido que ya trae, quitado que no trae)
     public function pruneMemberOverrides(int $id): void;
+
+    /**
+     * Ids de las personas que tienen el rol.
+     *
+     * @return list<int>
+     */
+    public function memberIds(int $id): array;
 }

@@ -40,7 +40,7 @@ Viven en `src/shared/ui/` y son los únicos que tocan Quasar directamente. Las p
 | `AppSkeleton` · `AppEmptyState` · `AppErrorState` | Estados de carga, vacío y error. El de error usa el catálogo de mensajes y ofrece "Reintentar". |
 | `AppFormDialog` | Diálogo con un formulario corto: título, explicación opcional, error general, los campos en el slot y Cancelar más el botón de guardar (en rojo si la acción es delicada). No se cierra solo: quien lo usa lo cierra cuando el guardado sale bien, así los errores quedan a la vista. Envuelve el formulario en un `div`, porque Quasar solo deja hacer clic en el primer `div` del diálogo. |
 | `AppCodeDialog` | Sobre `AppFormDialog`: pide el código actual de la aplicación antes de una acción sensible (regenerar códigos, desactivar el MFA, confirmar un cambio de administración) y muestra el error de la API sin cerrarse. |
-| `useFeedback()` | `confirm()` abre el diálogo de confirmación (devuelve `true` o `false`); `notify()` y `notifyError()` muestran notificaciones. Los errores no se cierran solos. |
+| `useFeedback()` | `confirm()` abre el diálogo de confirmación (devuelve `true` o `false`); `notify()` y `notifyError()` muestran notificaciones. `notify()` admite una acción (p. ej. "Abrir"); con ella el aviso dura 8 s en lugar de 4. Los errores no se cierran solos. |
 | `useLeaveGuard(dirty, mensaje)` | Avisa antes de salir con cambios sin guardar: al cambiar de sección pide confirmación con el estilo de Trazo; al cerrar o recargar la pestaña, el navegador muestra su propio aviso. |
 | `useViewport()` | Vista actual (`mobile`, `tablet`, `laptop` o `desktop`) y atajos como `isMobile`, `isLaptopUp` e `isDesktop`. |
 

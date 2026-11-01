@@ -27,6 +27,9 @@ async function filterByIncident(page: Page, code: string, compact: boolean): Pro
     await page.getByRole('searchbox', { name: 'Incidente' }).fill(code)
   }
   await expect(page).toHaveURL(new RegExp(`incident=${code}`))
+  // El registro nuevo ya estaba arriba en la lista sin filtrar: se espera a que llegue la lista filtrada (mientras
+  // carga, la anterior se atenúa y axe la mediría con poco contraste)
+  await expect(page.locator('[aria-label="Registros"]')).toHaveAttribute('aria-busy', 'false')
 }
 
 test('el supervisor encuentra un incidente por su código y ve desde dónde se hizo cada cambio', async ({

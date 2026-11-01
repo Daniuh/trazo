@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
@@ -23,6 +24,7 @@ final readonly class UpdateUser
         private UserRepository $users,
         private AdminLog $log,
         private AccountNotifier $notifier,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -40,6 +42,8 @@ final readonly class UpdateUser
 
         $this->transaction->run(function () use ($admin, $user, $name, $email, $changes, $context): void {
             $this->users->updateProfile($user->id, $name, $email);
+            // Su nombre se ve en el encabezado de sus pantallas abiertas
+            $this->signals->changed($user->id);
             $this->log->record(AdminActionType::UserUpdated, $admin->id, $user->id, $changes, $context);
         });
 

@@ -25,6 +25,8 @@ export default defineConfig({
       'quasar',
       'quasar/lang/es',
       'axios',
+      'laravel-echo',
+      'pusher-js',
       'grid-layout-plus/es/components/grid-layout.vue.mjs',
       'grid-layout-plus/es/components/grid-item.vue.mjs',
       'qrcode',

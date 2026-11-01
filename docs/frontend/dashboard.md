@@ -22,6 +22,7 @@ El dashboard es la página de inicio (`/`). Muestra los widgets que la persona t
 - **Encabezado:** "Resumen general" (quien ve todo) o "Mi resumen" (quien ve lo suyo), "Actualizado hace…" con la explicación en el ícono de información, y los botones "Personalizar" (portátil y monitor) y "Actualizar".
 - **Cada cifra es un enlace** al listado con el filtro que la explica: "Vencidos" abre el listado con `overdue=1`, cada barra de estado abre ese estado, y así con todas.
 - **Al volver a la pestaña**, si los datos tienen más de un minuto, se actualizan solos.
+- **En vivo:** cuando cambia un incidente, las cifras se refrescan solas, como máximo una vez cada 10 segundos y nunca en modo Personalizar ([tiempo real](realtime.md)).
 - **Estados:** esqueleto mientras carga; error con "Reintentar" (del diseño o de las cifras); y un mensaje claro si la persona ocultó todos sus widgets.
 
 ## Widgets

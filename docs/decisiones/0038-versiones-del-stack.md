@@ -33,6 +33,7 @@ La prueba exige PHP 8+ y Laravel 10+, así que cualquier versión posterior cump
   - Redis 8.4
   - Nginx 1.30, rama estable, en su variante sin root
   - Mailpit 1.31
+- **Tiempo real** (fase 3.5): Reverb 1.12 en el back, que obliga a usar Guzzle 7.16 en lugar de 8 ([ADR-0057](0057-tiempo-real-en-la-practica.md)); Laravel Echo 2.6 y pusher-js 8.6 en el front.
 - **Imágenes:** todas con versión exacta.
 
 ## Alternativas descartadas

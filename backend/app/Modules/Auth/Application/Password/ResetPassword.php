@@ -18,6 +18,7 @@ use App\Modules\Auth\Application\Ports\UserAccounts;
 use App\Modules\Auth\Domain\Exceptions\MfaExceptions;
 use App\Modules\Auth\Domain\Exceptions\PasswordExceptions;
 use App\Modules\Auth\Domain\LoginAttemptStore;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Domain\EmailAddress;
 use App\Modules\Shared\Domain\Exceptions\DomainException;
 use Carbon\CarbonImmutable;
@@ -33,6 +34,7 @@ final readonly class ResetPassword
         private SessionTokens $tokens,
         private LoginAttemptStore $loginAttempts,
         private SecurityNotifier $notifier,
+        private SessionSignals $signals,
         private LoggerInterface $logger,
         private int $maxAttempts,
     ) {}
@@ -55,6 +57,7 @@ final readonly class ResetPassword
         $this->accounts->updatePassword($account->id, $password);
         $this->resets->close($reset);
         $this->tokens->revokeAll($account->id);
+        $this->signals->changed($account->id);
         // Quien recuperó su contraseña puede entrar de inmediato, aunque antes la hubiera escrito mal varias veces
         $this->loginAttempts->clear(hash('sha256', EmailAddress::normalize($email)));
         $this->notifier->notify($account->id, SecurityEvent::PasswordChanged);

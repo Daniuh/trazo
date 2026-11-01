@@ -22,7 +22,15 @@ export function useFeedback() {
         .onCancel(() => resolve(false))
     })
 
-  const notify = (message: string) => $q.notify({ message, classes: 'app-notify', position: 'bottom', timeout: 4000 })
+  // Con una acción (p. ej. "Abrir"), el aviso se queda más tiempo para alcanzar a usarla
+  const notify = (message: string, action?: { label: string; handler: () => void }) =>
+    $q.notify({
+      message,
+      classes: 'app-notify',
+      position: 'bottom',
+      timeout: action ? 8000 : 4000,
+      actions: action ? [{ label: action.label, color: 'white', handler: action.handler }] : undefined,
+    })
 
   // Los errores se quedan más tiempo y se cierran a mano: el usuario debe alcanzar a leerlos
   const notifyError = (error: ApiError) =>

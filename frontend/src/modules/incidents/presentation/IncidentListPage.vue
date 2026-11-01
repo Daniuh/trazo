@@ -1,11 +1,13 @@
 <!-- Listado de incidentes. Monitor: tabla con vista previa al elegir una fila. Portátil: tabla; elegir una fila abre el detalle.
      Tablet y celular: tarjetas. Los filtros viven en la URL. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppPagination from '@/shared/ui/AppPagination.vue'
+import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import { useFeedback } from '@/shared/ui/feedback/useFeedback'
 import AppEmptyState from '@/shared/ui/states/AppEmptyState.vue'
 import AppErrorState from '@/shared/ui/states/AppErrorState.vue'
@@ -49,6 +51,20 @@ async function restore(id: string): Promise<void> {
   else notify('Incidente restaurado.')
 }
 
+// Cambios de otras personas: se anuncian sin mover las filas mientras alguien lee. Se cuentan incidentes, no avisos
+const changed = ref<string[]>([])
+useRealtime('incident', ({ id }) => {
+  if (!changed.value.includes(id)) changed.value = [...changed.value, id]
+})
+// Al volver la conexión pudo perderse algún aviso: se vuelve a consultar
+useRealtime('reconnected', () => void list.load())
+watch(criteria, () => (changed.value = []))
+
+function refresh(): void {
+  changed.value = []
+  void list.load()
+}
+
 function clearFilters(): void {
   list.update({ ...DEFAULT_CRITERIA, sort: criteria.value.sort, descending: criteria.value.descending })
 }
@@ -80,6 +96,10 @@ function clearFilters(): void {
       :assignees="options.assigneeOptions.value"
       @change="list.update"
     />
+    <AppAlert v-if="changed.length > 0" tone="info">
+      {{ changed.length === 1 ? 'Hay 1 incidente' : `Hay ${changed.length} incidentes` }} con cambios de otras personas.
+      <AppButton variant="link" icon="refresh" @click="refresh">Actualizar</AppButton>
+    </AppAlert>
 
     <div class="incident-list__body" :class="{ 'incident-list__body--preview': showPreview }">
       <section class="incident-list__results" :aria-busy="loading" aria-label="Resultados">

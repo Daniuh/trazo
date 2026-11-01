@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Modules\Incidents\Infrastructure;
 
 use App\Modules\Incidents\Application\Data\IncidentRecord;
+use App\Modules\Incidents\Application\Events\IncidentChange;
 use App\Modules\Incidents\Application\Events\IncidentChanged;
 use App\Modules\Incidents\Application\Ports\IncidentRepository;
 use App\Modules\Incidents\Domain\Exceptions\IncidentExceptions;
@@ -56,7 +57,7 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
         ]);
 
         $incident->forceFill(['code' => sprintf(self::CODE_FORMAT, $incident->id)])->saveQuietly();
-        event(new IncidentChanged($incident->id));
+        event(new IncidentChanged($incident->id, $incident->ulid, IncidentChange::Created, $createdBy, null, $assignedTo));
 
         return $incident->ulid;
     }
@@ -72,18 +73,24 @@ final readonly class EloquentIncidentRepository implements IncidentRepository
             throw IncidentExceptions::versionConflict();
         }
 
-        event(new IncidentChanged($incident->id));
+        $assignee = array_key_exists('assigned_to', $columns) ? $columns['assigned_to'] : $incident->assignee?->id;
+        $this->changed($incident, IncidentChange::Updated, is_int($assignee) ? $assignee : null);
     }
 
     public function delete(IncidentRecord $incident): void
     {
         Incident::query()->whereKey($incident->id)->delete();
-        event(new IncidentChanged($incident->id));
+        $this->changed($incident, IncidentChange::Deleted, $incident->assignee?->id);
     }
 
     public function restore(IncidentRecord $incident): void
     {
         Incident::onlyTrashed()->whereKey($incident->id)->restore();
-        event(new IncidentChanged($incident->id));
+        $this->changed($incident, IncidentChange::Restored, $incident->assignee?->id);
+    }
+
+    private function changed(IncidentRecord $incident, IncidentChange $change, ?int $assigneeAfter): void
+    {
+        event(new IncidentChanged($incident->id, $incident->ulid, $change, $incident->creator->id, $incident->assignee?->id, $assigneeAfter));
     }
 }

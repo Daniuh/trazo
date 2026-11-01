@@ -4,6 +4,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { ApiError, toApiError } from './apiError'
 import { httpEvents, type HttpEventBus } from './events'
+import { currentSocketId } from './socketId'
 import { tokenStore, type TokenStore } from './tokenStore'
 
 const RETRYABLE_STATUS = new Set([502, 504])
@@ -47,6 +48,9 @@ export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance
     if (token && !config.headers.Authorization) config.headers.Authorization = `Bearer ${token}`
     // Permite cruzar un error del navegador con los logs del servidor
     config.headers['X-Request-Id'] ??= crypto.randomUUID()
+    // Así esta pestaña no recibe el aviso en tiempo real de su propio cambio
+    const socket = currentSocketId()
+    if (socket) config.headers['X-Socket-ID'] = socket
     return config
   })
 

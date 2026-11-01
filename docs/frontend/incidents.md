@@ -97,6 +97,7 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
   - Cada escritura envía la versión que se conocía. Si la API responde `VERSION_CONFLICT`, aparece un aviso con el botón "Recargar", tanto en el detalle como en el formulario.
   - No se reintenta solo: guardar encima de los cambios de otra persona los borraría sin que nadie lo note.
 - **Otros errores** (estado final, ya asignado, transición inválida) se muestran en un aviso visible, con el mensaje del catálogo.
+- **Cambios de otras personas en vivo** ([tiempo real](realtime.md)): el listado avisa "Hay N incidentes con cambios de otras personas · Actualizar" sin mover las filas; el detalle y la vista previa se actualizan solos; el formulario de edición avisa "Otra persona cambió este incidente" con "Recargar", sin tocar lo que se escribió. Así el conflicto de versión casi no llega a ocurrir.
 
 ## Fechas
 

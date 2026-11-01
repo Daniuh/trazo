@@ -5,6 +5,8 @@ import { QDrawer, QHeader, QLayout, QPageContainer } from 'quasar'
 import { computed, ref } from 'vue'
 import { layout } from '@/design/tokens/layout'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import { useRealtimeConnection } from '@/modules/realtime/application/useRealtimeConnection'
+import { useRealtimeNotices } from '@/modules/realtime/presentation/useRealtimeNotices'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import AppLogo from '@/shared/ui/brand/AppLogo.vue'
 import { useViewport } from '@/shared/ui/useViewport'
@@ -18,6 +20,10 @@ const { loading } = useRouteLoading()
 const drawerOpen = ref(false)
 const session = useSessionStore()
 const navigation = computed(() => visibleNavigation(session.can))
+
+// El shell solo existe con sesión: aquí vive la conexión de tiempo real y los avisos personales
+useRealtimeConnection()
+useRealtimeNotices()
 
 // En celular el menú se cierra al elegir una sección
 const closeOnMobile = () => {

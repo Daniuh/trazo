@@ -1,12 +1,14 @@
 // Estado del dashboard: el diseño de la persona y los datos de sus widgets visibles, en una sola consulta.
 // Al volver a la pestaña, si los datos tienen más de un minuto, se actualizan solos. Documentado en docs/frontend/dashboard.md
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { ApiError, toApiError } from '@/shared/http'
 import { readingOrder, type DashboardLayout, type Metrics, type TrendDays, type WidgetCode } from '../domain/dashboard'
 import { dashboardApi } from '../infrastructure/dashboardApi'
 
 // Coincide con lo que la caché del servidor guarda una cifra
 const STALE_AFTER_MS = 60_000
+const LIVE_INTERVAL_MS = 10_000
 
 export function useDashboard() {
   const layout = shallowRef<DashboardLayout | null>(null)
@@ -79,6 +81,24 @@ export function useDashboard() {
     if (document.visibilityState === 'visible' && age > STALE_AFTER_MS && !refreshing.value) void loadMetrics()
   }
 
+  // Tiempo real: cuando cambia un incidente, las cifras se refrescan solas, como máximo una vez cada 10 s y nunca
+  // mientras se personaliza. El primer aviso tras un rato de calma refresca de una vez
+  let liveTimer: ReturnType<typeof setTimeout> | null = null
+  let lastLive = 0
+  function scheduleLive(): void {
+    if (draftCodes.value !== null || liveTimer) return
+    liveTimer = setTimeout(
+      () => {
+        liveTimer = null
+        lastLive = Date.now()
+        if (draftCodes.value === null) void loadMetrics()
+      },
+      Math.max(0, lastLive + LIVE_INTERVAL_MS - Date.now()),
+    )
+  }
+  useRealtime('incident', scheduleLive)
+  useRealtime('reconnected', scheduleLive)
+
   watch(trendDays, () => void loadMetrics())
   onMounted(() => {
     void load()
@@ -86,6 +106,7 @@ export function useDashboard() {
   })
   onBeforeUnmount(() => {
     current?.abort()
+    if (liveTimer) clearTimeout(liveTimer)
     document.removeEventListener('visibilitychange', onVisible)
   })
 

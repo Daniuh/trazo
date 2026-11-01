@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
@@ -27,6 +28,7 @@ final readonly class ResetUserAccess
         private AccountSecurity $security,
         private AdminLog $log,
         private AccountNotifier $notifier,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -38,6 +40,7 @@ final readonly class ResetUserAccess
         $this->transaction->run(function () use ($admin, $user, $context): void {
             $this->security->removeMfa($user->id);
             $this->security->revokeSessions($user->id);
+            $this->signals->changed($user->id);
             $this->log->record(AdminActionType::UserMfaReset, $admin->id, $user->id, [], $context);
         });
 
@@ -54,6 +57,7 @@ final readonly class ResetUserAccess
         $this->transaction->run(function () use ($admin, $user, $context): void {
             $this->users->scramblePassword($user->id);
             $this->security->revokeSessions($user->id);
+            $this->signals->changed($user->id);
             $this->log->record(AdminActionType::UserAccessReset, $admin->id, $user->id, [], $context);
         });
 

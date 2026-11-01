@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Modules\Users\Application;
 
 use App\Modules\Shared\Application\Data\RequestContext;
+use App\Modules\Shared\Application\Ports\SessionSignals;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Users\Application\Data\RoleDetail;
 use App\Modules\Users\Application\Data\RoleDraft;
@@ -27,6 +28,7 @@ final readonly class UpdateRole
         private RoleRepository $roles,
         private AccountSecurity $security,
         private AdminLog $log,
+        private SessionSignals $signals,
         private Transaction $transaction,
     ) {}
 
@@ -52,6 +54,8 @@ final readonly class UpdateRole
             if (! $change->isEmpty()) {
                 $this->roles->pruneMemberOverrides($role->role->id);
             }
+            // Las personas de este rol ven sus permisos nuevos sin recargar
+            $this->signals->changed(...$this->roles->memberIds($role->role->id));
             $this->log->recordForRole(AdminActionType::RoleUpdated, $admin->id, $role->role->id, [
                 'code' => $role->role->code, ...$changes,
             ], $context);

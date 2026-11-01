@@ -29,6 +29,8 @@ flowchart LR
   W[worker] --> R
   W --> M
   S[scheduler] --> M
+  G -->|/ws| V[reverb · websockets]
+  W -->|avisos| V
   I[init · migraciones] --> M
   A -->|SMTP| P[mailpit]
 
@@ -45,6 +47,7 @@ flowchart LR
 | `init` | `trazo/api` | Corre una vez antes que la API: migraciones y seeders. Si falla, la API no arranca. |
 | `worker` | `trazo/api` | Procesa las colas |
 | `scheduler` | `trazo/api` | Tareas programadas |
+| `reverb` | `trazo/api` | Websockets del tiempo real. Sin puerto propio: se llega por el gateway en `/ws` ([Tiempo real](tiempo-real.md)) |
 | `frontend` | `trazo/web` | En local, Vite con recarga en caliente. En producción, el build servido por Nginx sin root. |
 | `mysql` | MySQL 8.4 | Base de datos (`trazo` y `trazo_test` para pruebas) |
 | `redis` | Redis 8.4 | Caché y colas |
@@ -66,7 +69,7 @@ flowchart LR
 
 - **Un solo origen.** El navegador habla solo con el gateway, así que no hay CORS y la superficie expuesta es mínima.
 - **Red interna para datos.** MySQL y Redis están en la red `data`, marcada como interna: no tienen puertos publicados ni salida a internet.
-- **Una imagen para cuatro servicios.** `app`, `init`, `worker` y `scheduler` usan la misma imagen; no se repite configuración y todos ejecutan exactamente el mismo código.
+- **Una imagen para cinco servicios.** `app`, `init`, `worker`, `scheduler` y `reverb` usan la misma imagen; no se repite configuración y todos ejecutan exactamente el mismo código.
 - **Sin root.** PHP-FPM, el frontend y el gateway corren con usuarios sin privilegios.
 - **Versiones fijas.** Todas las imágenes base tienen versión exacta.
 - **Builds multi-etapa.** La imagen de producción no lleva Composer ni herramientas de compilación.
