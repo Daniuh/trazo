@@ -1,7 +1,7 @@
 # Imagen de la API (Laravel). La misma imagen sirve a app, init, worker y scheduler.
 # Documentado en docs/operacion/docker.md
 
-FROM mlocati/php-extension-installer:2.12.3 AS ext-installer
+FROM mlocati/php-extension-installer:2.13.1 AS ext-installer
 FROM composer:2.10.3 AS composer
 
 # Base común: PHP-FPM con las extensiones que necesita Laravel
