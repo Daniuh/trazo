@@ -3,19 +3,20 @@
 declare(strict_types=1);
 
 // Correo de aviso por un cambio que la administración hizo en la cuenta. Texto plano, sin datos sensibles: qué pasó,
-// cuándo y, si hace falta, qué hacer. Sale por la cola, después de confirmar la transacción.
+// cuándo y, si hace falta, qué hacer. Sale por la cola, cifrado, después de confirmar la transacción.
 // Documentado en docs/backend/users.md
 
 namespace App\Modules\Users\Infrastructure\Mail;
 
 use App\Modules\Users\Application\AccountEvent;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-final class AccountNotice extends Mailable implements ShouldQueue
+final class AccountNotice extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 

@@ -32,14 +32,18 @@ export function useFeedback() {
       actions: action ? [{ label: action.label, color: 'white', handler: action.handler }] : undefined,
     })
 
-  // Los errores se quedan más tiempo y se cierran a mano: el usuario debe alcanzar a leerlos
-  const notifyError = (error: ApiError) =>
+  // Los errores se quedan hasta que se cierran a mano: el usuario debe alcanzar a leerlos. La acción (p. ej.
+  // "Recargar") va antes de "Cerrar"
+  const notifyError = (error: ApiError, action?: { label: string; handler: () => void }) =>
     $q.notify({
       message: messageFor(error),
       classes: 'app-notify app-notify--error',
       position: 'bottom',
       timeout: 0,
-      actions: [{ label: 'Cerrar', color: 'white' }],
+      actions: [
+        ...(action ? [{ label: action.label, color: 'white', handler: action.handler }] : []),
+        { label: 'Cerrar', color: 'white' },
+      ],
     })
 
   return { confirm, notify, notifyError }

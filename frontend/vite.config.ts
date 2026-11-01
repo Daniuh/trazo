@@ -40,6 +40,11 @@ export default defineConfig({
     hmr: { clientPort: Number(process.env.VITE_HMR_CLIENT_PORT ?? 8088) },
     // En Docker sobre Windows o macOS los archivos montados no avisan cambios: se revisan por sondeo
     watch: { usePolling: process.env.VITE_USE_POLLING === 'true', interval: 300 },
+    // Compila al arrancar el layout y cada pantalla (con su SCSS): la primera visita a una ruta ya no espera a Vite.
+    // Solo afecta al desarrollo; el build de producción no lo usa
+    warmup: {
+      clientFiles: ['./src/main.ts', './src/app/layout/AppShell.vue', './src/modules/*/presentation/**/*Page.vue'],
+    },
   },
   test: {
     environment: 'jsdom',

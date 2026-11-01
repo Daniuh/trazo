@@ -28,15 +28,21 @@ function fill(template: string, params: ErrorParams): string {
     .trim()
 }
 
+// Un código que el catálogo no conoce usa el mensaje genérico. Si el mensaje pide el código de soporte y la falla no
+// trae uno, se usa el que no lo menciona: pedir "sin código" no le sirve a nadie
+function templateFor(error: ApiError): string {
+  const template = errorMessages[error.code] ?? (errorMessages.UNKNOWN_ERROR_TRACED as string)
+  return !error.traceId && template.includes('{traceId}') ? (errorMessages.UNKNOWN_ERROR as string) : template
+}
+
 export function messageFor(error: ApiError): string {
-  const template = errorMessages[error.code] ?? (errorMessages.UNKNOWN_ERROR as string)
   const params: ErrorParams = {
     ...error.params,
-    traceId: error.traceId ?? 'sin código',
+    traceId: error.traceId ?? '',
     wait: formatWait(error.retryAfter),
   }
 
-  return fill(template, params)
+  return fill(templateFor(error), params)
 }
 
 export function fieldMessageFor(error: FieldError): string {

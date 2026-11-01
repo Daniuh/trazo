@@ -3,19 +3,20 @@
 declare(strict_types=1);
 
 // Correo de aviso por un cambio de seguridad en la cuenta. Va en texto plano, sin enlaces ni datos sensibles: solo
-// cuenta qué pasó, cuándo y qué hacer si no fue la persona. Sale por la cola, después de confirmar la transacción.
-// Documentado en docs/backend/auth.md
+// cuenta qué pasó, cuándo y qué hacer si no fue la persona. Sale por la cola, cifrado, después de confirmar la
+// transacción. Documentado en docs/backend/auth.md
 
 namespace App\Modules\Auth\Infrastructure\Mail;
 
 use App\Modules\Auth\Application\Mfa\SecurityEvent;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-final class SecurityNotice extends Mailable implements ShouldQueue
+final class SecurityNotice extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 

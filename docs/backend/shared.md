@@ -62,6 +62,10 @@ Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay se
 
 En desarrollo, `php artisan trazo:reset-limits` vacía solo esa base: la suite E2E lo usa al empezar para poder repetirse sin esperar 15 minutos. En producción el comando no se registra.
 
+## Carga diferida estricta
+
+Fuera de producción, `AppServiceProvider` activa `Model::preventLazyLoading()`: si un código lee una relación que no se pidió con `with()`, Eloquent lanza una excepción en lugar de hacer una consulta más por cada registro. Así un N+1 nuevo falla en desarrollo y en la suite, aunque nadie haya escrito una prueba que cuente consultas para esa pantalla. En producción queda apagado, para que un caso no previsto se vuelva lento y no se caiga ([ADR-0061](../decisiones/0061-entrega-verificada-desde-cero.md)).
+
 ## Puertos que comparten los módulos
 
 | Pieza | Capa | Para qué |

@@ -18,8 +18,17 @@ export const ClientErrorCode = {
   Canceled: 'REQUEST_CANCELED',
   // El servidor de Trazo no contestó y respondió el que está delante (gateway): 502 o 504 sin cuerpo de la API
   ServerUnreachable: 'SERVER_UNREACHABLE',
+  // No se pudo descargar una pantalla: hay una versión nueva desplegada o se cortó la conexión
+  ScreenLoadFailed: 'SCREEN_LOAD_FAILED',
   Unknown: 'UNKNOWN_ERROR',
 } as const
+
+// Cómo avisa cada navegador que no pudo descargar un módulo (Chrome y Firefox, Safari, y la precarga de Vite)
+const SCREEN_LOAD_ERRORS = /dynamically imported module|Importing a module script failed|Unable to preload CSS/i
+
+export function isScreenLoadError(error: unknown): boolean {
+  return error instanceof Error && SCREEN_LOAD_ERRORS.test(error.message)
+}
 
 // Respuestas que no traen el formato de error de la API, según su estado HTTP
 const STATUS_WITHOUT_BODY: Record<number, string> = {
@@ -71,6 +80,7 @@ export class ApiError extends Error {
 
 export function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error
+  if (isScreenLoadError(error)) return new ApiError('network', ClientErrorCode.ScreenLoadFailed)
   if (!isAxiosError(error)) return new ApiError('network', ClientErrorCode.Unknown)
 
   if (error.code === AxiosError.ERR_CANCELED) return new ApiError('canceled', ClientErrorCode.Canceled)

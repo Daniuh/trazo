@@ -47,6 +47,7 @@ Para cada categoría: qué hace Trazo y dónde está la prueba que lo demuestra.
 - Secreto del MFA cifrado con la clave de la app.
 - Códigos de recuperación con SHA-256.
 - Códigos de recuperación de contraseña con HMAC-SHA256.
+- Correos en la cola cifrados con la clave de la app: el código de recuperación, los nombres y las direcciones nunca quedan legibles en Redis ni en `failed_jobs` (lo exige una prueba de arquitectura).
 - Tokens Sanctum guardados con hash.
 - Cifrado en reposo de InnoDB.
 - TLS en producción, con HSTS.

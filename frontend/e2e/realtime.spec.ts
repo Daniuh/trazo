@@ -22,25 +22,45 @@ async function createIncident(page: Page, title: string): Promise<IncidentBody['
   return ((await response.json()) as IncidentBody).data
 }
 
-// La segunda persona, en su propio navegador
+const INCIDENTS_CHANNEL = 'incidents.all'
+const PERSONAL_CHANNEL = 'users.'
+
+// Abre la ruta y espera a que Reverb confirme la suscripción al canal (o a uno que empiece así). Solo cuenta el
+// WebSocket que abre esa ruta: goto recarga la app, y la confirmación de la pantalla anterior llegaba antes que la
+// nueva conexión, que arranca un momento después. La respuesta de /broadcasting/auth tampoco basta: el canal
+// personal suele confirmarse primero
+async function gotoSubscribed(page: Page, path: string, channel: string): Promise<void> {
+  const confirmation = `"channel":"private-${channel}`
+  const ready = new Promise<void>((resolve) => {
+    page.on('websocket', (socket) => {
+      if (new URL(page.url()).pathname !== path) return
+      socket.on('framereceived', ({ payload }) => {
+        if (
+          typeof payload === 'string' &&
+          payload.includes('subscription_succeeded') &&
+          payload.includes(confirmation)
+        ) {
+          resolve()
+        }
+      })
+    })
+  })
+  await page.goto(path)
+  await ready
+}
+
+// La segunda persona, en su propio navegador y ya suscrita a su canal personal
 async function openAs(browser: Browser, email: string, path: string): Promise<Page> {
   const page = await (await browser.newContext()).newPage()
   await signInAs(page, email)
-  await page.goto(path)
+  await gotoSubscribed(page, path, PERSONAL_CHANNEL)
   return page
-}
-
-// Da tiempo a que la pestaña se conecte y se suscriba antes de provocar el cambio
-async function waitForRealtime(page: Page): Promise<void> {
-  await page.waitForResponse((response) => response.url().includes('/broadcasting/auth') && response.ok())
 }
 
 test('el listado avisa los cambios de otras personas sin mover las filas', async ({ page }, info) => {
   await signInAs(page, SUPERVISOR)
-  const subscribed = waitForRealtime(page)
-  await page.goto('/incidentes')
+  await gotoSubscribed(page, '/incidentes', INCIDENTS_CHANNEL)
   await expect(page.getByRole('heading', { level: 1, name: 'Incidentes' })).toBeVisible()
-  await subscribed
 
   const title = `Tiempo real ${info.project.name} ${Date.now()}`
   await createIncident(page, title)
@@ -61,10 +81,8 @@ test('el detalle se actualiza solo cuando otra persona cambia el estado', async 
   await page.goto('/')
   const incident = await createIncident(page, `Detalle en vivo ${Date.now()}`)
 
-  const subscribed = waitForRealtime(page)
-  await page.goto(`/incidentes/${incident.id}`)
+  await gotoSubscribed(page, `/incidentes/${incident.id}`, INCIDENTS_CHANNEL)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await subscribed
 
   const response = await page.request.put(`/api/v1/incidents/${incident.id}/status`, {
     headers: authHeaderOf(SUPERVISOR),
@@ -83,7 +101,6 @@ test('a quien le asignan un incidente le llega el aviso con "Abrir"', async ({ p
   const incident = await createIncident(page, `Asignación en vivo ${Date.now()}`)
 
   const agent = await openAs(browser, 'agente2@trazo.test', '/')
-  await waitForRealtime(agent)
   const me = await page.request.get('/api/v1/auth/me', { headers: authHeaderOf('agente2@trazo.test') })
   const agentId = ((await me.json()) as { data: { id: string } }).data.id
 
@@ -104,7 +121,6 @@ test('el menú cambia en vivo cuando le conceden un permiso a la persona', async
   await signInAs(page, ROOT)
   await page.goto('/')
   const agent = await openAs(browser, 'agente3@trazo.test', '/')
-  await waitForRealtime(agent)
   await expect(agent.getByRole('link', { name: 'Auditoría' })).toHaveCount(0)
 
   const headers = authHeaderOf(ROOT)
@@ -138,10 +154,8 @@ test('el formulario de edición avisa si otra persona cambió el incidente, sin 
   await page.goto('/')
   const incident = await createIncident(page, `Edición en vivo ${Date.now()}`)
 
-  const subscribed = waitForRealtime(page)
-  await page.goto(`/incidentes/${incident.id}/editar`)
+  await gotoSubscribed(page, `/incidentes/${incident.id}/editar`, INCIDENTS_CHANNEL)
   await expect(page.getByLabel('Título')).toBeVisible()
-  await subscribed
   await page.getByLabel('Título').fill('Lo que alcancé a escribir')
 
   const response = await page.request.put(`/api/v1/incidents/${incident.id}/status`, {
@@ -161,7 +175,6 @@ test('al desactivar una cuenta, su pantalla se cierra al instante', async ({ pag
   await signInAs(page, ROOT)
   await page.goto('/')
   const person = await openAs(browser, PERSON, '/')
-  await waitForRealtime(person)
 
   const headers = authHeaderOf(ROOT)
   const found = (await (await page.request.get('/api/v1/users?search=solicitante2', { headers })).json()) as {

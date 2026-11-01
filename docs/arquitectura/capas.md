@@ -3,7 +3,7 @@ title: Capas del backend
 description: Cómo se divide cada módulo de la API y qué puede depender de qué.
 audience: tecnico
 area: arquitectura
-order: 2
+order: 4
 ---
 
 # Capas del backend
@@ -29,7 +29,7 @@ Lo transversal vive en el módulo `Shared` con la misma división.
 
 ## Cómo se garantiza
 
-Las reglas de la tabla no dependen de la disciplina de cada persona: la prueba de arquitectura recorre todos los módulos y falla si alguna capa usa algo que no le corresponde. Además verifica que todo el código use tipos estrictos, que no queden funciones de depuración y que las variables de entorno se lean solo desde `config/`.
+Las reglas de la tabla no dependen de la disciplina de cada persona: la prueba de arquitectura recorre todos los módulos y falla si alguna capa usa algo que no le corresponde. Además verifica que todo el código use tipos estrictos, que no queden funciones de depuración, que las variables de entorno se lean solo desde `config/` y que todo correo que sale por la cola viaje cifrado.
 
 ## Dónde está en el código
 

@@ -51,6 +51,37 @@ jobs:
       - name: Enlaces entre documentación y código
         run: node scripts/docs/check-links.mjs
 
+  # PHPDoc y TSDoc generados como sitio: falla si un comentario está roto. El resultado queda como artefacto
+  api-docs:
+    name: Documentación de funciones
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend (TypeDoc)
+        working-directory: frontend
+        run: npm ci && npm run docs:ts
+      - name: Backend (phpDocumentor)
+        run: |
+          mkdir -p docs-build
+          docker compose -p trazo --profile docs run --rm phpdoc
+          grep -q "No errors have been found" docs-build/backend/reports/errors.html \
+            || { echo "::error title=phpDocumentor::Hay PHPDoc con errores. Revisar docs-build/backend/reports/errors.html"; exit 1; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentacion-de-funciones
+          path: |
+            docs-build/backend
+            docs-build/frontend
+          retention-days: 14
+
   frontend:
     name: Frontend
     runs-on: ubuntu-24.04

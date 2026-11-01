@@ -3,17 +3,18 @@
 declare(strict_types=1);
 
 // Correo con el código para recuperar la contraseña. Texto plano, sin enlaces: solo el código y cuánto dura.
-// Sale por la cola. Documentado en docs/backend/auth.md
+// Sale por la cola, cifrado: el código nunca queda legible en Redis ni en failed_jobs. Documentado en docs/backend/auth.md
 
 namespace App\Modules\Auth\Infrastructure\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-final class PasswordResetCode extends Mailable implements ShouldQueue
+final class PasswordResetCode extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 

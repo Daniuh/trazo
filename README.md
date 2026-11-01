@@ -19,10 +19,11 @@ Sistema de gestión de solicitudes e incidentes: creación y seguimiento de caso
 6. [Seeders](#seeders)
 7. [Pruebas](#pruebas)
 8. [Servicios y puertos](#servicios-y-puertos)
-9. [Actualizar](#actualizar)
-10. [Detener y limpiar](#detener-y-limpiar)
-11. [Problemas frecuentes](#problemas-frecuentes)
-12. [Documentación](#documentación)
+9. [Respaldos](#respaldos)
+10. [Actualizar](#actualizar)
+11. [Detener y limpiar](#detener-y-limpiar)
+12. [Problemas frecuentes](#problemas-frecuentes)
+13. [Documentación](#documentación)
 
 ## Requisitos
 
@@ -40,6 +41,8 @@ git clone <url-del-repositorio> trazo
 cd trazo
 docker compose up -d
 ```
+
+> **En Windows:** clonar cerca de la raíz del disco (por ejemplo `C:\proyectos\trazo`). Algunas rutas del backend son largas y, dentro de una carpeta muy profunda, superan el límite de 260 caracteres de Windows: Git muestra `Filename too long` y deja el clon incompleto. Si no se puede cambiar la carpeta, activar las rutas largas antes de clonar con `git config --global core.longpaths true`.
 
 Eso es todo. La primera vez tarda unos minutos, porque construye las imágenes, instala las dependencias y carga los datos de prueba. Las siguientes veces arranca en segundos.
 
@@ -61,7 +64,7 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 
 | Correo | Rol | Qué puede hacer |
 |---|---|---|
-| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera, crear y editar roles, ver toda la auditoría y, cuando esté listo, el sistema |
+| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera, crear y editar roles, ver toda la auditoría, revisar la salud y los eventos del sistema y ejecutar sus acciones (reiniciar procesos, limpiar caché, mantenimiento) |
 | `admin@trazo.test` | Administrador | Crear y administrar a las personas por debajo de su nivel: datos, rol, permisos por persona, activar y desactivar. Ve la auditoría de la administración y sus propios incidentes |
 | `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado, ver el resumen general y la auditoría de incidentes |
 | `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
@@ -165,6 +168,9 @@ Están todas en [`.env.example`](.env.example), con su valor por defecto para lo
 | `REVERB_APP_ID`, `REVERB_APP_KEY` | `trazo`, `trazo-local-key` | Identificación del servidor de tiempo real. La clave es pública |
 | `REVERB_APP_SECRET` | `trazo_local_only` | Firma las suscripciones al tiempo real. **Solo para local**: en producción se define otro |
 | `REVERB_ALLOWED_ORIGINS` | `localhost` | Dominios desde los que se aceptan conexiones de tiempo real (sin `http://`) |
+| `BACKUP_ENCRYPTION_KEY` | vacía | Llave que cifra los respaldos de la base. En local se genera sola. **En producción es obligatoria** y se guarda fuera del servidor |
+| `BACKUP_AT`, `BACKUP_TIMEZONE` | `03:00`, `America/Bogota` | Hora del respaldo diario |
+| `BACKUP_RETENTION_DAYS` | `7` | Días de respaldos que se guardan |
 
 El resto de la configuración (conexiones a MySQL y Redis, colas, caché) está fija en [`docker-compose.yml`](docker-compose.yml), porque no cambia entre equipos. El repositorio es público: ningún secreto real se guarda en él.
 
@@ -265,14 +271,30 @@ La [estrategia de pruebas](docs/calidad/estrategia-de-pruebas.md) explica qué c
 
 Solo el gateway publica un puerto. MySQL y Redis viven en una red interna, sin acceso desde fuera. El detalle de cada contenedor está en [Docker](docs/operacion/docker.md).
 
+## Respaldos
+
+El servicio `backup` copia la base cada día a las 3:00 (hora de Bogotá), comprimida y cifrada, y guarda los últimos 7 días. Corre solo desde que se levanta el stack; el primer respaldo aparece a los pocos segundos.
+
+```bash
+# Ver los respaldos
+docker compose exec backup trazo-backup list
+
+# Hacer uno ahora
+docker compose exec backup trazo-backup run
+```
+
+Cómo probarlos y restaurarlos: [Respaldos](docs/operacion/respaldos.md).
+
 ## Actualizar
 
 Después de traer cambios del repositorio, levantar el stack reconstruyendo las imágenes, por si cambiaron sus archivos o las dependencias. Las migraciones y los seeders nuevos se aplican solos al arrancar.
 
 ```bash
 git pull
-docker compose up -d --build
+docker compose up -d --build --renew-anon-volumes
 ```
+
+`--renew-anon-volumes` hace falta porque, en local, las dependencias del front (`node_modules`) viven en un volumen anónimo que Compose reutiliza al recrear el contenedor: sin esa opción, la imagen nueva trae las dependencias actualizadas, pero el contenedor sigue usando las anteriores. No toca los datos: la base, la caché y la clave están en volúmenes con nombre.
 
 ## Detener y limpiar
 
@@ -283,7 +305,7 @@ docker compose stop
 # Detener y quitar los contenedores (los datos se conservan)
 docker compose down
 
-# Quitar también los datos: la base, la caché y la clave generada
+# Quitar también los datos: la base, la caché, las claves generadas y los respaldos
 docker compose down -v
 ```
 
@@ -312,6 +334,16 @@ La carpeta [`docs/`](docs/index.md) explica el producto y cada decisión técnic
 - [Registro de decisiones](docs/decisiones/index.md): cada elección con sus alternativas y por qué se descartaron
 - [Mejoras aplicadas](docs/mejoras/aplicadas.md) y [propuestas](docs/mejoras/propuestas.md): lo que va más allá de la prueba técnica
 - [Flujo de trabajo con Git](docs/operacion/flujo-de-trabajo.md)
+
+Las clases y funciones se documentan en el código (PHPDoc y TSDoc). Para generar el sitio navegable, que queda en `docs-build/`:
+
+```bash
+# Backend, con phpDocumentor
+docker compose --profile docs run --rm phpdoc
+
+# Frontend, con TypeDoc (desde frontend/)
+npm run docs:ts
+```
 
 | Carpeta | Contenido |
 |---|---|

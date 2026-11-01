@@ -28,7 +28,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Archivado de registros antiguos | Mantiene ágiles las tablas principales | Igual que la anterior |
 | Motor de búsqueda externo (Meilisearch) | Búsqueda tolerante a errores y más rápida a gran escala | Otra pieza de infraestructura |
 | Paginación por cursor | Rendimiento constante en páginas muy profundas | La interfaz de tabla espera páginas numeradas |
-| Copia de respaldos fuera del servidor | Sobrevivir a una falla total del servidor | El respaldo local cubre el alcance actual |
+| Copia de respaldos fuera del servidor | Sobrevivir a una falla total del servidor | El respaldo local cifrado ([ADR-0064](../decisiones/0064-respaldo-diario-de-mysql.md)) cubre el alcance actual |
+| Recuperación al minuto con binlogs de MySQL | Perder minutos de datos en vez de hasta un día | Exige guardar y rotar binlogs; el respaldo diario cubre el alcance actual |
 
 ## Producto
 
@@ -56,6 +57,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | CSS de Quasar solo con los componentes usados | Bajar los 38 kB comprimidos de la carga inicial, casi todos de estilos que no se usan |
 | Escaneo de ZAP en el CI | Repetir el escaneo pasivo en cada Pull Request, contra el stack del propio CI |
 | Despliegue sin caída (blue/green) | Actualizaciones sin interrupción |
+| Conservar los archivos de la versión anterior tras publicar | Quien tenía Trazo abierto sigue navegando sin recargar ([ADR-0063](../decisiones/0063-pantalla-que-no-se-descarga.md)) |
+| Recarga automática ante una versión nueva | Una sola recarga, y solo si no hay cambios sin guardar, en lugar del aviso con "Recargar" ([ADR-0063](../decisiones/0063-pantalla-que-no-se-descarga.md)) |
 | Commits firmados | Garantía de autoría de cada cambio |
 | Pruebas de mutación | Verifican que las pruebas detectan errores reales |
 | Pruebas de carga (k6) | Comportamiento con cientos de usuarios simultáneos |
