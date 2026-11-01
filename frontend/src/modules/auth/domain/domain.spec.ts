@@ -1,6 +1,7 @@
 // Reglas puras del módulo de sesión: permisos y redirección segura después del login.
 import { describe, expect, it } from 'vitest'
 import { safeRedirect } from './safeRedirect'
+import { passwordRequirements } from './password'
 import { hasPermission, type SessionUser } from './session'
 
 const user: SessionUser = {
@@ -38,5 +39,17 @@ describe('safeRedirect', () => {
     ['/a'],
   ])('rechaza %s', (target) => {
     expect(safeRedirect(target)).toBeNull()
+  })
+})
+
+describe('passwordRequirements', () => {
+  it('marca el largo y la coincidencia mientras se escribe, y deja la filtración para la API', () => {
+    const empty = passwordRequirements('', '')
+    const ready = passwordRequirements('Cielo-Naranja-42', 'Cielo-Naranja-42')
+
+    expect(empty.map((item) => item.met)).toEqual([false, false, null])
+    expect(ready.map((item) => item.met)).toEqual([true, true, null])
+    expect(passwordRequirements('corta', 'corta')[0]?.met).toBe(false)
+    expect(passwordRequirements('Cielo-Naranja-42', 'otra')[1]?.met).toBe(false)
   })
 })

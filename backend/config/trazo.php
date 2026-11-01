@@ -37,6 +37,18 @@ return [
             'max_attempts' => 5,
             'recovery_codes' => 8,
         ],
+
+        // Recuperación de contraseña. Documentado en docs/backend/auth.md
+        'password' => [
+            // Vida del código que llega al correo y del pase para elegir la contraseña nueva
+            'reset_code_minutes' => 15,
+            'reset_ticket_minutes' => 10,
+            // Intentos fallidos (código o segundo factor) antes de anular la solicitud
+            'reset_max_attempts' => 5,
+            // Have I Been Pwned: cuánto se espera antes de seguir solo con la lista local
+            'breach_check_timeout' => 3,
+            'common_list' => resource_path('security/common-passwords.txt'),
+        ],
     ],
 
     // Documentado en docs/backend/dashboard.md

@@ -10,13 +10,20 @@ namespace App\Modules\Auth\Infrastructure;
 use App\Modules\Auth\Application\Mfa\ConfirmMfaSetup;
 use App\Modules\Auth\Application\Mfa\RegenerateRecoveryCodes;
 use App\Modules\Auth\Application\Mfa\VerifyMfa;
+use App\Modules\Auth\Application\Password\RequestPasswordReset;
+use App\Modules\Auth\Application\Password\ResetPassword;
+use App\Modules\Auth\Application\Password\VerifyResetCode;
+use App\Modules\Auth\Application\Ports\BreachedPasswords;
 use App\Modules\Auth\Application\Ports\CredentialVerifier;
 use App\Modules\Auth\Application\Ports\MfaPolicies;
 use App\Modules\Auth\Application\Ports\MfaStore;
 use App\Modules\Auth\Application\Ports\OneTimePasswords;
+use App\Modules\Auth\Application\Ports\PasswordResets;
+use App\Modules\Auth\Application\Ports\ResetCodeSender;
 use App\Modules\Auth\Application\Ports\SecurityNotifier;
 use App\Modules\Auth\Application\Ports\SessionTokens;
 use App\Modules\Auth\Application\Ports\SessionUserReader;
+use App\Modules\Auth\Application\Ports\UserAccounts;
 use App\Modules\Auth\Domain\LockoutPolicy;
 use App\Modules\Auth\Domain\LoginAttemptStore;
 use App\Modules\Shared\Domain\EmailAddress;
@@ -24,12 +31,14 @@ use App\Modules\Users\Infrastructure\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
 use PragmaRX\Google2FA\Google2FA;
+use Psr\Log\LoggerInterface;
 
 final class AuthServiceProvider extends ServiceProvider
 {
@@ -42,6 +51,19 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->bind(SessionUserReader::class, EloquentSessionUserReader::class);
         $this->app->bind(MfaStore::class, EloquentMfaStore::class);
         $this->app->bind(MfaPolicies::class, DatabaseMfaPolicies::class);
+        $this->app->bind(UserAccounts::class, EloquentUserAccounts::class);
+        $this->app->bind(ResetCodeSender::class, MailResetCodeSender::class);
+
+        $this->app->bind(PasswordResets::class, fn (): PasswordResets => new DatabasePasswordResets(
+            (string) config('app.key'),
+        ));
+
+        $this->app->bind(BreachedPasswords::class, fn ($app): BreachedPasswords => new HibpBreachedPasswords(
+            $app->make(HttpClient::class),
+            $app->make(LoggerInterface::class),
+            (string) config('trazo.auth.password.common_list'),
+            (int) config('trazo.auth.password.breach_check_timeout'),
+        ));
 
         $this->app->bind(SessionTokens::class, fn (): SessionTokens => new SanctumSessionTokens(
             (int) config('sanctum.expiration'),
@@ -70,6 +92,13 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->when([ConfirmMfaSetup::class, RegenerateRecoveryCodes::class])
             ->needs('$recoveryCodes')
             ->give(fn (): int => (int) config('trazo.auth.mfa.recovery_codes'));
+
+        $this->app->when(RequestPasswordReset::class)->needs('$codeMinutes')
+            ->give(fn (): int => (int) config('trazo.auth.password.reset_code_minutes'));
+        $this->app->when(VerifyResetCode::class)->needs('$ticketMinutes')
+            ->give(fn (): int => (int) config('trazo.auth.password.reset_ticket_minutes'));
+        $this->app->when([VerifyResetCode::class, ResetPassword::class])->needs('$maxAttempts')
+            ->give(fn (): int => (int) config('trazo.auth.password.reset_max_attempts'));
     }
 
     public function boot(): void
@@ -84,6 +113,18 @@ final class AuthServiceProvider extends ServiceProvider
         // Códigos del MFA: 5 por minuto por persona, igual que el login
         RateLimiter::for('mfa', fn (Request $request): Limit => Limit::perMinute(5)->by(
             'mfa|'.($request->user()?->getAuthIdentifier() ?? $request->ip()),
+        ));
+
+        // Recuperación de contraseña: 3 solicitudes cada 15 minutos y 5 intentos de código por minuto, por correo + IP
+        RateLimiter::for('password-forgot', fn (Request $request): Limit => Limit::perMinutes(15, 3)->by(
+            'forgot|'.EmailAddress::normalize((string) $request->input('email')).'|'.$request->ip(),
+        ));
+        RateLimiter::for('password-reset', fn (Request $request): Limit => Limit::perMinute(5)->by(
+            'reset|'.EmailAddress::normalize((string) $request->input('email')).'|'.$request->ip(),
+        ));
+        // Cambiar la contraseña desde Mi cuenta: 5 por minuto por persona, porque pide la actual
+        RateLimiter::for('password-change', fn (Request $request): Limit => Limit::perMinute(5)->by(
+            'change|'.($request->user()?->getAuthIdentifier() ?? $request->ip()),
         ));
 
         // Además del vencimiento: una sesión sin uso se cierra sola, una cuenta desactivada pierde sus sesiones y el

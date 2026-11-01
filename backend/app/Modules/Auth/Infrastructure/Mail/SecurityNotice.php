@@ -32,6 +32,10 @@ final class SecurityNotice extends Mailable implements ShouldQueue
             'Se usó un código de recuperación en tu cuenta',
             'Alguien ingresó a tu cuenta con uno de tus códigos de recuperación. Ese código ya no sirve.',
         ],
+        'password_changed' => [
+            'Tu contraseña cambió',
+            'La contraseña de tu cuenta de Trazo cambió y se cerraron las demás sesiones abiertas.',
+        ],
         'recovery_codes_regenerated' => [
             'Generaste códigos de recuperación nuevos',
             'Los códigos de recuperación anteriores dejaron de servir. Guarda los nuevos en un lugar seguro.',

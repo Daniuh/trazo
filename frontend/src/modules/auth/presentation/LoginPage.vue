@@ -8,7 +8,7 @@ import { ApiError, toApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
-import { SESSION_EXPIRED_REASON } from '../application/authGuard'
+import { PASSWORD_CHANGED_REASON, SESSION_EXPIRED_REASON } from '../application/authGuard'
 import { useSessionStore } from '../application/useSessionStore'
 import { safeRedirect } from '../domain/safeRedirect'
 import type { LoginStep } from '../domain/session'
@@ -27,6 +27,7 @@ const submitting = ref(false)
 
 const sessionExpired = computed(() => route.query.motivo === SESSION_EXPIRED_REASON && !formError.value)
 const expiredMessage = messageFor(new ApiError('http', 'UNAUTHENTICATED'))
+const passwordChanged = computed(() => route.query.motivo === PASSWORD_CHANGED_REASON && !formError.value)
 
 // Revisión rápida antes de enviar, para no esperar a la API por un campo vacío
 function localErrors(): Record<string, string> {
@@ -74,6 +75,9 @@ async function submit(): Promise<void> {
     <form class="login__form" novalidate @submit.prevent="submit">
       <AppAlert v-if="formError">{{ formError }}</AppAlert>
       <AppAlert v-else-if="sessionExpired" tone="info">{{ expiredMessage }}</AppAlert>
+      <AppAlert v-else-if="passwordChanged" tone="info">
+        Tu contraseña cambió y cerramos tus sesiones abiertas. Ingresa con la contraseña nueva.
+      </AppAlert>
 
       <AppTextField
         v-model="form.email"
@@ -94,6 +98,8 @@ async function submit(): Promise<void> {
         :error="fieldErrors.password"
       />
 
+      <RouterLink class="login__forgot" :to="{ name: 'password-forgot' }">¿Olvidaste tu contraseña?</RouterLink>
+
       <AppButton type="submit" :loading="submitting" block>Ingresar</AppButton>
     </form>
   </AuthPanel>
@@ -106,5 +112,13 @@ async function submit(): Promise<void> {
   display: flex;
   flex-direction: column;
   gap: $space-4;
+}
+
+.login__forgot {
+  align-self: flex-end;
+  margin-top: -$space-2;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
 }
 </style>

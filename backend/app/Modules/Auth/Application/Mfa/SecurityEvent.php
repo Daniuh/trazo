@@ -12,4 +12,5 @@ enum SecurityEvent: string
     case MfaDisabled = 'mfa_disabled';
     case RecoveryCodeUsed = 'recovery_code_used';
     case RecoveryCodesRegenerated = 'recovery_codes_regenerated';
+    case PasswordChanged = 'password_changed';
 }

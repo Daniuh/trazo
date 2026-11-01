@@ -1,6 +1,6 @@
 ---
 title: Módulo Auth
-description: Inicio y cierre de sesión, verificación en dos pasos (MFA), tokens, bloqueo progresivo y vencimiento de la sesión.
+description: Inicio y cierre de sesión, verificación en dos pasos (MFA), recuperación y cambio de contraseña, tokens, bloqueo progresivo y vencimiento de la sesión.
 audience: tecnico
 area: backend
 module: auth
@@ -23,6 +23,10 @@ Se encarga de comprobar quién es la persona y de mantener su sesión. Los permi
 | `POST` | `/api/v1/auth/mfa/setup/confirm` | Ingreso a medias o sesión | 5 por minuto | Activa el MFA con el primer `code`; devuelve los 8 códigos de recuperación y, si venía de un ingreso a medias, la sesión completa |
 | `POST` | `/api/v1/auth/mfa/recovery-codes` | Sí | 5 por minuto | Con un `code` actual, 8 códigos nuevos; los anteriores dejan de servir |
 | `DELETE` | `/api/v1/auth/mfa` | Sí | 5 por minuto | Con un `code` actual, desactiva el MFA si la política del rol no lo exige |
+| `POST` | `/api/v1/auth/password/forgot` | No | 3 cada 15 minutos (correo + IP) | `202` siempre: si el correo es de una cuenta activa, le llega un código |
+| `POST` | `/api/v1/auth/password/verify-code` | No | 5 por minuto (correo + IP) | Con `email` y `code`, un pase de un solo uso (`ticket`) y si la cuenta pide segundo factor (`mfa_required`) |
+| `POST` | `/api/v1/auth/password/reset` | No | 5 por minuto (correo + IP) | Con `email`, `ticket`, `password`, su confirmación y, si hace falta, `mfa_code` o `recovery_code`; `204` |
+| `PUT` | `/api/v1/auth/password` | Sí | 5 por minuto por persona | Con `current_password`, `password` y su confirmación; `204` |
 
 Todas las rutas de la API tienen además el límite general de 120 peticiones por minuto, por usuario o por IP.
 
@@ -97,6 +101,12 @@ flowchart TD
 | `MFA_SETUP_NOT_STARTED` | 409 | Confirmar sin haber pedido antes una clave | — |
 | `MFA_REQUIRED_BY_POLICY` | 409 | Desactivar el MFA cuando el rol lo exige | — |
 | `MFA_NOT_PENDING` | 409 | Verificar un código con una sesión que ya está completa | — |
+| `MFA_CODE_REQUIRED` | 422 | Recuperar la contraseña de una cuenta con MFA sin enviar ningún código | — |
+| `PASSWORD_RESET_CODE_INVALID` | 422 | Código de recuperación incorrecto, vencido, agotado o de un correo que no existe (la misma respuesta) | — |
+| `PASSWORD_RESET_EXPIRED` | 422 | El pase venció, ya se usó o la solicitud se anuló por intentos | — |
+| `PASSWORD_BREACHED` | 422 | La contraseña nueva está en filtraciones conocidas o entre las más comunes (error del campo `password`) | — |
+| `CURRENT_PASSWORD_INVALID` | 422 | Al cambiarla desde Mi cuenta, la contraseña actual no es correcta | — |
+| `PASSWORD_SAME_AS_CURRENT` | 422 | La contraseña nueva es igual a la actual | — |
 
 ## Reglas de seguridad
 
@@ -156,10 +166,45 @@ TOTP estándar (RFC 6238): 6 dígitos que cambian cada 30 segundos, compatibles 
 - **Códigos de recuperación:** 8, de 10 caracteres sin letras que se confunden (`ABCDE-FGHJK`). Se guarda solo su hash SHA-256: son aleatorios y largos (unos 50 bits), así que no necesitan un hash lento. Cada uno sirve una vez y se aceptan con minúsculas, espacios o sin guion.
 
 ### Avisos por correo
-Se envía un aviso, por la cola y en texto plano, cuando se activa o desactiva el MFA, cuando se usa un código de recuperación y cuando se generan códigos nuevos. Dice qué pasó, cuándo (hora de Colombia) y qué hacer si no fue la persona. No lleva enlaces ni datos sensibles. En local llega a Mailpit (`http://localhost:8025`).
+Se envía un aviso, por la cola y en texto plano, cuando se activa o desactiva el MFA, cuando se usa un código de recuperación, cuando se generan códigos nuevos y cuando cambia la contraseña. Dice qué pasó, cuándo (hora de Colombia) y qué hacer si no fue la persona. No lleva enlaces ni datos sensibles. En local llega a Mailpit (`http://localhost:8025`).
 
 ### Registro en el log
 Solo lo que puede ser un ataque o un problema: un ingreso con código de recuperación (con cuántos quedan) y un ingreso cortado por intentos fallidos. Los códigos incorrectos aislados no se registran.
+
+## Recuperar y cambiar la contraseña
+
+### Política de contraseñas
+- **De 12 a 128 caracteres**, con confirmación. El máximo evita que una contraseña enorme haga trabajar de más a Argon2id.
+- **No puede estar filtrada.** Primero se revisa una lista local de las 10.000 más comunes (`resources/security/common-passwords.txt`, de SecLists). Después, Have I Been Pwned con su consulta anónima: solo salen los primeros 5 caracteres del SHA-1 y la respuesta viene con relleno. Si el servicio no responde en 3 segundos, queda la lista local y se registra una advertencia; nadie se queda sin poder cambiar su contraseña por una caída externa.
+- La revisión solo corre si la contraseña ya cumple el largo (`bail`), para no consultar el servicio en vano.
+
+### Recuperación en tres pasos
+
+```mermaid
+sequenceDiagram
+  participant P as Persona
+  participant API
+  participant Correo
+  P->>API: POST /password/forgot (email)
+  API-->>Correo: Código de 6 dígitos (15 min), si la cuenta existe y está activa
+  API->>P: 202 siempre
+  P->>API: POST /password/verify-code (email, code)
+  API->>P: ticket (10 min) y mfa_required
+  P->>API: POST /password/reset (ticket, password, mfa_code o recovery_code)
+  API->>API: Guarda la contraseña, cierra todas las sesiones y levanta el bloqueo del login
+  API-->>Correo: Aviso "Tu contraseña cambió"
+  API->>P: 204
+```
+
+- **No revela qué cuentas existen:** pedir el código siempre responde `202`, y un código de un correo inexistente da el mismo `PASSWORD_RESET_CODE_INVALID` que uno mal escrito.
+- **Código y pase con HMAC-SHA256** y la clave de la aplicación. Con un millón de combinaciones, un hash simple se descifraría con una copia de la base.
+- **Una sola solicitud vigente:** pedir otro código anula los anteriores. Cinco fallos (del código o del segundo factor) anulan la solicitud y se registran en el log.
+- **Segundo factor:** si la cuenta tiene MFA, se pide el código de la aplicación o uno de los códigos de recuperación, para quien perdió el teléfono y olvidó la contraseña a la vez. Un código incorrecto responde con `attempts_left`.
+- **Al terminar:** se cierran todas las sesiones, se levanta el bloqueo del login para ese correo y llega el aviso por correo.
+
+### Cambio desde Mi cuenta
+- Pide la contraseña actual. No vuelve a pedir el MFA: la sesión ya lo pasó.
+- Cierra las demás sesiones y deja abierta la actual. Llega el mismo aviso por correo.
 
 ## Capas
 
@@ -174,8 +219,13 @@ Solo lo que puede ser un ataque o un problema: un ingreso con código de recuper
 | Application | `CredentialVerifier`, `SessionTokens`, `SessionUserReader`, `OneTimePasswords`, `MfaStore`, `MfaPolicies`, `SecurityNotifier` | Puertos que implementa la infraestructura |
 | Infrastructure | `EloquentCredentialVerifier`, `SanctumSessionTokens`, `CacheLoginAttemptStore`, `EloquentSessionUserReader` | Implementaciones con Eloquent, Sanctum y Redis |
 | Infrastructure | `Google2faOneTimePasswords`, `EloquentMfaStore`, `DatabaseMfaPolicies`, `MailSecurityNotifier`, `Mail/SecurityNotice` | TOTP con la librería, guardado del MFA, política por rol y avisos por correo |
-| Infrastructure | `AuthServiceProvider` | Conexión de los puertos, límites del login y del MFA, inactividad, alcance del token de un ingreso a medias y morph map |
+| Domain | `Password/PasswordPolicy`, `Password/ResetCode`, `PasswordExceptions` | Largo de las contraseñas, generación del código y del pase, y errores de la contraseña |
+| Application | `Password/RequestPasswordReset`, `VerifyResetCode`, `ResetPassword`, `ChangePassword` | Casos de uso de la recuperación y del cambio |
+| Application | `UserAccounts`, `PasswordResets`, `ResetCodeSender`, `BreachedPasswords` | Puertos de la contraseña |
+| Infrastructure | `EloquentUserAccounts`, `DatabasePasswordResets`, `MailResetCodeSender`, `Mail/PasswordResetCode`, `HibpBreachedPasswords` | Cuentas, solicitudes con HMAC, correo del código y revisión de contraseñas filtradas |
+| Infrastructure | `AuthServiceProvider` | Conexión de los puertos, límites del login, del MFA y de la contraseña, inactividad, alcance del token de un ingreso a medias y morph map |
 | Http | `AuthController`, `MfaController`, `LoginRequest`, `VerifyMfaRequest`, `MfaCodeRequest`, `SessionPayload`, `SessionUserResource` | Endpoints, validación de entrada y forma de la respuesta |
+| Http | `PasswordController`, `ForgotPasswordRequest`, `VerifyResetCodeRequest`, `ResetPasswordRequest`, `ChangePasswordRequest`, `Rules/NewPassword`, `Rules/NotBreachedPassword` | Endpoints de la contraseña y la regla única de contraseñas nuevas |
 
 ## Dónde está en el código
 
@@ -183,6 +233,7 @@ Solo lo que puede ser un ataque o un problema: un ingreso con código de recuper
 - [`backend/config/sanctum.php`](../../backend/config/sanctum.php) y [`backend/config/trazo.php`](../../backend/config/trazo.php)
 - [`backend/routes/console.php`](../../backend/routes/console.php): limpieza diaria de tokens.
 - Pruebas: [`tests/Feature/Auth/`](../../backend/tests/Feature/Auth/) y [`tests/Unit/Auth/`](../../backend/tests/Unit/Auth/)
-- Correo de aviso: [`resources/views/mail/security-notice.blade.php`](../../backend/resources/views/mail/security-notice.blade.php)
-- Tablas: [personal_access_tokens](../base-de-datos/diccionario/personal-access-tokens.md) y [MFA](../base-de-datos/diccionario/mfa.md)
-- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md), [ADR-0016](../decisiones/0016-contrasenas.md), [ADR-0017](../decisiones/0017-mfa-totp.md), [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md) y [ADR-0051](../decisiones/0051-mfa-en-la-practica.md)
+- Correos: [`security-notice.blade.php`](../../backend/resources/views/mail/security-notice.blade.php) y [`password-reset-code.blade.php`](../../backend/resources/views/mail/password-reset-code.blade.php)
+- Lista local de contraseñas comunes: [`resources/security/common-passwords.txt`](../../backend/resources/security/common-passwords.txt)
+- Tablas: [personal_access_tokens](../base-de-datos/diccionario/personal-access-tokens.md), [MFA](../base-de-datos/diccionario/mfa.md) y [password_reset_codes](../base-de-datos/diccionario/password-reset-codes.md)
+- Decisiones: [ADR-0015](../decisiones/0015-autenticacion-sanctum.md), [ADR-0016](../decisiones/0016-contrasenas.md), [ADR-0017](../decisiones/0017-mfa-totp.md), [ADR-0018](../decisiones/0018-recuperacion-contrasena.md), [ADR-0042](../decisiones/0042-sesion-y-bloqueo.md), [ADR-0051](../decisiones/0051-mfa-en-la-practica.md) y [ADR-0052](../decisiones/0052-recuperacion-y-cambio-de-contrasena.md)

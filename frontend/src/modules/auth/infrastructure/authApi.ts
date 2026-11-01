@@ -1,4 +1,4 @@
-// Repositorio de sesión: habla con /auth de la API (ingreso y MFA) y traduce sus respuestas al modelo del front.
+// Repositorio de sesión: habla con /auth de la API (ingreso, MFA y contraseña) y traduce sus respuestas al modelo del front.
 // Los pedidos del segundo paso del ingreso llevan su propio token, que todavía no es el de la sesión.
 // Documentado en docs/frontend/auth.md
 import { http } from '@/shared/http'
@@ -36,6 +36,21 @@ export interface ConfirmedMfa {
   recoveryCodes: string[]
   // La sesión completa, si se configuró durante el ingreso
   session: LoginResult | null
+}
+
+// Pase de un solo uso que entrega el código del correo, y si la cuenta pide además el segundo factor
+export interface ResetTicket {
+  ticket: string
+  mfaRequired: boolean
+}
+
+export interface PasswordResetInput {
+  email: string
+  ticket: string
+  password: string
+  confirmation: string
+  mfaCode?: string
+  recoveryCode?: string
 }
 
 const toSessionUser = (dto: SessionUserDto): SessionUser => ({
@@ -98,5 +113,36 @@ export const authApi = {
 
   async disableMfa(code: string): Promise<void> {
     await http.delete('/auth/mfa', { data: { code } })
+  },
+
+  async forgotPassword(email: string): Promise<void> {
+    await http.post('/auth/password/forgot', { email })
+  },
+
+  async verifyResetCode(email: string, code: string): Promise<ResetTicket> {
+    const { data } = await http.post<{ data: { ticket: string; mfa_required: boolean } }>(
+      '/auth/password/verify-code',
+      { email, code },
+    )
+    return { ticket: data.data.ticket, mfaRequired: data.data.mfa_required }
+  },
+
+  async resetPassword(reset: PasswordResetInput): Promise<void> {
+    await http.post('/auth/password/reset', {
+      email: reset.email,
+      ticket: reset.ticket,
+      password: reset.password,
+      password_confirmation: reset.confirmation,
+      mfa_code: reset.mfaCode || undefined,
+      recovery_code: reset.recoveryCode || undefined,
+    })
+  },
+
+  async changePassword(current: string, password: string, confirmation: string): Promise<void> {
+    await http.put('/auth/password', {
+      current_password: current,
+      password,
+      password_confirmation: confirmation,
+    })
   },
 }

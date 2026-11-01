@@ -24,6 +24,7 @@ async function render(query: Record<string, string> = {}) {
     routes: [
       { path: '/ingresar', name: LOGIN_ROUTE, component: LoginPage },
       { path: '/', name: 'home', component: { template: '<div />' } },
+      { path: '/recuperar', name: 'password-forgot', component: { template: '<div />' } },
       { path: '/incidentes', name: 'incidents', component: { template: '<div />' } },
     ],
   })

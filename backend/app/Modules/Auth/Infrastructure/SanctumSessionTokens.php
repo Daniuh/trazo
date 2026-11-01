@@ -46,6 +46,15 @@ final readonly class SanctumSessionTokens implements SessionTokens
         PersonalAccessToken::query()->whereKey($tokenId)->delete();
     }
 
+    public function revokeAll(int $userId, ?int $exceptTokenId = null): void
+    {
+        PersonalAccessToken::query()
+            ->where('tokenable_type', 'user')
+            ->where('tokenable_id', $userId)
+            ->when($exceptTokenId !== null, fn ($query) => $query->whereKeyNot($exceptTokenId))
+            ->delete();
+    }
+
     /**
      * @param  list<string>  $abilities
      */
