@@ -1,0 +1,68 @@
+# Producción: se usa junto al compose base, sin el override local (sin Mailpit ni herramientas):
+#   docker compose -p trazo -f docker-compose.yml -f docker-compose.prod.yml up -d --build --wait
+# El HTTPS lo pone el proxy del servidor (Caddy), que llega al gateway por la red "proxy". Nada publica puertos.
+# Los secretos salen del .env del servidor: si falta uno, Compose se detiene antes de crear nada.
+# Documentado en docs/operacion/despliegue.md
+
+x-prod-env: &prod-env
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_URL: ${APP_URL:?Falta APP_URL, por ejemplo https://trazo.daniuh.dev}
+  APP_KEY: ${APP_KEY:?Falta APP_KEY}
+  DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+  REDIS_PASSWORD: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD}
+  REVERB_APP_KEY: ${REVERB_APP_KEY:?Falta REVERB_APP_KEY}
+  REVERB_APP_SECRET: ${REVERB_APP_SECRET:?Falta REVERB_APP_SECRET}
+  REVERB_ALLOWED_ORIGINS: ${REVERB_ALLOWED_ORIGINS:?Falta REVERB_ALLOWED_ORIGINS, por ejemplo trazo.daniuh.dev}
+  MAIL_HOST: ${MAIL_HOST:?Falta MAIL_HOST}
+  MAIL_PORT: ${MAIL_PORT:?Falta MAIL_PORT}
+  MAIL_USERNAME: ${MAIL_USERNAME:?Falta MAIL_USERNAME}
+  MAIL_PASSWORD: ${MAIL_PASSWORD:?Falta MAIL_PASSWORD}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:?Falta MAIL_FROM_ADDRESS}
+
+services:
+  init:
+    environment: *prod-env
+  app:
+    environment: *prod-env
+  worker:
+    environment: *prod-env
+  scheduler:
+    environment: *prod-env
+  reverb:
+    environment: *prod-env
+
+  mysql:
+    environment:
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Falta DB_ROOT_PASSWORD}
+
+  redis:
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?Falta REDIS_PASSWORD}
+
+  backup:
+    environment:
+      APP_ENV: production
+      DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:?Falta BACKUP_ENCRYPTION_KEY}
+
+  # Sin puerto en el servidor: solo el proxy lo alcanza, por su nombre trazo-gateway en la red "proxy"
+  gateway:
+    ports: !reset []
+    volumes:
+      - ./docker/nginx/real-ip.prod.conf:/etc/nginx/conf.d/real-ip.conf:ro
+    networks:
+      edge: {}
+      proxy:
+        aliases: [trazo-gateway]
+
+networks:
+  # Red compartida con el proxy del servidor. Nombre fijo y subred propia: la IP real de cada visitante se toma solo
+  # de lo que llega desde aquí. Si se cambia la subred, cambiarla también en docker/nginx/real-ip.prod.conf
+  proxy:
+    name: trazo-proxy
+    ipam:
+      config:
+        - subnet: 172.30.250.0/24
