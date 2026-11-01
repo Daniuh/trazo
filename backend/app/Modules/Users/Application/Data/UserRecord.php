@@ -19,7 +19,10 @@ final readonly class UserRecord
     public function __construct(
         public int $id,
         public string $ulid,
+        // Nombre completo para mostrar (nombres + apellidos)
         public string $name,
+        public string $givenNames,
+        public string $familyNames,
         public string $email,
         public bool $isActive,
         public array $roles,

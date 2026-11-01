@@ -9,7 +9,7 @@ order: 48
 # ADR-0038: Versiones del stack
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba exige PHP 8+ y Laravel 10+, así que cualquier versión posterior cumple. Lo que hay que evitar es construir sobre una versión que ya no recibe parches de seguridad.

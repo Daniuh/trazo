@@ -28,10 +28,10 @@ const emit = defineEmits<{ add: [code: WidgetCode]; restore: []; cancel: []; sav
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
 
-// Fija bajo el encabezado de la app ($header-height), con el fondo de la página para que el contenido pase por debajo
+// Fija arriba de la pantalla, con el fondo de la página para que el contenido pase por debajo
 .edit-toolbar {
   position: sticky;
-  top: $header-height;
+  top: 0;
   z-index: 4;
   display: flex;
   flex-wrap: wrap;

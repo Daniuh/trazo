@@ -13,6 +13,8 @@ use App\Modules\Incidents\Application\DeleteIncident;
 use App\Modules\Incidents\Application\ExportIncidents;
 use App\Modules\Incidents\Application\IncidentGate;
 use App\Modules\Incidents\Application\ListIncidents;
+use App\Modules\Incidents\Application\ListMyIncidents;
+use App\Modules\Incidents\Application\Ports\IncidentComments;
 use App\Modules\Incidents\Application\UpdateIncident;
 use App\Modules\Incidents\Domain\IncidentAction;
 use App\Modules\Incidents\Http\Requests\IncidentRequest;
@@ -36,7 +38,26 @@ final readonly class IncidentController
 
         return new JsonResponse([
             'data' => array_map(fn (IncidentRecord $incident): array => $this->resource->summary($incident, $actor), $page->items),
-            'meta' => ['page' => $page->page, 'per_page' => $page->perPage, 'total' => $page->total, 'last_page' => $page->lastPage()],
+            'meta' => [
+                'page' => $page->page,
+                'per_page' => $page->perPage,
+                'total' => $page->total,
+                'last_page' => $page->lastPage(),
+                // Total de cada grupo de la página con los mismos filtros (vacío si no se agrupa)
+                'groups' => array_map(fn (string $key, int $total): array => ['key' => $key, 'total' => $total], array_keys($page->groups), $page->groups),
+            ],
+        ]);
+    }
+
+    // "Mis incidentes": todos los del tablero de una vez (sin páginas), con los estados a los que se puede mover cada uno
+    public function mine(Request $request, ListMyIncidents $list): JsonResponse
+    {
+        $actor = $this->requests->actor($request);
+        $result = $list->handle($actor);
+
+        return new JsonResponse([
+            'data' => array_map(fn (IncidentRecord $incident): array => $this->resource->board($incident, $actor), $result['items']),
+            'meta' => ['truncated' => $result['truncated'], 'limit' => ListMyIncidents::LIMIT, 'finished_days' => ListMyIncidents::FINISHED_DAYS],
         ]);
     }
 
@@ -54,11 +75,13 @@ final readonly class IncidentController
         return new JsonResponse(['data' => $this->resource->toArray($incident, $actor)], 201);
     }
 
-    public function show(Request $request, string $incident, IncidentGate $gate): JsonResponse
+    public function show(Request $request, string $incident, IncidentGate $gate, IncidentComments $comments): JsonResponse
     {
         $actor = $this->requests->actor($request);
+        $record = $gate->load($actor, $incident, IncidentAction::View);
 
-        return new JsonResponse(['data' => $this->resource->toArray($gate->load($actor, $incident, IncidentAction::View), $actor)]);
+        // Solo el detalle trae cuántos mensajes tiene la conversación (el botón lo muestra antes de abrirla)
+        return new JsonResponse(['data' => [...$this->resource->toArray($record, $actor), 'comments_count' => $comments->count($record->id)]]);
     }
 
     public function update(IncidentRequest $request, string $incident, UpdateIncident $update): JsonResponse

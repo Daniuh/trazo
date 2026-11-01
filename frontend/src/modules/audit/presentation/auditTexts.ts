@@ -34,13 +34,14 @@ function incidentValue(field: string, value: unknown): string {
 }
 
 function incidentRows(entry: IncidentAuditEntry): ChangeRow[] {
-  return Object.entries(entry.changes ?? {}).map(([field, change]) => ({
+  const rows = Object.entries(entry.changes ?? {}).map(([field, change]) => ({
     label: INCIDENT_FIELDS[field] ?? field,
     value:
       'from' in change
         ? arrow(incidentValue(field, change.from), incidentValue(field, change.to))
         : incidentValue(field, change.to),
   }))
+  return entry.note ? [...rows, { label: 'Nota', value: entry.note }] : rows
 }
 
 function mfaText(value: unknown): string {
@@ -114,7 +115,11 @@ function adminRows(entry: AdminAuditEntry, catalog: AuditCatalog): ChangeRow[] {
     else if (key === 'added') push('Permisos concedidos', permissionList(catalog, value))
     else if (key === 'removed') push('Permisos quitados', permissionList(catalog, value))
     else if (key === 'permissions' && Array.isArray(value)) push('Permisos', permissionList(catalog, value))
-    else if (key === 'permissions' && isRecord(value)) {
+    // Al cambiar de rol se borran las excepciones de la persona: se muestran las que tenía
+    else if (key === 'cleared' && isRecord(value)) {
+      push('Permisos adicionales que se quitaron', permissionList(catalog, value.granted))
+      push('Permisos del rol que se devolvieron', permissionList(catalog, value.denied))
+    } else if (key === 'permissions' && isRecord(value)) {
       push('Permisos agregados', permissionList(catalog, value.added))
       push('Permisos quitados', permissionList(catalog, value.removed))
     }

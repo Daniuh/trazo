@@ -5,6 +5,7 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   { path: 'incidentes', name: 'incidents', component: () => import('./presentation/IncidentListPage.vue') },
   { path: 'incidentes/nuevo', name: 'incident-create', component: () => import('./presentation/IncidentFormPage.vue') },
+  { path: 'incidentes/mios', name: 'my-incidents', component: () => import('./presentation/MyIncidentsPage.vue') },
   {
     path: 'incidentes/:id',
     name: 'incident-detail',

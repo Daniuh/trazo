@@ -5,7 +5,7 @@ import type Echo from 'laravel-echo'
 import { onBeforeUnmount, onMounted, watch } from 'vue'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { setSocketIdSource } from '@/shared/http'
-import { channelsFor, type IncidentChange } from '../domain/realtime'
+import { channelsFor, type IncidentChange, type RealtimeEvents } from '../domain/realtime'
 import { createEcho, realtimeConfig } from '../infrastructure/echoClient'
 import { emitRealtime } from './realtimeBus'
 
@@ -24,9 +24,11 @@ export function useRealtimeConnection() {
     channel.listen('.incident.changed', (payload: { id: string; change: IncidentChange }) =>
       emitRealtime('incident', payload),
     )
+    channel.listen('.incident.commented', (payload: RealtimeEvents['comment']) => emitRealtime('comment', payload))
     if (name.startsWith('users.')) {
       channel.listen('.incident.assigned', (payload: { id: string }) => emitRealtime('assigned', payload))
       channel.listen('.session.changed', () => emitRealtime('session', {}))
+      channel.listen('.notifications.changed', () => emitRealtime('notifications', {}))
     }
   }
 

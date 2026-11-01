@@ -10,6 +10,7 @@ namespace App\Modules\Incidents\Infrastructure;
 
 use App\Modules\Incidents\Application\Data\IncidentListCriteria;
 use App\Modules\Incidents\Application\Ports\IncidentCatalog;
+use App\Modules\Incidents\Domain\IncidentCode;
 use App\Modules\Incidents\Domain\IncidentSort;
 use App\Modules\Incidents\Domain\StatusFlags;
 use App\Modules\Incidents\Domain\VisibilityScope;
@@ -21,9 +22,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 final readonly class IncidentFilters
 {
-    // "INC-123" o "inc-000123": se busca por código exacto
-    private const CODE_PATTERN = '/^INC-?(\d{1,10})$/i';
-
     private const MIN_TERM_LENGTH = 3;
 
     public function __construct(private IncidentCatalog $catalog) {}
@@ -47,7 +45,8 @@ final readonly class IncidentFilters
     }
 
     /**
-     * Orden pedido y, siempre, el id como desempate: así las páginas no repiten ni saltan filas.
+     * Orden pedido y, siempre, el id como desempate: así las páginas no repiten ni saltan filas. El grupo, si lo hay,
+     * lo pone IncidentGroups.
      *
      * @param  Builder<Incident>  $query
      * @return Builder<Incident>
@@ -99,6 +98,13 @@ final readonly class IncidentFilters
             $query->whereIn('incidents.status_id', $this->pendingStatusIds())->where('incidents.due_date', '<', now());
         }
 
+        // Usa el índice único de pending_incident_id: una fila como máximo por incidente
+        if ($criteria->reopenRequested) {
+            $query->whereExists(fn (QueryBuilder $pending) => $pending->selectRaw('1')
+                ->from('incident_reopen_requests')
+                ->whereColumn('incident_reopen_requests.pending_incident_id', 'incidents.id'));
+        }
+
         if ($criteria->search !== null) {
             $this->search($query, $criteria->search);
         }
@@ -109,8 +115,10 @@ final readonly class IncidentFilters
      */
     private function search(Builder $query, string $text): void
     {
-        if (preg_match(self::CODE_PATTERN, trim($text), $match) === 1) {
-            $query->where('incidents.code', sprintf('INC-%06d', (int) $match[1]));
+        // "TZ-26-0142" o "26-142": se busca por código exacto
+        $code = IncidentCode::normalize($text, (string) config('trazo.incidents.code_prefix'));
+        if ($code !== null) {
+            $query->where('incidents.code', $code);
 
             return;
         }
@@ -152,13 +160,15 @@ final readonly class IncidentFilters
     }
 
     /**
-     * @return list<int>
+     * Ids de los estados pendientes; sin ninguno en el catálogo, un id que no existe (nada cuenta como pendiente).
+     *
+     * @return non-empty-list<int>
      */
-    private function pendingStatusIds(): array
+    public function pendingStatusIds(): array
     {
         $pending = array_filter($this->catalog->statuses(), fn (StatusFlags $status): bool => $status->isPending);
 
-        return array_values(array_map(fn (StatusFlags $status): int => $status->id, $pending));
+        return array_values(array_map(fn (StatusFlags $status): int => $status->id, $pending)) ?: [0];
     }
 
     /**

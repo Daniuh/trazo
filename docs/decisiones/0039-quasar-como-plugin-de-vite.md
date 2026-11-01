@@ -9,7 +9,7 @@ order: 49
 # ADR-0039: Quasar integrado como plugin de Vite
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Quasar se puede usar de dos maneras oficiales, y la elección define quién controla la estructura del frontend. El proyecto ya tiene una estructura aprobada por módulos y capas (ADR-0003).

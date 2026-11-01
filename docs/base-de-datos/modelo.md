@@ -23,6 +23,15 @@ erDiagram
   incidents ||--o{ incident_activities : historial
   users ||--o{ incident_activities : realiza
   activity_types ||--o{ incident_activities : tipo
+  incidents ||--o{ incident_reopen_requests : "pedido de reapertura"
+  users ||--o{ incident_reopen_requests : "pide o decide"
+  incidents ||--o{ incident_comments : "conversación"
+  users ||--o{ incident_comments : "escribe"
+  users ||--o{ notifications : "recibe"
+  notification_types ||--o{ notifications : tipo
+  incidents ||--o{ notifications : "sobre"
+  incident_comments |o--o{ notifications : "mensaje"
+  incident_activities |o--o{ notifications : "cambio"
   permissions |o--o{ dashboard_widgets : "exige"
   users ||--o{ user_dashboard_widgets : "diseño"
   dashboard_widgets ||--o{ user_dashboard_widgets : "lugar"
@@ -48,6 +57,10 @@ Toda referencia es una clave foránea real; no hay relaciones polimórficas. La 
 |---|---|---|
 | `incidents.created_by`, `incidents.assigned_to` → `users` | RESTRICT | Nunca se pierde quién reportó o atendió algo. Los usuarios se desactivan, no se borran. |
 | `incident_activities` → `incidents`, `users`, `activity_types` | RESTRICT | El historial es inmutable |
+| `incident_reopen_requests` → `incidents`, `users` (pide y decide) | RESTRICT | Las solicitudes son parte del rastro del incidente |
+| `incident_comments` → `incidents`, `users` | RESTRICT | Los mensajes son parte del rastro del incidente |
+| `notifications` → `users`, `incident_activities` | CASCADE | Un aviso no tiene sentido sin su destinatario ni sin el registro que lo originó |
+| `notifications` → `incidents`, `incident_comments`, `notification_types` | RESTRICT | Incidentes y mensajes no se borran de verdad, y MySQL no admite CASCADE en columnas de las que depende una columna calculada |
 | `incidents` → `priorities`, `statuses` | RESTRICT | Un catálogo en uso no se borra; se desactiva |
 | `status_transitions` → `statuses` | RESTRICT | Igual que el anterior |
 | `user_role.user_id` → `users` | CASCADE | Solo aplica a un usuario sin historial (si tiene historial, el borrado ya está bloqueado) |
@@ -79,6 +92,10 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | `priorities`, `statuses`, `status_transitions`, `activity_types` | [Catálogos](diccionario/catalogos.md) |
 | `incidents` | [incidents](diccionario/incidents.md) |
 | `incident_activities` | [incident_activities](diccionario/incident-activities.md) |
+| `incident_reopen_requests` | [incident_reopen_requests](diccionario/incident-reopen-requests.md) |
+| `incident_comments` | [incident_comments](diccionario/incident-comments.md) |
+| `incident_code_sequences` | [incident_code_sequences](diccionario/incident-code-sequences.md) |
+| `notification_types`, `notifications` | [notifications](diccionario/notifications.md) |
 | `personal_access_tokens` | [personal_access_tokens](diccionario/personal-access-tokens.md) |
 | `dashboard_widgets`, `user_dashboard_widgets` | [Dashboard](diccionario/dashboard.md) |
 | `mfa_policies`, `user_mfa_factors`, `user_recovery_codes` | [MFA](diccionario/mfa.md) |

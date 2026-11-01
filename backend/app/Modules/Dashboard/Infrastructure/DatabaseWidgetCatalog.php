@@ -56,6 +56,7 @@ final class DatabaseWidgetCatalog implements WidgetCatalog
                 (int) $row->max_h,
                 (int) $row->default_w,
                 (int) $row->default_h,
+                (bool) $row->in_default_layout,
             );
         }
 

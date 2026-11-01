@@ -15,8 +15,8 @@ Cada solicitud o incidente reportado. Contiene todos los campos que exige la pru
 |---|---|---|---|
 | `id` | BIGINT UNSIGNED | PK | Clave interna |
 | `ulid` | CHAR(26) | UNIQUE, NOT NULL | Identificador público para la API |
-| `code` | VARCHAR(20) | UNIQUE, NOT NULL | Código legible: `INC-000123` |
-| `title` | VARCHAR(150) | NOT NULL | |
+| `code` | VARCHAR(20) | UNIQUE, NOT NULL | Código legible: prefijo, año y consecutivo del año (`TZ-26-0142`), tomado de [`incident_code_sequences`](incident-code-sequences.md) |
+| `title` | VARCHAR(150) | NOT NULL | La API acepta de 5 a 80 caracteres ([ADR-0073](../../decisiones/0073-largo-del-titulo.md)); la columna conserva 150 porque las migraciones son solo aditivas |
 | `description` | TEXT | NOT NULL | |
 | `priority_id` | TINYINT UNSIGNED | FK → `priorities`, RESTRICT | |
 | `status_id` | TINYINT UNSIGNED | FK → `statuses`, RESTRICT | |

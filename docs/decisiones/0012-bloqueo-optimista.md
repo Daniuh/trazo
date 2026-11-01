@@ -9,7 +9,7 @@ order: 22
 # ADR-0012: Bloqueo optimista en incidentes
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Varias personas pueden editar el mismo incidente al mismo tiempo. Sin control, el último en guardar pisa los cambios de los demás sin que nadie lo note.

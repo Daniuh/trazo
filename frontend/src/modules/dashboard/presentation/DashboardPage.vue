@@ -118,7 +118,7 @@ async function save(): Promise<void> {
 
     <template v-else>
       <header class="dashboard__header">
-        <div>
+        <div class="dashboard__heading">
           <h1 class="dashboard__title">
             {{ title }}
             <AppInfoTip
@@ -217,6 +217,24 @@ async function save(): Promise<void> {
   margin: 0;
   color: $color-text-secondary;
   font-size: $font-size-sm;
+}
+
+// Desde tablet, "Actualizado hace…" va junto al título, en la misma fila que los botones, para ahorrar alto
+@include tablet {
+  .dashboard__header {
+    align-items: center;
+  }
+
+  .dashboard__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: $space-4;
+  }
+
+  .dashboard__updated {
+    margin: 0;
+  }
 }
 
 @include laptop {

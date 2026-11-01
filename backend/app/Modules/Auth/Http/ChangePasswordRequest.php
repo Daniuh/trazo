@@ -17,8 +17,20 @@ final class ChangePasswordRequest extends FormRequest
     {
         return [
             'current_password' => ['required', 'string', 'max:255'],
-            'password' => NewPassword::rules(),
+            'password' => NewPassword::rules($this->personalData()),
         ];
+    }
+
+    /**
+     * Correo y nombre de quien cambia su contraseña, para que no los use en ella.
+     *
+     * @return list<string>
+     */
+    private function personalData(): array
+    {
+        $user = $this->user();
+
+        return $user === null ? [] : [(string) $user->getAttribute('email'), (string) $user->getAttribute('name')];
     }
 
     public function currentPassword(): string

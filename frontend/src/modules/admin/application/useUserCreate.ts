@@ -8,7 +8,7 @@ import { usersApi } from '../infrastructure/usersApi'
 import { profileErrors } from './profileRules'
 
 export function useUserCreate() {
-  const draft = reactive<UserDraft>({ name: '', email: '', role: null })
+  const draft = reactive<UserDraft>({ givenNames: '', familyNames: '', email: '', role: null })
   const fieldErrors = ref<Partial<Record<keyof UserDraft, string>>>({})
   const formError = ref<string | null>(null)
   let attempt: { payload: string; key: string } | null = null

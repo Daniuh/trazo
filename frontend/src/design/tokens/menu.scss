@@ -1,0 +1,44 @@
+// Opción de lista de todos los desplegables (selectores, menú ⋯, menú de la cuenta, "Agregar widget"):
+// se define una vez y cada menú la incluye, para que todos se vean y se comporten igual.
+// Documentado en docs/frontend/sistema-de-diseno/componentes.md
+@use 'breakpoints' as *;
+@use 'colors' as *;
+@use 'spacing' as *;
+@use 'typography' as *;
+
+@mixin menu-item {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: $space-2;
+  width: 100%;
+  min-height: $touch-target;
+  padding: $space-2 $space-4;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: $color-text;
+  font: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-base;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: $color-page;
+    outline: none;
+  }
+
+  &:disabled {
+    color: $color-text-secondary;
+    cursor: not-allowed;
+  }
+
+  // Con mouse la fila puede ser tan compacta como un campo
+  @include laptop {
+    min-height: $field-height;
+  }
+}

@@ -18,6 +18,8 @@ type Envelope<T> = { data: T }
 interface SummaryDto {
   id: string
   name: string
+  given_names: string
+  family_names: string
   email: string
   is_active: boolean
   role: RoleRef | null
@@ -54,10 +56,19 @@ export interface UserPage {
 
 const path = (id: string) => `/users/${encodeURIComponent(id)}`
 
+// Nombres, apellidos y correo como los recibe la API
+const toProfileBody = (draft: ProfileDraft) => ({
+  given_names: draft.givenNames,
+  family_names: draft.familyNames,
+  email: draft.email,
+})
+
 function toSummary(dto: SummaryDto): UserSummary {
   return {
     id: dto.id,
     name: dto.name,
+    givenNames: dto.given_names,
+    familyNames: dto.family_names,
     email: dto.email,
     isActive: dto.is_active,
     role: dto.role,
@@ -118,7 +129,7 @@ export const usersApi = {
 
   // La clave identifica este intento de creación: si se reenvía, la API no crea otra cuenta
   async create(draft: UserDraft, idempotencyKey: string, code?: string): Promise<UserDetail> {
-    const body = withCode({ name: draft.name, email: draft.email, role: draft.role }, code)
+    const body = withCode({ ...toProfileBody(draft), role: draft.role }, code)
     const { data } = await http.post<Envelope<DetailDto>>('/users', body, {
       headers: { 'Idempotency-Key': idempotencyKey },
     })
@@ -126,7 +137,7 @@ export const usersApi = {
   },
 
   async updateProfile(id: string, draft: ProfileDraft): Promise<UserDetail> {
-    const { data } = await http.patch<Envelope<DetailDto>>(path(id), draft)
+    const { data } = await http.patch<Envelope<DetailDto>>(path(id), toProfileBody(draft))
     return toDetail(data.data)
   },
 

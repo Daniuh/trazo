@@ -53,10 +53,8 @@ test('el supervisor encuentra un incidente por su código y ve desde dónde se h
   await expect(entry).toBeVisible()
   await entry.click()
 
-  const detail =
-    info.project.name === 'monitor'
-      ? page.getByRole('complementary', { name: 'Detalle del registro' })
-      : page.getByRole('dialog')
+  // En todas las vistas el detalle se abre en un panel encima de la lista
+  const detail = page.getByRole('dialog')
   await expect(detail.getByText('Dirección IP')).toBeVisible()
   await expect(detail.getByRole('link', { name: 'Abrir incidente' })).toBeVisible()
   await expectAccessible(page)

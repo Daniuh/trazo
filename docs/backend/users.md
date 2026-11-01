@@ -73,7 +73,7 @@ flowchart LR
 
 - **Solo se administra hacia abajo.** Quien administra actúa sobre personas con un nivel menor que el suyo, y solo da roles por debajo de su nivel.
 - **La cima (Super admin) administra a todos**, incluso a otro Super admin (por ejemplo, para restablecer su MFA si perdió el teléfono).
-- **Nadie se cambia a sí mismo** el rol, los permisos, el estado ni el acceso. Sus propios datos (nombre y correo) sí los corrige.
+- **Nadie se cambia a sí mismo** el rol, los permisos, el estado ni el acceso. Sus propios datos (nombres, apellidos y correo) sí los corrige.
 - **Siempre queda un Super admin activo.** Desactivar o bajar de rol a uno bloquea antes a los Super admin activos en la misma transacción. Si quedaría ninguno, responde `LAST_SUPER_ADMIN`.
 
 ## Permisos por persona
@@ -82,7 +82,7 @@ flowchart LR
 - **Cómo se cambian:** el front envía la lista de permisos que la persona debe tener. `PermissionChange` (dominio) calcula las excepciones respecto de su rol y qué gana o pierde.
 - **Nadie concede lo que no tiene**, salvo la cima. Quitar sí se puede.
 - **El Super admin no lleva excepciones:** su rol ya trae todo.
-- **Al cambiar de rol** se quitan las excepciones que el rol nuevo vuelve innecesarias (un concedido que el rol ya trae, o un quitado que el rol ya no trae).
+- **Al cambiar de rol** la persona queda con los permisos exactos del rol nuevo: se borran todas sus excepciones (concedidos y quitados), y el registro de auditoría guarda cuáles eran en `cleared` ([ADR-0069](../decisiones/0069-cambio-de-rol-con-permisos-exactos.md)).
 - **Dónde se aplica la regla:** `UserPermissions` es la consulta única para la sesión, `/auth/me` y las reglas de cada módulo. `PermissionSql` es la misma regla como filtro SQL, para elegir personas por permiso (por ejemplo, el selector de "asignar a"). Una prueba compara las dos con cada permiso y cada persona.
 
 ## Cuenta nueva y acceso restablecido

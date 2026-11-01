@@ -28,7 +28,7 @@ final readonly class IncidentWorkflowController
     public function status(WorkflowRequest $request, string $incident, ChangeIncidentStatus $change): JsonResponse
     {
         $actor = $this->requests->actor($request);
-        $record = $change->handle($actor, $incident, $request->version(), $request->status(), $this->requests->context($request));
+        $record = $change->handle($actor, $incident, $request->version(), $request->status(), $request->note(), $this->requests->context($request));
 
         return new JsonResponse(['data' => $this->resource->toArray($record, $actor)]);
     }

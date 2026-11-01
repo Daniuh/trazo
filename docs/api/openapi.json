@@ -984,6 +984,60 @@
                 }
             }
         },
+        "/v1/incidents/mine": {
+            "get": {
+                "operationId": "incident.mine",
+                "tags": [
+                    "Incident"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "truncated": {
+                                                    "type": "boolean"
+                                                },
+                                                "limit": {
+                                                    "type": "integer",
+                                                    "const": 500
+                                                },
+                                                "finished_days": {
+                                                    "type": "integer",
+                                                    "const": 7
+                                                }
+                                            },
+                                            "required": [
+                                                "truncated",
+                                                "limit",
+                                                "finished_days"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/incidents/export": {
             "get": {
                 "operationId": "incident.export",
@@ -1117,6 +1171,13 @@
                     },
                     {
                         "name": "filter[deleted]",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "filter[reopen_requested]",
                         "in": "query",
                         "schema": {
                             "type": "boolean"
@@ -1292,6 +1353,13 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "filter[reopen_requested]",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -1377,13 +1445,50 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1436,13 +1541,54 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
+                                                },
+                                                "comments_count": {
+                                                    "type": "integer"
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request",
+                                                "comments_count"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1500,13 +1646,50 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1583,13 +1766,50 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1603,6 +1823,729 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/comments": {
+            "get": {
+                "operationId": "incidentComment.index",
+                "tags": [
+                    "IncidentComment"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "before",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "before": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Con una p\u00e1gina completa puede haber mensajes m\u00e1s viejos: se piden con before=<este id>"
+                                                }
+                                            },
+                                            "required": [
+                                                "total",
+                                                "before"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "incidentComment.store",
+                "tags": [
+                    "IncidentComment"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "author": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "body": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "mine": {
+                                                    "type": "boolean"
+                                                },
+                                                "created_at": {
+                                                    "type": "string"
+                                                },
+                                                "deleted_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "actions": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "delete": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "delete"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "author",
+                                                "body",
+                                                "mine",
+                                                "created_at",
+                                                "deleted_at",
+                                                "actions"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/comments/{comment}": {
+            "delete": {
+                "operationId": "incidentComment.destroy",
+                "tags": [
+                    "IncidentComment"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "before",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "author": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "body": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "mine": {
+                                                    "type": "boolean"
+                                                },
+                                                "created_at": {
+                                                    "type": "string"
+                                                },
+                                                "deleted_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "actions": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "delete": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "delete"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "author",
+                                                "body",
+                                                "mine",
+                                                "created_at",
+                                                "deleted_at",
+                                                "actions"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/reopen": {
+            "post": {
+                "operationId": "incidents.reopen",
+                "tags": [
+                    "IncidentReopen"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReopenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "next_statuses": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "description",
+                                                "next_statuses",
+                                                "reopen_request"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/reopen-request": {
+            "post": {
+                "operationId": "incidents.reopen.request",
+                "tags": [
+                    "IncidentReopen"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReopenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "next_statuses": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "description",
+                                                "next_statuses",
+                                                "reopen_request"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/reopen-request/approve": {
+            "post": {
+                "operationId": "incidents.reopen.approve",
+                "tags": [
+                    "IncidentReopen"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReopenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "next_statuses": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "description",
+                                                "next_statuses",
+                                                "reopen_request"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/incidents/{incident}/reopen-request/reject": {
+            "post": {
+                "operationId": "incidents.reopen.reject",
+                "tags": [
+                    "IncidentReopen"
+                ],
+                "parameters": [
+                    {
+                        "name": "incident",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReopenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "next_statuses": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "description",
+                                                "next_statuses",
+                                                "reopen_request"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -1649,13 +2592,50 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1718,13 +2698,50 @@
                                                 },
                                                 "next_statuses": {
                                                     "type": "array",
-                                                    "description": "Solo los estados a los que esta persona puede llevarlo",
                                                     "items": {}
+                                                },
+                                                "reopen_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "requested_by": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "requested_by",
+                                                        "reason",
+                                                        "created_at"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "description",
-                                                "next_statuses"
+                                                "next_statuses",
+                                                "reopen_request"
                                             ],
                                             "additionalProperties": {}
                                         }
@@ -1819,6 +2836,12 @@
                                                         ],
                                                         "additionalProperties": {}
                                                     },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
                                                     "created_at": {
                                                         "type": "string"
                                                     }
@@ -1827,6 +2850,7 @@
                                                     "type",
                                                     "user",
                                                     "changes",
+                                                    "note",
                                                     "created_at"
                                                 ]
                                             }
@@ -2269,6 +3293,217 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications": {
+            "get": {
+                "operationId": "notification.index",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "conversations",
+                                "activity"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "before",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "incident",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "unread": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "before": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Con una p\u00e1gina completa puede haber m\u00e1s viejas: se piden con before=<esta>"
+                                                }
+                                            },
+                                            "required": [
+                                                "unread",
+                                                "before"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/unread": {
+            "get": {
+                "operationId": "notification.unread",
+                "tags": [
+                    "Notification"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/read": {
+            "post": {
+                "operationId": "notification.readAll",
+                "tags": [
+                    "Notification"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NotificationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/{notification}/read": {
+            "post": {
+                "operationId": "notification.read",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -5147,6 +6382,19 @@
                 ],
                 "title": "ChannelAuthRequest"
             },
+            "CommentRequest": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "body"
+                ],
+                "title": "CommentRequest"
+            },
             "EventStatus": {
                 "type": "string",
                 "enum": [
@@ -5187,7 +6435,8 @@
                 "properties": {
                     "title": {
                         "type": "string",
-                        "maxLength": 150
+                        "minLength": 5,
+                        "maxLength": 80
                     },
                     "description": {
                         "type": "string",
@@ -5271,6 +6520,41 @@
                 ],
                 "title": "MfaCodeRequest"
             },
+            "NotificationRequest": {
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "conversations",
+                            "activity"
+                        ]
+                    },
+                    "before": {
+                        "type": "string"
+                    },
+                    "incident": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "category"
+                ],
+                "title": "NotificationRequest"
+            },
+            "ReopenRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "reason"
+                ],
+                "title": "ReopenRequest"
+            },
             "ResetPasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -5286,6 +6570,7 @@
                     },
                     "password": {
                         "type": "string",
+                        "description": "Solo el correo que ya trae la petici\u00f3n: buscar el nombre antes de validar el pase revelar\u00eda datos de la cuenta",
                         "minLength": 12,
                         "maxLength": 128
                     },

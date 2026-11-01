@@ -4,7 +4,7 @@
 // borrar lo escrito; en monitor, la pantalla que se cierra sola al desactivar la cuenta.
 // Documentado en docs/calidad/estrategia-de-pruebas.md
 import { expect, test, type Browser, type Page } from '@playwright/test'
-import { authHeaderOf, expectAccessible, forgetSession, signInAs } from './support'
+import { authHeaderOf, expectAccessible, forgetSession, gotoSubscribed, signInAs } from './support'
 
 const SUPERVISOR = 'supervisor@trazo.test'
 const ROOT = 'superadmin@trazo.test'
@@ -25,30 +25,6 @@ async function createIncident(page: Page, title: string): Promise<IncidentBody['
 const INCIDENTS_CHANNEL = 'incidents.all'
 const PERSONAL_CHANNEL = 'users.'
 
-// Abre la ruta y espera a que Reverb confirme la suscripción al canal (o a uno que empiece así). Solo cuenta el
-// WebSocket que abre esa ruta: goto recarga la app, y la confirmación de la pantalla anterior llegaba antes que la
-// nueva conexión, que arranca un momento después. La respuesta de /broadcasting/auth tampoco basta: el canal
-// personal suele confirmarse primero
-async function gotoSubscribed(page: Page, path: string, channel: string): Promise<void> {
-  const confirmation = `"channel":"private-${channel}`
-  const ready = new Promise<void>((resolve) => {
-    page.on('websocket', (socket) => {
-      if (new URL(page.url()).pathname !== path) return
-      socket.on('framereceived', ({ payload }) => {
-        if (
-          typeof payload === 'string' &&
-          payload.includes('subscription_succeeded') &&
-          payload.includes(confirmation)
-        ) {
-          resolve()
-        }
-      })
-    })
-  })
-  await page.goto(path)
-  await ready
-}
-
 // La segunda persona, en su propio navegador y ya suscrita a su canal personal
 async function openAs(browser: Browser, email: string, path: string): Promise<Page> {
   const page = await (await browser.newContext()).newPage()
@@ -59,7 +35,8 @@ async function openAs(browser: Browser, email: string, path: string): Promise<Pa
 
 test('el listado avisa los cambios de otras personas sin mover las filas', async ({ page }, info) => {
   await signInAs(page, SUPERVISOR)
-  await gotoSubscribed(page, '/incidentes', INCIDENTS_CHANNEL)
+  // Sin agrupar: el más reciente queda primero (agrupado por vencimiento, uno nuevo cae en "Más adelante")
+  await gotoSubscribed(page, '/incidentes?agrupar=ninguno', INCIDENTS_CHANNEL)
   await expect(page.getByRole('heading', { level: 1, name: 'Incidentes' })).toBeVisible()
 
   const title = `Tiempo real ${info.project.name} ${Date.now()}`
@@ -121,7 +98,7 @@ test('el menú cambia en vivo cuando le conceden un permiso a la persona', async
   await signInAs(page, ROOT)
   await page.goto('/')
   const agent = await openAs(browser, 'agente3@trazo.test', '/')
-  await expect(agent.getByRole('link', { name: 'Auditoría' })).toHaveCount(0)
+  await expect(agent.getByRole('link', { name: 'Auditoría', exact: true })).toHaveCount(0)
 
   const headers = authHeaderOf(ROOT)
   const users = (await (await page.request.get('/api/v1/users?search=agente3', { headers })).json()) as {
@@ -139,7 +116,7 @@ test('el menú cambia en vivo cuando le conceden un permiso a la persona', async
   expect(grant.ok()).toBe(true)
 
   try {
-    await expect(agent.getByRole('link', { name: 'Auditoría' })).toBeVisible()
+    await expect(agent.getByRole('link', { name: 'Auditoría', exact: true })).toBeVisible()
   } finally {
     await page.request.put(`/api/v1/users/${id}/permissions`, { headers, data: { permissions: original } })
     await agent.context().close()

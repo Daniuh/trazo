@@ -31,7 +31,10 @@ async function confirmCode(): Promise<void> {
 <template>
   <AppCard title="Avisos">
     <div class="guide-stack">
-      <AppAlert tone="info">Hay 3 incidentes con cambios de otras personas.</AppAlert>
+      <AppAlert tone="info">
+        Hay 3 incidentes con cambios de otras personas.
+        <AppButton variant="link" icon="refresh">Actualizar</AppButton>
+      </AppAlert>
       <AppAlert>No pudimos guardar: revisa los campos marcados.</AppAlert>
     </div>
   </AppCard>

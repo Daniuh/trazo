@@ -9,7 +9,7 @@ order: 54
 # ADR-0044: Listado de incidentes filtrado en SQL con la misma regla de visibilidad
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El listado debe paginar, ordenar, buscar y filtrar sobre cientos de miles de incidentes. Además, cada persona solo puede ver lo que el detalle le permite.

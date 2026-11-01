@@ -18,7 +18,7 @@ use PragmaRX\Google2FA\Google2FA;
 uses(RefreshDatabase::class);
 
 const MFA_EMAIL = 'agente1@trazo.test';
-const MFA_PASSWORD = 'Trazo.Demo.2026';
+const MFA_PASSWORD = 'Cometa.Demo.2026';
 
 beforeEach(function (): void {
     Mail::fake();

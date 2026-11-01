@@ -6,6 +6,7 @@ use App\Modules\Audit\Infrastructure\AuditServiceProvider;
 use App\Modules\Auth\Infrastructure\AuthServiceProvider;
 use App\Modules\Dashboard\Infrastructure\DashboardServiceProvider;
 use App\Modules\Incidents\Infrastructure\IncidentServiceProvider;
+use App\Modules\Notifications\Infrastructure\NotificationsServiceProvider;
 use App\Modules\Realtime\Infrastructure\RealtimeServiceProvider;
 use App\Modules\System\Infrastructure\SystemServiceProvider;
 use App\Modules\Users\Infrastructure\UsersServiceProvider;
@@ -19,5 +20,6 @@ return [
     UsersServiceProvider::class,
     AuditServiceProvider::class,
     RealtimeServiceProvider::class,
+    NotificationsServiceProvider::class,
     SystemServiceProvider::class,
 ];

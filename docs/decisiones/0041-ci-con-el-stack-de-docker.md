@@ -9,7 +9,7 @@ order: 51
 # ADR-0041: El CI prueba el backend dentro del stack de Docker
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0034](0034-ci-cd.md) define un CI en GitHub Actions con trabajos de back, front, e2e y seguridad. Falta decidir cómo corre cada uno. El backend necesita MySQL con parámetros concretos (charset, zona horaria y FULLTEXT desde 3 letras) y la base `trazo_test`. Además, la prueba pide que el proyecto se levante con Docker.

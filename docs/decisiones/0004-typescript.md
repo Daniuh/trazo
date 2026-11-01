@@ -9,7 +9,7 @@ order: 14
 # ADR-0004: TypeScript en el frontend
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba pide Vue.js 3. El frontend maneja contratos con la API que conviene validar durante el desarrollo y no en producción.

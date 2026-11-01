@@ -22,7 +22,8 @@ class IncidentFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => fake()->unique()->numerify('INC-######'),
+            // Año 00: no choca con los que entrega el contador durante una prueba
+            'code' => fake()->unique()->numerify('TZ-00-######'),
             'title' => fake()->sentence(6),
             'description' => fake()->paragraph(),
             'priority_id' => fn (): int => (int) Priority::query()->inRandomOrder()->value('id'),

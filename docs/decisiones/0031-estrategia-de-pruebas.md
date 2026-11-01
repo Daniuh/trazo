@@ -9,7 +9,7 @@ order: 41
 # ADR-0031: Estrategia de pruebas
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Se valoran los tests con Pest o PHPUnit, el manejo de errores, las validaciones y que todo sea ejecutable. Además, las reglas del proyecto (capas, permisos, responsive y tokens) deben verificarse de forma automática.

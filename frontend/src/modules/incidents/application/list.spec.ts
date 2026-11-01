@@ -24,7 +24,7 @@ vi.mock('@/shared/download/saveFile', () => ({ saveFile: vi.fn() }))
 
 const list = vi.mocked(listApi)
 const incidents = vi.mocked(incidentsApi)
-const page = { items: [], total: 34, lastPage: 2 }
+const page = { items: [], total: 34, lastPage: 2, groups: {} }
 
 function sessionWith(...permissions: string[]): void {
   const user: SessionUser = {

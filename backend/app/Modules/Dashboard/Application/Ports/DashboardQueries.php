@@ -9,6 +9,7 @@ namespace App\Modules\Dashboard\Application\Ports;
 
 use App\Modules\Dashboard\Application\Data\IncidentDigest;
 use App\Modules\Dashboard\Application\Data\WorkloadRow;
+use App\Modules\Incidents\Domain\DueWindow;
 use App\Modules\Incidents\Domain\VisibilityScope;
 use DateTimeImmutable;
 
@@ -56,6 +57,29 @@ interface DashboardQueries
      * @return list<WorkloadRow>
      */
     public function workload(int $actorId, VisibilityScope $scope, array $pendingStatusIds, DateTimeImmutable $now, int $limit): array;
+
+    /**
+     * De los resueltos desde una fecha, cuántos antes de su vencimiento.
+     *
+     * @return array{resolved: int, on_time: int}
+     */
+    public function onTimeResolutions(int $actorId, VisibilityScope $scope, DateTimeImmutable $from): array;
+
+    /**
+     * Pendientes por prioridad y grupo de vencimiento (posición en DueBucket: 0 vencido, 1 hoy, 2 semana, 3 después).
+     *
+     * @param  list<int>  $pendingStatusIds
+     * @return array<int, array<int, int>> [priority_id][grupo] => cantidad
+     */
+    public function riskMatrix(int $actorId, VisibilityScope $scope, array $pendingStatusIds, DueWindow $window): array;
+
+    /**
+     * Los que terminaron sin resolverse (cancelados) desde una fecha, por hora UTC de su última actualización.
+     *
+     * @param  list<int>  $pendingStatusIds
+     * @return array<string, int>
+     */
+    public function exitsWithoutResolution(int $actorId, VisibilityScope $scope, array $pendingStatusIds, DateTimeImmutable $from): array;
 
     public function userUlid(int $userId): string;
 }

@@ -9,7 +9,7 @@ order: 55
 # ADR-0045: Listado en el front con los filtros en la URL y una presentación por vista
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El listado combina búsqueda, cinco filtros principales, rangos de fechas, orden y paginación. Tiene que funcionar igual de bien en un celular de 320 px y en un monitor. Además, quien soporta a un cliente necesita poder compartir "lo que está viendo".

@@ -25,23 +25,41 @@ Desde entonces, cada ingreso pide tu contraseña y el código que muestra la apl
 ## Reportar un incidente
 
 1. En el menú, abre **Incidentes** y pulsa **Nuevo incidente**.
-2. Escribe un **título** corto y claro ("La impresora del piso 3 no imprime") y una **descripción** con lo que pasa, desde cuándo y qué intentaste.
-3. Elige la **prioridad**. Trazo sugiere la fecha de vencimiento según la prioridad; puedes cambiarla o dejar la sugerida.
-4. Pulsa **Crear incidente**. Recibes un código, por ejemplo `INC-000123`, con el que cualquiera puede encontrarlo.
+2. Escribe un **título** corto y claro ("La impresora del piso 3 no imprime"). Si aparece **¿Ya lo reportaron?**, revisa los parecidos: si es el mismo problema, escribe en su conversación en vez de crear otro.
+3. Escribe una **descripción** con lo que pasa, desde cuándo y qué intentaste.
+4. Elige la **prioridad**: cada tarjeta dice cuánto tiempo hay para resolverlo. El vencimiento queda **Sugerido** según la prioridad; también puedes elegir **Hoy**, **Mañana** u **Otra fecha**. A la derecha (o abajo, en el celular) ves **así se verá**.
+5. Pulsa **Crear incidente**. Recibes un código, por ejemplo `TZ-26-0142` (el incidente 142 de 2026), con el que cualquiera puede encontrarlo.
 
-| Prioridad | Úsala cuando |
-|---|---|
-| Crítica | Algo importante está detenido para muchas personas |
-| Alta | Te impide trabajar y no hay alternativa |
-| Media | Te molesta, pero puedes seguir trabajando |
-| Baja | Es una mejora o algo que puede esperar |
+| Prioridad | Plazo | Úsala cuando |
+|---|---|---|
+| Crítica | 4 h | Detiene la operación |
+| Alta | 1 día | Afecta a un equipo o a clientes |
+| Media | 3 días | Afecta a una persona o a un proceso |
+| Baja | 5 días | Molesta, pero se puede seguir trabajando |
 
 ## Seguir tus incidentes
 
 - **Incidentes** muestra los que reportaste. Busca por palabra o por código, y filtra por estado o prioridad.
-- Abre uno para ver su estado, quién lo atiende, cuándo vence y su **historial** completo.
+- Abre uno para ver en qué punto va (su **camino**, de Abierto a Cerrado), quién lo atiende, cuánto plazo queda y su **historial**: los 5 movimientos más recientes, cambios con las notas de quien lo atiende (por ejemplo, cómo se resolvió) y mensajes. **Ver toda la actividad** abre el resto en un panel. Bajo el título está la descripción en una línea; **Ver más** la muestra completa.
+- Si se cerró y el problema volvió, usa **Solicitar reapertura** y explica qué pasa. Un supervisor la revisa.
 - Los cambios aparecen solos: si alguien lo toma o cambia su estado mientras lo miras, la pantalla se actualiza.
-- **Inicio** muestra tu resumen: cuántos tienes, cuántos siguen pendientes y cuántos van vencidos.
+- **Inicio** muestra tu resumen: cuántos tienes, cuántos siguen pendientes y cuántos van vencidos, y cuáles están por vencer según su prioridad.
+
+## Conversar sobre un incidente
+
+En la ficha de cada incidente, el botón **Chat** abre un panel con la conversación con quienes lo atienden. Escribe tu pregunta o aclaración al pie y pulsa Enter para enviarla (Shift + Enter hace un salto de línea). Los mensajes de los demás llegan solos, sin recargar. Si tocas un mensaje en el **historial** del incidente, el chat se abre justo en ese mensaje.
+
+- Se puede escribir también en un incidente cerrado o cancelado, por ejemplo para preguntar si quedó bien. Eso no cambia su estado.
+- Si te equivocas, durante los primeros 5 minutos puedes **Borrar** tu mensaje; en su lugar queda "Mensaje eliminado".
+
+## Notificaciones
+
+La **campana**, en el menú de abajo junto a tus iniciales, muestra cuántos avisos tienes sin leer. Al tocarla se abre el centro de notificaciones con dos pestañas:
+
+- **Conversaciones:** respuestas en las conversaciones de los incidentes en los que participas. Si llegan varios mensajes del mismo incidente, se juntan en un solo aviso.
+- **Actividad:** cuando alguien cambia el estado de tus incidentes, cuando los reabren y la respuesta a tus solicitudes de reapertura.
+
+Toca un aviso para ir al incidente; si es un mensaje, la conversación se abre sola. **Marcar todo como leído** limpia la pestaña. Los avisos se guardan 90 días.
 
 ## Corregir un incidente
 
@@ -49,7 +67,7 @@ Puedes editar lo que reportaste **mientras esté en Abierto**. Cuando alguien em
 
 ## Cuidar tu cuenta
 
-Abre tu nombre, en la parte superior, y entra a **Mi cuenta**. Ahí puedes:
+Toca el círculo con tus iniciales, al final del menú de abajo, y entra a **Mi cuenta**. Ahí puedes:
 
 - **Cambiar la contraseña:** pide la actual y la nueva dos veces. Al cambiarla, se cierran tus otras sesiones abiertas y te llega un aviso por correo.
 - **Generar códigos de recuperación nuevos:** los anteriores dejan de servir.

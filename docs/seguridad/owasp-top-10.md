@@ -72,7 +72,7 @@ Para cada categoría: qué hace Trazo y dónde está la prueba que lo demuestra.
 
 ## A07 — Fallas de autenticación
 
-- **Contraseñas:** de 12 a 128 caracteres; se rechazan las filtradas (lista local y Have I Been Pwned con k-anonimato).
+- **Contraseñas:** de 12 a 128 caracteres; se rechazan las predecibles (repetidas, secuenciales o con datos de la persona o la marca) y las filtradas (lista local y Have I Been Pwned con k-anonimato).
 - **Bloqueo progresivo** por correo, exista o no la cuenta, con hash de relleno para igualar tiempos.
 - **MFA (TOTP)** para todos:
   - El token de un ingreso a medias solo sirve para el segundo paso.

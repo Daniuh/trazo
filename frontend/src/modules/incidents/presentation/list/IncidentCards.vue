@@ -1,4 +1,4 @@
-<!-- Listado en tarjetas (celular y tablet): una por fila, con código, título, estado, prioridad, asignado y vencimiento.
+<!-- Listado en tarjetas (celular y tablet): una por fila, con código, título, estado, prioridad, reapertura pendiente, asignado y vencimiento.
      Tocar una tarjeta abre el detalle. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { formatShortDateTime } from '@/shared/format/dates'
@@ -23,6 +23,7 @@ const emit = defineEmits<{ open: [id: string]; restore: [id: string] }>()
         <p class="incident-cards__code">{{ incident.code }}</p>
         <h2 class="incident-cards__title">{{ incident.title }}</h2>
         <IncidentBadges :incident="incident" />
+        <p v-if="incident.reopenRequested" class="incident-cards__reopen">Reapertura pendiente</p>
         <p class="incident-cards__meta">
           {{ incident.assignee?.name ?? 'Sin asignar' }} · vence {{ formatShortDateTime(incident.dueDate) }}
         </p>
@@ -71,6 +72,12 @@ const emit = defineEmits<{ open: [id: string]; restore: [id: string] }>()
   margin: 0;
   color: $color-text-secondary;
   font-size: $font-size-xs;
+}
+
+.incident-cards__reopen {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
 }
 
 .incident-cards__code {

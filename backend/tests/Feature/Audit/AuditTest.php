@@ -152,12 +152,13 @@ describe('incidentes', function (): void {
         $byAgent = activityOf($second, 'agente1@trazo.test', 'status_changed');
         auditViewer('supervisor@trazo.test');
         $agent = User::query()->where('email', 'agente1@trazo.test')->value('ulid');
-        $number = (int) substr($second->code, 4);
+        // Sin el prefijo y en minúsculas, como lo escribiría una persona (00-123456)
+        $typed = strtolower(substr($second->code, 3));
 
         expect(auditIds('incidents', "filter[actor]={$agent}"))->toBe([$byAgent])
             ->and(auditIds('incidents', 'filter[type]=created,updated'))->toBe([$bySupervisor])
-            ->and(auditIds('incidents', "filter[incident]=inc-{$number}"))->toBe([$byAgent])
-            ->and(auditIds('incidents', 'filter[incident]=INC-999999'))->toBe([])
+            ->and(auditIds('incidents', "filter[incident]={$typed}"))->toBe([$byAgent])
+            ->and(auditIds('incidents', 'filter[incident]=TZ-99-9999'))->toBe([])
             ->and(auditIds('incidents', 'filter[actor]=01ARZ3NDEKTSV4RRFFQ69G5FAV'))->toBe([]);
         expect(fieldError($this->getJson('/api/v1/audit/incidents?filter[incident]=abc'), 'filter.incident'))->toBe('INCIDENT_CODE_FORMAT');
     });

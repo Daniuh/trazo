@@ -9,7 +9,7 @@ order: 30
 # ADR-0020: El backend como única autoridad
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Cualquier regla que se valide solo en el navegador se puede saltar manipulando las peticiones.

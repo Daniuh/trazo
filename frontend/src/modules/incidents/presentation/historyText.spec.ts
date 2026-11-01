@@ -8,6 +8,7 @@ const activity = (type: string, changes: Activity['changes'] = null): Activity =
   type,
   user: laura,
   changes,
+  note: null,
   createdAt: '2026-10-22T15:00:00Z',
 })
 
@@ -45,5 +46,22 @@ describe('describeActivity', () => {
     expect(
       describeActivity(activity('created', { assignee: { from: null, to: { name: 'Andrés Castro' } } })).text,
     ).toBe('Laura Gómez creó el incidente y lo asignó a Andrés Castro')
+  })
+
+  it('dice "se lo asignó" cuando quien crea se asigna a sí mismo', () => {
+    const own = activity('created', { assignee: { from: null, to: laura } })
+
+    expect(describeActivity(own).text).toBe('Laura Gómez creó el incidente y se lo asignó')
+  })
+
+  it('cuenta la reapertura: quién la pidió, quién la rechazó y a qué estado volvió', () => {
+    const status = { from: { name: 'Cerrado' }, to: { name: 'En progreso' } }
+
+    expect(describeActivity(activity('reopen_requested')).text).toBe('Laura Gómez pidió reabrir el incidente')
+    expect(describeActivity(activity('reopen_rejected')).text).toBe('Laura Gómez rechazó la reapertura')
+    expect(describeActivity(activity('reopened', { status }))).toEqual({
+      text: 'Laura Gómez reabrió el incidente',
+      detail: 'Cerrado → En progreso',
+    })
   })
 })

@@ -26,6 +26,7 @@ flowchart LR
 - **No bloquea la app:** el volcado lee una foto consistente de la base mientras la app sigue funcionando.
 - **Mínimo privilegio:** usa el usuario de la base de la app (no root) y solo la red interna `data`.
 - **Al arrancar:** si no hay un respaldo de las últimas 24 horas, hace uno de inmediato. Por eso, en un equipo nuevo, el primer respaldo aparece a los pocos segundos de `docker compose up -d`.
+- **Reintentos:** el servicio revisa cada 5 minutos si le toca un respaldo, en vez de dormir hasta la hora. Si falla (por ejemplo, MySQL todavía no acepta conexiones porque Docker se reinició y levantó los contenedores en otro orden), lo vuelve a intentar en la revisión siguiente. Si el equipo estaba apagado o suspendido a las 3:00, el respaldo de ese día se hace en cuanto vuelve.
 - **Salud:** el contenedor aparece como *unhealthy* si el último respaldo tiene más de 26 horas. Es la señal de que algo falla (`docker compose -p trazo logs backup` dice qué).
 
 Cada respaldo son dos archivos, por ejemplo:
@@ -58,6 +59,7 @@ openssl rand -base64 32
 | `BACKUP_AT` | `03:00` | Hora del respaldo diario |
 | `BACKUP_TIMEZONE` | `America/Bogota` | Zona horaria de esa hora |
 | `BACKUP_RETENTION_DAYS` | `7` | Días que se guardan |
+| `BACKUP_CHECK_SECONDS` | `300` | Cada cuánto revisa si toca un respaldo (y reintenta uno fallido) |
 
 ## Comandos
 

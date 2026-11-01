@@ -32,6 +32,10 @@ Entrar exige `dashboard.view.own` o `dashboard.view.any`. Con `dashboard.view.an
 
 | Código | Tipo | Permiso propio | Datos |
 |---|---|---|---|
+| `operation_pulse` | Gráfico | — | Total (todos los visibles), pendientes, vencidos y qué parte de los pendientes son, pendientes de la prioridad más alta, creados y resueltos hoy (día del negocio) y el cumplimiento del plazo: de lo resuelto en 30 días, qué porcentaje antes del vencimiento (`null` si no hay resueltos) |
+| `risk_map` | Gráfico | — | Pendientes por prioridad (de la más alta a la más baja) y grupo de vencimiento (`overdue`, `today`, `week`, `later`, con los límites de `DueWindow`), cada celda con su filtro del listado; y por prioridad, el `total` en cualquier estado |
+| `status_flow` | Gráfico | — | Cantidad por estado: el camino (`stages`) y las salidas (`exits`): los estados finales a los que se llega directo desde el inicial |
+| `backlog_balance` | Gráfico | — | Pendientes de cada día del periodo (`trend_days`), reconstruidos desde los de hoy hacia atrás con lo que entró y salió cada día (resuelto, o terminado sin resolverse según su última actualización), y el cambio en el periodo |
 | `total_incidents` | Número | — | Todos los visibles, en cualquier estado |
 | `pending_incidents` | Número | — | Abiertos, en progreso o en espera |
 | `overdue_incidents` | Número | — | Pendientes con el vencimiento pasado, y qué porcentaje de los pendientes son |
@@ -43,12 +47,12 @@ Entrar exige `dashboard.view.own` o `dashboard.view.any`. Con `dashboard.view.an
 | `assigned_to_me` | Lista | `incidents.view.assigned` | Los 5 pendientes propios que vencen antes, y el total |
 | `workload_by_agent` | Gráfico | `incidents.assign` | Pendientes y vencidos de las 8 personas más cargadas |
 
-El catálogo vive en la tabla `dashboard_widgets` (ver [diccionario](../base-de-datos/diccionario/dashboard.md)). Un widget solo se ofrece si además tiene implementación en el código (`WidgetCode`). Agregar uno nuevo es sumar el caso en `WidgetCode`, su consulta y su forma en `WidgetMetrics`, y su fila en el seeder.
+El catálogo vive en la tabla `dashboard_widgets` (ver [diccionario](../base-de-datos/diccionario/dashboard.md)). Un widget solo se ofrece si además tiene implementación en el código (`WidgetCode`). Agregar uno nuevo es sumar el caso en `WidgetCode`, su consulta y su forma en `WidgetMetrics` (o `RiskMetrics`), y su fila en el seeder. `in_default_layout` dice si forma parte del diseño original ([ADR-0081](../decisiones/0081-dashboard-de-riesgo.md)).
 
 ## Grilla y diseño
 
 - **Grilla de 12 columnas.** Cada widget tiene topes de ancho y alto en el catálogo. El servidor rechaza un diseño con widgets fuera de la grilla (`WIDGET_OUT_OF_GRID`), de tamaño inválido (`WIDGET_SIZE_OUT_OF_RANGE`, con los topes en `params`), repetidos (`WIDGET_DUPLICATED`), no disponibles para la persona (`WIDGET_NOT_AVAILABLE`) o visibles que chocan (`WIDGETS_OVERLAP`).
-- **Diseño original** (`DashboardGrid::defaults`): los widgets permitidos, en el orden del catálogo, de izquierda a derecha y fila por fila. Si a una fila le sobra espacio, el último widget crece dentro de su tope. Así, por ejemplo, el solicitante (sin "Sin asignar") ve tres indicadores que llenan la fila, sin huecos.
+- **Diseño original** (`DashboardGrid::defaults`): los widgets permitidos marcados con `in_default_layout`, en el orden del catálogo, de izquierda a derecha y fila por fila. Si a una fila le sobra espacio, el último widget crece dentro de su tope. Los demás permitidos quedan ocultos, debajo de todo, listos para "Agregar widget".
 - **Guardar** escribe una fila por widget permitido, con su lugar y si está visible. Un widget oculto conserva su lugar, para volver a donde estaba si se agrega de nuevo. Los que no se enviaron quedan ocultos, debajo de todo.
 - **Widgets nuevos en el catálogo**: para quien ya personalizó, aparecen ocultos, listos para agregarse. Si el catálogo cambia los topes de un widget, el tamaño guardado se ajusta solo (`DashboardGrid::fit`).
 - **Sin filas guardadas** la persona ve el diseño original. "Restaurar" borra sus filas.
@@ -85,4 +89,5 @@ El rendimiento con 100.000 incidentes está medido en [Rendimiento](../base-de-d
 - Evento de cambios: [`IncidentChanged`](../../backend/app/Modules/Incidents/Application/Events/IncidentChanged.php)
 - Configuración: [`backend/config/trazo.php`](../../backend/config/trazo.php) (`dashboard`)
 - Pruebas: [`tests/Unit/Dashboard/`](../../backend/tests/Unit/Dashboard/) y [`tests/Feature/Dashboard/`](../../backend/tests/Feature/Dashboard/)
-- Decisiones: [ADR-0030](../decisiones/0030-dashboard-personalizable.md), [ADR-0047](../decisiones/0047-metricas-del-dashboard.md) y [ADR-0048](../decisiones/0048-diseno-del-dashboard-por-persona.md)
+- Diseño centrado en el riesgo: [`RiskMetrics`](../../backend/app/Modules/Dashboard/Application/Metrics/RiskMetrics.php), las fuentes `onTime`, `risk` y `exits` en [`MetricSources`](../../backend/app/Modules/Dashboard/Application/Metrics/MetricSources.php) y la migración [`000043`](../../backend/database/migrations/2026_10_31_000043_add_in_default_layout_to_dashboard_widgets.php)
+- Decisiones: [ADR-0030](../decisiones/0030-dashboard-personalizable.md), [ADR-0047](../decisiones/0047-metricas-del-dashboard.md), [ADR-0048](../decisiones/0048-diseno-del-dashboard-por-persona.md) y [ADR-0081](../decisiones/0081-dashboard-de-riesgo.md)

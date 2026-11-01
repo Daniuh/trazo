@@ -11,6 +11,7 @@ use App\Modules\Dashboard\Application\Data\DigestItem;
 use App\Modules\Dashboard\Application\Data\IncidentDigest;
 use App\Modules\Dashboard\Application\Data\WorkloadRow;
 use App\Modules\Dashboard\Application\Ports\DashboardQueries;
+use App\Modules\Incidents\Domain\DueWindow;
 use App\Modules\Incidents\Domain\VisibilityScope;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
 use App\Modules\Incidents\Infrastructure\VisibilitySql;
@@ -111,6 +112,50 @@ final class EloquentDashboardQueries implements DashboardQueries
                 return new WorkloadRow((string) $person?->ulid, (string) $person?->name, (int) $row->pending, (int) $row->overdue);
             })
             ->all());
+    }
+
+    public function onTimeResolutions(int $actorId, VisibilityScope $scope, DateTimeImmutable $from): array
+    {
+        $row = $this->visible($actorId, $scope)->toBase()
+            ->selectRaw('COUNT(*) AS resolved')
+            ->selectRaw('COALESCE(SUM(incidents.resolved_at <= incidents.due_date), 0) AS on_time')
+            ->where('incidents.resolved_at', '>=', $from)
+            ->first();
+
+        return ['resolved' => (int) ($row->resolved ?? 0), 'on_time' => (int) ($row->on_time ?? 0)];
+    }
+
+    public function riskMatrix(int $actorId, VisibilityScope $scope, array $pendingStatusIds, DueWindow $window): array
+    {
+        // Mismos límites que los grupos de la lista de incidentes (DueWindow)
+        $rows = $this->visible($actorId, $scope)->toBase()
+            ->select('incidents.priority_id')
+            ->selectRaw('CASE WHEN incidents.due_date < ? THEN 0 WHEN incidents.due_date < ? THEN 1 WHEN incidents.due_date < ? THEN 2 ELSE 3 END AS bucket', [$window->now, $window->endOfToday, $window->endOfWeek])
+            ->selectRaw('COUNT(*) AS total')
+            ->whereIn('incidents.status_id', $pendingStatusIds)
+            ->groupBy('incidents.priority_id', 'bucket')
+            ->get();
+
+        $matrix = [];
+        foreach ($rows as $row) {
+            $matrix[(int) $row->priority_id][(int) $row->bucket] = (int) $row->total;
+        }
+
+        return $matrix;
+    }
+
+    public function exitsWithoutResolution(int $actorId, VisibilityScope $scope, array $pendingStatusIds, DateTimeImmutable $from): array
+    {
+        return $this->visible($actorId, $scope)->toBase()
+            ->selectRaw("DATE_FORMAT(incidents.updated_at, '%Y-%m-%d %H:00:00') AS hour")
+            ->selectRaw('COUNT(*) AS total')
+            ->whereNotIn('incidents.status_id', $pendingStatusIds)
+            ->whereNull('incidents.resolved_at')
+            ->where('incidents.updated_at', '>=', $from)
+            ->groupBy('hour')
+            ->pluck('total', 'hour')
+            ->map(fn (mixed $total): int => (int) $total)
+            ->all();
     }
 
     public function userUlid(int $userId): string

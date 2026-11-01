@@ -80,4 +80,22 @@ describe('AppColumnChart', () => {
     expect(chart.findAll('.app-columns__bar')).toHaveLength(4)
     expect(chart.find('title').text()).toBe('21 oct: 4 creados, 1 resueltos')
   })
+
+  it('usa una escala de raíz cuadrada para que un pico no aplaste a los demás días', () => {
+    const chart = mount(AppColumnChart, {
+      props: {
+        label: 'Creados',
+        series: [{ key: 'created', label: 'Creados', tone: 'blue' }],
+        points: [
+          { key: 'a', label: '21 oct', values: { created: 100 } },
+          { key: 'b', label: '22 oct', values: { created: 25 } },
+        ],
+      },
+    })
+
+    const heights = chart.findAll('.app-columns__bar').map((bar) => Number(bar.attributes('height')))
+    // 25 es la cuarta parte de 100, pero su columna mide la mitad
+    expect(heights).toEqual([100, 50])
+    expect(chart.find('.app-columns__max').text()).toBe('Día con más: 100')
+  })
 })

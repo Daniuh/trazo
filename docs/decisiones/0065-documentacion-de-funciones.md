@@ -9,7 +9,7 @@ order: 75
 # ADR-0065: Documentación de funciones
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La documentación en Markdown llega hasta el submódulo y el caso de uso. El nivel de función se documenta con PHPDoc y TSDoc en el código, y estaba aprobado generarlo con phpDocumentor y TypeDoc. Faltaba configurarlo, y también decidir cuándo se genera y dónde queda el resultado.

@@ -9,7 +9,7 @@ order: 43
 # ADR-0033: Flujo de Git con cuatro ramas
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El código debe avanzar por etapas de validación claras, con un historial legible y sin atajos.

@@ -45,6 +45,19 @@ Cada listado hace dos consultas importantes: el **conteo** (para el total y las 
 | Rango de vencimiento | 55.010 | 19 ms | `status_id, due_date, deleted_at` (salto de índice) | `due_date, deleted_at` |
 | Búsqueda de texto | 6.233 | 40 ms | FULLTEXT `title, description` | FULLTEXT + ordenamiento |
 
+**Lista agrupada** ([ADR-0080](../decisiones/0080-lista-agrupada-con-plazo.md)). En lugar del conteo general hay un conteo por grupo, y la página sale de una consulta corta por cada grupo que la toca:
+
+| Escenario | Resultados | Tiempo total | Conteo por grupo usa | Página del grupo usa |
+|---|---|---|---|---|
+| Todo, agrupado por vencimiento | 100.000 | 42 ms | `status_id, due_date, deleted_at` (solo índice) | `created_at` (550 filas) |
+| Agente, agrupado por vencimiento | 30.227 | 40 ms | `dashboard_assignee` (solo índice) | `created_at` (550 filas) |
+| Todo, agrupado por estado | 100.000 | 23 ms | `status_id, due_date, deleted_at` (solo índice) | `created_at` (540 filas) |
+| Todo, agrupado por prioridad | 100.000 | 27 ms | `dashboard_counts` (solo índice) | `created_at` (200 filas) |
+| Todo, agrupado por asignado | 100.000 | 24 ms | `dashboard_assignee` (solo índice) | `created_at` (900 filas) |
+| Pendientes por vencimiento, orden por vencimiento | 8.979 | 22 ms | `status_id, due_date, deleted_at` (rango) | `due_date, deleted_at` |
+
+La primera versión ordenaba todo lo filtrado por grupo (`ORDER BY CASE …`) y tardaba de 130 a 300 ms sin filtros: el orden por una expresión obliga a MySQL a ordenar todas las filas. El conteo por prioridad se agrupa por estado y prioridad, y se suma en PHP: así lo cubre el índice `dashboard_counts`; agrupado solo por prioridad, MySQL elegía el índice de `priority_id`, que no tiene `deleted_at`, y leía cada fila (142 ms).
+
 **Todos los escenarios responden en menos de 100 ms con 100.000 incidentes.**
 
 ## Ajuste que salió de la medición
@@ -84,6 +97,11 @@ En uso real, cada fuente queda en caché hasta que cambia un incidente o pasan 6
 | Próximos a vencer (conteo y 5 filas) | 7 ms | 28 ms | 19 ms | `status_id, due_date, deleted_at` y `due_date, deleted_at` |
 | Asignados a mí (conteo y 5 filas) | 17 ms | 15 ms | 3 ms | `dashboard_assignee` |
 | Carga por agente | 52 ms | 62 ms | 35 ms | `dashboard_assignee` (solo índice) |
+| Cumplimiento del plazo (30 días) | 55 ms | 52 ms | — | `resolved_at, deleted_at` (lee cada resuelto para comparar con su vencimiento) |
+| Mapa de riesgo | 17 ms | 16 ms | — | `status_id, due_date, deleted_at` (solo pendientes) |
+| Salidas sin resolver por hora (90 días) | 34 ms | 31 ms | — | `resolved_at, deleted_at` (los que no tienen fecha de resolución) |
+
+Las tres últimas son del diseño centrado en el riesgo ([ADR-0081](../decisiones/0081-dashboard-de-riesgo.md)), medidas en una corrida posterior con el mismo volumen; el pulso, el flujo y el balance reutilizan además el conteo por estado y prioridad y la tendencia.
 
 Los datos de demostración reparten los incidentes en los últimos 60 días, así que con 100.000 hay unos 1.600 por día. Es mucho más que una mesa de ayuda normal, y sirve como peor caso:
 

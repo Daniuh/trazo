@@ -16,4 +16,8 @@ enum IncidentAction: string
     case Assign = 'assign';
     case Delete = 'delete';
     case Restore = 'restore';
+    case RequestReopen = 'request_reopen';
+    case Reopen = 'reopen';
+    case DecideReopen = 'decide_reopen';
+    case Comment = 'comment';
 }

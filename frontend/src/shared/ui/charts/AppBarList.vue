@@ -30,9 +30,11 @@ const width = (value: number) => `${Math.round((value / max.value) * 100)}%`
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
 
+// Si el contenedor es más alto que las barras (una tarjeta pareja con su vecina), las filas se reparten el alto
 .app-bars {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   gap: $space-1;
   margin: 0;
   padding: 0;

@@ -9,7 +9,7 @@ order: 17
 # ADR-0007: MySQL 8.4 LTS como base de datos
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba permite MySQL o MariaDB. Se requieren FULLTEXT, restricciones CHECK, JSON y buen soporte en la nube.

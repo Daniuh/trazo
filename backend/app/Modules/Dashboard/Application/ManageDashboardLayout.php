@@ -98,12 +98,15 @@ final readonly class ManageDashboardLayout
      */
     private function defaults(array $allowed): array
     {
-        $placements = DashboardGrid::defaults(array_values($allowed));
+        $original = array_filter($allowed, fn (WidgetDefinition $definition): bool => $definition->inDefaultLayout);
+        $placements = DashboardGrid::defaults(array_values($original));
+        $saved = [];
+        foreach ($placements as $code => $placement) {
+            $saved[$code] = new WidgetLayout($allowed[$code]->code, $placement, true);
+        }
 
-        return array_values(array_map(
-            fn (WidgetDefinition $definition): WidgetLayout => new WidgetLayout($definition->code, $placements[$definition->code->value], true),
-            $allowed,
-        ));
+        // Los que no son del diseño original quedan ocultos, debajo de todo
+        return $this->complete($allowed, $saved);
     }
 
     /**

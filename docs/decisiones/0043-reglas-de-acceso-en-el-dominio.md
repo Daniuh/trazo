@@ -9,7 +9,7 @@ order: 53
 # ADR-0043: Reglas de acceso a incidentes en una sola clase de dominio
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Quién puede hacer qué con un incidente depende de varias cosas a la vez: los permisos granulares (`own`, `assigned`, `unassigned`, `any`), quién lo creó, quién lo atiende, el estado (inicial o final) y si está eliminado.

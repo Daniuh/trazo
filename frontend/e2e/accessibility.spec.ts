@@ -57,6 +57,10 @@ test('todas las pantallas con sesión son accesibles', async ({ page }) => {
   const paths = [
     '/incidentes',
     '/incidentes/nuevo',
+    '/incidentes/mios?vista=kanban',
+    '/incidentes/mios?vista=lista',
+    '/incidentes/mios?vista=calendario',
+    '/incidentes/mios?vista=dia',
     `/incidentes/${incident}`,
     `/incidentes/${incident}/editar`,
     '/auditoria/incidentes',
@@ -70,8 +74,10 @@ test('todas las pantallas con sesión son accesibles', async ({ page }) => {
     '/sistema/salud',
     '/sistema/eventos',
     '/mi-cuenta',
-    '/guia-visual',
   ]
+  // La guía visual solo existe en el modo desarrollo (Vite); el build final no la incluye
+  const html = await (await page.request.get('/')).text()
+  if (html.includes('/@vite/client')) paths.push('/guia-visual')
 
   await expectAccessible(page)
   for (const path of paths) {

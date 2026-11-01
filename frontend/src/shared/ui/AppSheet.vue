@@ -1,6 +1,6 @@
 <!-- Panel que se abre sobre la página: desde la derecha en portátil y monitor, desde abajo en celular y tablet (o
-     siempre desde abajo con side="bottom"). Título, botón de cerrar, contenido que se desplaza si no cabe y un pie
-     opcional que queda a la vista. Base de AppFilterSheet. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
+     siempre desde abajo con side="bottom"). Título, botón de cerrar, una barra opcional bajo el título (toolbar),
+     contenido que se desplaza si no cabe y un pie opcional; la barra y el pie quedan a la vista. Base de AppFilterSheet. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import { QDialog } from 'quasar'
 import { computed, useId } from 'vue'
@@ -12,6 +12,8 @@ const props = withDefaults(defineProps<{ title: string; side?: 'auto' | 'bottom'
   closable: true,
 })
 const open = defineModel<boolean>('open', { default: false })
+// Terminó de abrirse: ya se puede mover el foco dentro del panel
+const emit = defineEmits<{ shown: [] }>()
 
 const titleId = useId()
 const { isLaptopUp } = useViewport()
@@ -25,6 +27,7 @@ const position = computed(() => (props.side === 'auto' && isLaptopUp.value ? 'ri
     :full-width="position === 'bottom'"
     :full-height="position === 'right'"
     class="app-popup-sheet"
+    @show="emit('shown')"
   >
     <div class="app-sheet" :class="`app-sheet--${position}`" role="dialog" :aria-labelledby="titleId">
       <header class="app-sheet__header">
@@ -33,6 +36,9 @@ const position = computed(() => (props.side === 'auto' && isLaptopUp.value ? 'ri
           <AppIcon name="close" />
         </button>
       </header>
+      <div v-if="$slots.toolbar" class="app-sheet__toolbar">
+        <slot name="toolbar" />
+      </div>
       <div class="app-sheet__body">
         <slot />
       </div>
@@ -64,7 +70,10 @@ const position = computed(() => (props.side === 'auto' && isLaptopUp.value ? 'ri
   max-width: 100vw;
   height: 100vh;
   max-height: 100vh;
-  border-radius: $radius-card 0 0 $radius-card;
+
+  // De arriba abajo, pegado al borde: sin esquinas redondeadas
+  border-left: 1px solid $color-border;
+  border-radius: 0;
 }
 
 .app-sheet__header {
@@ -93,6 +102,11 @@ const position = computed(() => (props.side === 'auto' && isLaptopUp.value ? 'ri
   &:hover {
     color: $color-text;
   }
+}
+
+// Pestañas o filtros bajo el título: quedan fijos mientras el cuerpo se desplaza
+.app-sheet__toolbar {
+  padding: $space-3 $space-4 0;
 }
 
 // Si el contenido no cabe, se desplaza y el pie queda siempre a la vista

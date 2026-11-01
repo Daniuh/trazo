@@ -54,8 +54,11 @@ onMounted(load)
       @open="open"
     >
       <template #cell-name="{ row }">
-        <span class="role-list__name">{{ row.name }}</span>
-        <AppBadge v-if="row.isSystem" class="role-list__system" tone="neutral">Base</AppBadge>
+        <!-- La etiqueta va al final de la celda, para que quede en la misma línea vertical en todas las filas -->
+        <span class="role-list__name-cell">
+          <span class="role-list__name">{{ row.name }}</span>
+          <AppBadge v-if="row.isSystem" tone="neutral">Base</AppBadge>
+        </span>
       </template>
       <template #cell-members="{ row }">{{ row.members }}</template>
       <template #cell-permissions="{ row }">{{ row.permissions.length }}</template>
@@ -109,12 +112,18 @@ onMounted(load)
   line-height: $line-height-tight;
 }
 
-.role-list__name {
-  font-weight: $font-weight-medium;
+.role-list__name-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
 }
 
-.role-list__system {
-  margin-left: $space-2;
+.role-list__name {
+  overflow: hidden;
+  font-weight: $font-weight-medium;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .role-list__cards {

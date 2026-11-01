@@ -13,6 +13,9 @@ const FIELD_LABELS: Record<string, string> = {
 }
 
 const nameOf = (value: unknown): string => String((value as Named)?.name ?? '')
+// Quien hizo el cambio quedó asignado a sí mismo (lo tomó)
+const isSelf = (value: unknown, activity: Activity): boolean =>
+  (value as { id?: unknown } | null)?.id === activity.user.id
 
 function listFields(fields: string[]): string {
   const labels = fields.map((field) => FIELD_LABELS[field] ?? field)
@@ -33,11 +36,12 @@ export function describeActivity(activity: Activity): { text: string; detail: st
 
   switch (activity.type) {
     case 'created': {
-      const assignee = nameOf(changes.assignee?.to)
-      return {
-        text: assignee ? `${who} creó el incidente y lo asignó a ${assignee}` : `${who} creó el incidente`,
-        detail: null,
-      }
+      const to = changes.assignee?.to
+      if (!to) return { text: `${who} creó el incidente`, detail: null }
+      const text = isSelf(to, activity)
+        ? `${who} creó el incidente y se lo asignó`
+        : `${who} creó el incidente y lo asignó a ${nameOf(to)}`
+      return { text, detail: null }
     }
     case 'updated':
       return { text: `${who} editó ${listFields(Object.keys(changes))}`, detail: changeDetail(activity) }
@@ -47,9 +51,11 @@ export function describeActivity(activity: Activity): { text: string; detail: st
         detail: `${nameOf(changes.status?.from)} → ${nameOf(changes.status?.to)}`,
       }
     case 'assigned': {
-      const to = changes.assignee?.to as Named
-      const taken = (to as { id?: string } | null)?.id === activity.user.id
-      return { text: taken ? `${who} tomó el incidente` : `${who} asignó el incidente a ${nameOf(to)}`, detail: null }
+      const to = changes.assignee?.to
+      return {
+        text: isSelf(to, activity) ? `${who} tomó el incidente` : `${who} asignó el incidente a ${nameOf(to)}`,
+        detail: null,
+      }
     }
     case 'unassigned':
       return { text: `${who} quitó la asignación a ${nameOf(changes.assignee?.from)}`, detail: null }
@@ -57,6 +63,15 @@ export function describeActivity(activity: Activity): { text: string; detail: st
       return { text: `${who} eliminó el incidente`, detail: null }
     case 'restored':
       return { text: `${who} restauró el incidente`, detail: null }
+    case 'reopen_requested':
+      return { text: `${who} pidió reabrir el incidente`, detail: null }
+    case 'reopen_rejected':
+      return { text: `${who} rechazó la reapertura`, detail: null }
+    case 'reopened':
+      return {
+        text: `${who} reabrió el incidente`,
+        detail: `${nameOf(changes.status?.from)} → ${nameOf(changes.status?.to)}`,
+      }
     default:
       return { text: `${who} hizo un cambio`, detail: null }
   }

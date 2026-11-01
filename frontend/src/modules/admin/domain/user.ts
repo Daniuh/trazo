@@ -9,7 +9,10 @@ export interface RoleRef {
 
 export interface UserSummary {
   id: string
+  // Nombre completo para mostrar (nombres + apellidos), armado por la API
   name: string
+  givenNames: string
+  familyNames: string
   email: string
   isActive: boolean
   role: RoleRef | null
@@ -60,12 +63,14 @@ export interface PermissionOption {
 }
 
 export interface UserDraft {
-  name: string
+  givenNames: string
+  familyNames: string
   email: string
   role: string | null
 }
 
 export interface ProfileDraft {
-  name: string
+  givenNames: string
+  familyNames: string
   email: string
 }

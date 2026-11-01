@@ -18,6 +18,7 @@ Cada cambio de un incidente queda registrado aquí: quién, qué y cuándo. Es l
 | `user_id` | BIGINT UNSIGNED | FK → `users`, RESTRICT | Quién hizo el cambio |
 | `activity_type_id` | TINYINT UNSIGNED | FK → `activity_types`, RESTRICT | |
 | `changes` | JSON | NULL | Valores anteriores y nuevos |
+| `note` | VARCHAR(1000) | NULL | Lo que escribió la persona: la solución, el motivo de cancelar, de pedir, rechazar o hacer una reapertura ([ADR-0071](../../decisiones/0071-nota-de-estado-y-reapertura.md)) |
 | `ip_address` | VARCHAR(45) | NULL | Alcanza para IPv6. Vacía en el historial de los datos de demostración, que no viene de una petición |
 | `user_agent` | VARCHAR(255) | NULL | |
 | `created_at` | TIMESTAMP | NOT NULL | Sin `updated_at`: el registro no cambia |
@@ -38,4 +39,5 @@ Esta es la tabla que más crece. Su estrategia de crecimiento (archivado en luga
 
 - Migración: [`2026_10_21_000011_create_incident_activities_table.php`](../../../backend/database/migrations/2026_10_21_000011_create_incident_activities_table.php)
 - Índices de la auditoría: [`000032`](../../../backend/database/migrations/2026_10_24_000032_add_audit_indexes.php) ([ADR-0056](../../decisiones/0056-auditoria-global.md))
+- Nota: [`000036`](../../../backend/database/migrations/2026_10_27_000036_add_note_to_incident_activities.php)
 - Modelo: [`IncidentActivity.php`](../../../backend/app/Modules/Incidents/Infrastructure/Models/IncidentActivity.php)

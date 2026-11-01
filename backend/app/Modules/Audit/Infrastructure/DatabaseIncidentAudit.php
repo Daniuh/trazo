@@ -28,7 +28,7 @@ final readonly class DatabaseIncidentAudit implements IncidentAuditQuery
             ->join('users as u', 'u.id', '=', 'a.user_id')
             ->join('incidents as i', 'i.id', '=', 'a.incident_id')
             ->select([
-                'a.id', 'a.created_at', 'a.changes', 'a.ip_address', 'a.user_agent',
+                'a.id', 'a.created_at', 'a.changes', 'a.note', 'a.ip_address', 'a.user_agent',
                 't.code as type_code', 't.name as type_name', 'u.ulid as actor_id', 'u.name as actor_name',
                 'i.ulid as incident_id', 'i.code as incident_code', 'i.title as incident_title',
                 'i.created_by', 'i.assigned_to', 'i.deleted_at',
@@ -96,6 +96,7 @@ final readonly class DatabaseIncidentAudit implements IncidentAuditQuery
                 $row->deleted_at !== null,
             ),
             changes: is_array($changes) ? $changes : null,
+            note: $row->note === null ? null : (string) $row->note,
             ipAddress: $row->ip_address === null ? null : (string) $row->ip_address,
             userAgent: $row->user_agent === null ? null : (string) $row->user_agent,
         );

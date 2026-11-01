@@ -15,5 +15,7 @@ final readonly class IncidentState
         public bool $statusIsInitial,
         public bool $statusIsFinal,
         public bool $deleted,
+        // Quién pidió reabrirlo, si hay una solicitud pendiente
+        public ?int $reopenRequestedBy = null,
     ) {}
 }

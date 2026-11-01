@@ -1,4 +1,4 @@
-<!-- Estado (etiqueta sólida), "Vencido" si aplica y prioridad (punto de color). Lo usan el detalle y luego el listado. -->
+<!-- Estado (etiqueta sólida), "Vencido" si aplica y prioridad (punto de color). Lo usan las tarjetas del listado y la vista previa. -->
 <!-- Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import AppBadge from '@/shared/ui/AppBadge.vue'

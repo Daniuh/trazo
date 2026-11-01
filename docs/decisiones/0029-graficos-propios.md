@@ -9,7 +9,7 @@ order: 39
 # ADR-0029: Gráficos con componentes SVG propios
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El dashboard necesita gráficos por estado y por prioridad. Deben respetar los tokens de diseño y adaptarse al tamaño de cada widget.

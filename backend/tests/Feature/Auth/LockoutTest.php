@@ -35,10 +35,10 @@ it('bloquea un minuto al quinto fallo seguido, incluso con la contraseña correc
         ->assertJsonPath('params.retry_after', 60);
 
     $this->travel(30)->seconds();
-    attemptLogin('agente1@trazo.test', 'Trazo.Demo.2026')->assertStatus(423);
+    attemptLogin('agente1@trazo.test', 'Cometa.Demo.2026')->assertStatus(423);
 
     $this->travel(31)->seconds();
-    attemptLogin('agente1@trazo.test', 'Trazo.Demo.2026')->assertOk();
+    attemptLogin('agente1@trazo.test', 'Cometa.Demo.2026')->assertOk();
 });
 
 it('bloquea igual un correo que no existe, para no revelar qué cuentas hay', function (): void {
@@ -56,11 +56,11 @@ it('alarga la espera en cada escalón', function (): void {
 
 it('reinicia el contador con un ingreso correcto', function (): void {
     failTimes('agente1@trazo.test', 4);
-    attemptLogin('agente1@trazo.test', 'Trazo.Demo.2026')->assertOk();
+    attemptLogin('agente1@trazo.test', 'Cometa.Demo.2026')->assertOk();
 
     failTimes('agente1@trazo.test', 4);
     $this->travel(61)->seconds();
-    attemptLogin('agente1@trazo.test', 'Trazo.Demo.2026')->assertOk();
+    attemptLogin('agente1@trazo.test', 'Cometa.Demo.2026')->assertOk();
 });
 
 it('registra el bloqueo en el log, sin el correo en claro', function (): void {

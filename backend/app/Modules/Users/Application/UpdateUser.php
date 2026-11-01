@@ -16,6 +16,7 @@ use App\Modules\Users\Application\Data\UserRecord;
 use App\Modules\Users\Application\Ports\AccountNotifier;
 use App\Modules\Users\Application\Ports\UserRepository;
 use App\Modules\Users\Domain\Administrator;
+use App\Modules\Users\Domain\PersonName;
 use App\Modules\Users\Domain\UserAction;
 
 final readonly class UpdateUser
@@ -29,12 +30,12 @@ final readonly class UpdateUser
         private Transaction $transaction,
     ) {}
 
-    public function handle(Administrator $admin, string $ulid, string $name, string $email, RequestContext $context): UserRecord
+    public function handle(Administrator $admin, string $ulid, PersonName $name, string $email, RequestContext $context): UserRecord
     {
         $user = $this->gate->load($admin, $ulid, UserAction::Update);
 
         $changes = array_filter([
-            'name' => $user->name !== $name ? ['from' => $user->name, 'to' => $name] : null,
+            'name' => $name->equals(new PersonName($user->givenNames, $user->familyNames)) ? null : ['from' => $user->name, 'to' => $name->full()],
             'email' => $user->email !== $email ? ['from' => $user->email, 'to' => $email] : null,
         ]);
         if ($changes === []) {
@@ -49,7 +50,7 @@ final readonly class UpdateUser
         });
 
         if (isset($changes['email'])) {
-            $this->notifier->emailChanged($user->email, $name);
+            $this->notifier->emailChanged($user->email, $name->full());
         }
 
         return $this->gate->reload($user);

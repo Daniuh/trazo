@@ -9,7 +9,7 @@ order: 72
 # ADR-0062: Correos cifrados en la cola
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Todos los correos de Trazo salen por la cola, para que la respuesta no espere al servidor de correo. Mientras esperan, quedan serializados en Redis. Si fallan tres veces, quedan guardados en la tabla `failed_jobs`. Al documentar esa tabla se revisó qué llevan:

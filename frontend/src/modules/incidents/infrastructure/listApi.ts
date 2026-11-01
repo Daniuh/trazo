@@ -2,7 +2,7 @@
 // exportación en CSV con los mismos criterios. Documentado en docs/frontend/incidents.md
 import { filenameFrom } from '@/shared/download/saveFile'
 import { http } from '@/shared/http'
-import type { ListCriteria, ListPage } from '../domain/listing'
+import { effectiveGroup, type ListCriteria, type ListPage } from '../domain/listing'
 import { toIncident, type IncidentDto } from './mappers'
 
 const EXPORT_TIMEOUT_MS = 120_000
@@ -11,7 +11,7 @@ type SummaryDto = Omit<IncidentDto, 'description' | 'next_statuses'>
 
 interface ListResponse {
   data: SummaryDto[]
-  meta: { page: number; per_page: number; total: number; last_page: number }
+  meta: { page: number; per_page: number; total: number; last_page: number; groups?: { key: string; total: number }[] }
 }
 
 export function toParams(criteria: ListCriteria): Record<string, string | number> {
@@ -24,6 +24,8 @@ export function toParams(criteria: ListCriteria): Record<string, string | number
     if (value) params[key] = value
   }
 
+  const group = effectiveGroup(criteria)
+  add('group_by', group === 'none' ? null : group)
   add('search', criteria.search.trim() || null)
   add('filter[status]', criteria.statuses.join(','))
   add('filter[priority]', criteria.priorities.join(','))
@@ -35,6 +37,7 @@ export function toParams(criteria: ListCriteria): Record<string, string | number
   add('filter[due_to]', criteria.dueTo)
   if (criteria.overdue) params['filter[overdue]'] = 1
   if (criteria.deleted) params['filter[deleted]'] = 1
+  if (criteria.reopenRequested) params['filter[reopen_requested]'] = 1
   return params
 }
 
@@ -46,6 +49,7 @@ export const listApi = {
       items: data.data.map((dto) => toIncident({ ...dto, description: '', next_statuses: [] })),
       total: data.meta.total,
       lastPage: data.meta.last_page,
+      groups: Object.fromEntries((data.meta.groups ?? []).map((group) => [group.key, group.total])),
     }
   },
 

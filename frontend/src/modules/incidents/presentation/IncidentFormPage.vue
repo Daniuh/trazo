@@ -7,11 +7,13 @@ import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { messageFor } from '@/shared/errors'
 import { ApiError } from '@/shared/http'
+import AppBackLink from '@/shared/ui/AppBackLink.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import { useFeedback } from '@/shared/ui/feedback/useFeedback'
 import AppErrorState from '@/shared/ui/states/AppErrorState.vue'
 import AppSkeleton from '@/shared/ui/states/AppSkeleton.vue'
+import { listReturnLocation } from '../application/listReturn'
 import { useIncidentForm } from '../application/useIncidentForm'
 import IncidentForm from './components/IncidentForm.vue'
 
@@ -21,10 +23,31 @@ const session = useSessionStore()
 const { notify } = useFeedback()
 
 const editingId = route.params.id ? String(route.params.id) : null
-const { form, status, loadError, fieldErrors, formError, conflict, submitting, suggestedDueDate, prepare, submit } =
-  useIncidentForm(editingId)
+const {
+  form,
+  existing,
+  status,
+  loadError,
+  fieldErrors,
+  formError,
+  conflict,
+  submitting,
+  suggestedDueDate,
+  prepare,
+  submit,
+} = useIncidentForm(editingId)
+// Al editar, la vista previa muestra el código, el estado y la persona asignada de verdad
+const current = computed(() =>
+  existing.value
+    ? { code: existing.value.code, status: existing.value.status, assigneeName: existing.value.assignee?.name ?? null }
+    : null,
+)
 const conflictMessage = messageFor(new ApiError('http', 'VERSION_CONFLICT'))
 const canAssign = computed(() => !editingId && session.can('incidents.assign'))
+// Quien solo toma incidentes puede asignarse el que crea (el back solo le permite elegirse a sí mismo)
+const selfAssignId = computed(() =>
+  !editingId && !canAssign.value && session.can('incidents.take') ? (session.user?.id ?? null) : null,
+)
 
 const toDetail = (id: string) => router.replace({ name: 'incident-detail', params: { id } })
 
@@ -57,6 +80,10 @@ onMounted(load)
 
 <template>
   <div class="incident-form-page">
+    <!-- Al editar se vuelve al incidente; al crear, al listado -->
+    <AppBackLink v-if="editingId" :to="{ name: 'incident-detail', params: { id: editingId } }" label="Incidente" />
+    <AppBackLink v-else :to="listReturnLocation()" label="Incidentes" />
+
     <h1 class="incident-form-page__title">{{ editingId ? 'Editar incidente' : 'Nuevo incidente' }}</h1>
 
     <AppErrorState v-if="loadError" :error="loadError" @retry="load" />
@@ -83,7 +110,9 @@ onMounted(load)
         :errors="fieldErrors"
         :suggested-due-date="suggestedDueDate"
         :can-assign="canAssign"
+        :self-assign-id="selfAssignId"
         :creating="!editingId"
+        :current="current"
       />
 
       <div class="incident-form-page__actions">
@@ -113,17 +142,49 @@ onMounted(load)
   line-height: $line-height-tight;
 }
 
-// En celular los botones se apilan, con la acción principal arriba
+// Celular y tablet: los botones quedan fijos abajo, sobre el dock, para no tener que bajar hasta el final.
+// La acción principal ocupa más
 .incident-form-page__actions {
+  position: sticky;
+  z-index: 1;
+  bottom: $dock-clearance-mobile;
   display: flex;
-  flex-direction: column-reverse;
   gap: $space-2;
+  padding: $space-2;
+  border: 1px solid $color-border;
+  border-radius: $radius-card;
+  background: $color-surface;
+  box-shadow: $shadow-overlay;
+
+  > :first-child {
+    flex: 1;
+  }
+
+  > :last-child {
+    flex: 2;
+  }
 }
 
 @include tablet {
   .incident-form-page__actions {
-    flex-direction: row;
+    bottom: $dock-clearance;
+  }
+}
+
+// Desde portátil, a la derecha y sin marco: el formulario cabe en la pantalla
+@include laptop {
+  .incident-form-page__actions {
+    position: static;
     justify-content: flex-end;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+
+    > :first-child,
+    > :last-child {
+      flex: none;
+    }
   }
 }
 

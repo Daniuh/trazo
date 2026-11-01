@@ -9,3 +9,12 @@ $duration-base: 200ms;
 
 // Widget que se arrastra en el modo Personalizar: flota sobre los demás
 $shadow-dragging: 0 0.75rem 2rem rgb(22 22 22 / 18%);
+
+// Tarjeta de las pantallas sin sesión: flota sobre el fondo de marca con una sombra amplia y fría
+$shadow-auth-card:
+  0 1.5rem 3.5rem rgb(2 60 80 / 12%),
+  0 0.25rem 0.75rem rgb(22 22 22 / 5%);
+
+// Movimiento ambiental del fondo de marca: tan lento que no distrae (se detiene con "reducir movimiento")
+$duration-ambient: 36s;
+$duration-ambient-ring: 160s;

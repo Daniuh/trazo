@@ -20,7 +20,7 @@ final class EloquentActivityReader implements ActivityReader
             ->where('incident_id', $incidentId)
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->paginate($perPage, ['id', 'activity_type_id', 'user_id', 'changes', 'created_at'], 'page', $page);
+            ->paginate($perPage, ['id', 'activity_type_id', 'user_id', 'changes', 'note', 'created_at'], 'page', $page);
 
         $items = array_values(array_map(function (IncidentActivity $activity): array {
             $type = IncidentMapper::loaded($activity->type);
@@ -30,6 +30,7 @@ final class EloquentActivityReader implements ActivityReader
                 'type' => ['code' => $type->code, 'name' => $type->name],
                 'user' => ['id' => $user->ulid, 'name' => $user->name],
                 'changes' => $activity->changes,
+                'note' => $activity->note,
                 'created_at' => $activity->created_at->format(DateTimeInterface::ATOM),
             ];
         }, $paginator->items()));

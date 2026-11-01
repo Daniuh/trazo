@@ -57,6 +57,8 @@ function clear(): void {
     search: draft.value.search,
     sort: draft.value.sort,
     descending: draft.value.descending,
+    view: draft.value.view,
+    groupBy: draft.value.groupBy,
   }
 }
 

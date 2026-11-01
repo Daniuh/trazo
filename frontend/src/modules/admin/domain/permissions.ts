@@ -53,7 +53,55 @@ export function differenceCount(selected: string[], rolePermissions: string[]): 
   return [...all].filter((code) => differenceFromRole(code, selected, rolePermissions) !== null).length
 }
 
+export interface RoleDifference {
+  code: string
+  name: string
+  kind: 'added' | 'removed'
+}
+
+// Lo que difiere del rol, en el orden del catálogo (por módulo), para resumirlo en la ficha
+export function roleDifferences(
+  selected: string[],
+  rolePermissions: string[],
+  catalog: PermissionOption[],
+): RoleDifference[] {
+  return groupByModule(catalog).flatMap((group) =>
+    group.items.flatMap((permission) => {
+      const kind = differenceFromRole(permission.code, selected, rolePermissions)
+      return kind ? [{ code: permission.code, name: permission.name, kind }] : []
+    }),
+  )
+}
+
 // Un permiso se puede tocar si quien administra lo tiene o si se trata de quitarlo
 export function canToggle(permission: PermissionOption, selected: string[]): boolean {
   return permission.grantable || selected.includes(permission.code)
+}
+
+export interface ModuleSelection {
+  selected: number
+  total: number
+  // Estado de la casilla "Todos": marcada, a medias o vacía
+  state: 'all' | 'some' | 'none'
+  // Algún permiso del módulo no se puede tocar (quien administra no lo tiene)
+  blocked: boolean
+}
+
+// Resumen de un módulo para su encabezado: cuántos van marcados y cómo se ve la casilla "Todos"
+export function moduleSelection(items: PermissionOption[], selected: string[]): ModuleSelection {
+  const count = items.filter((permission) => selected.includes(permission.code)).length
+  return {
+    selected: count,
+    total: items.length,
+    state: count === 0 ? 'none' : count === items.length ? 'all' : 'some',
+    blocked: items.some((permission) => !canToggle(permission, selected)),
+  }
+}
+
+// Marca o desmarca un módulo completo. Al marcar solo se suman los que quien administra puede conceder
+export function toggleModule(items: PermissionOption[], selected: string[], on: boolean): string[] {
+  const codes = new Set(items.map((permission) => permission.code))
+  if (!on) return selected.filter((code) => !codes.has(code))
+  const added = items.filter((permission) => permission.grantable && !selected.includes(permission.code))
+  return [...selected, ...added.map((permission) => permission.code)]
 }

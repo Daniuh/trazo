@@ -36,7 +36,7 @@ it('se puede ejecutar varias veces sin duplicar nada', function (): void {
     expect(tableCounts())->toBe($first)
         ->and($first)->toMatchArray([
             'priorities' => 4, 'statuses' => 6, 'status_transitions' => 9,
-            'activity_types' => 7, 'roles' => 5, 'permissions' => 30,
+            'activity_types' => 10, 'roles' => 5, 'permissions' => 33,
         ]);
 });
 
@@ -63,13 +63,13 @@ it('aplica la matriz de permisos por rol, con su nivel', function (): void {
     $this->seed(DatabaseSeeder::class);
 
     // El super admin tiene todo salvo el dashboard propio, que ya cubre dashboard.view.any
-    expect(permissionsOf('super_admin'))->toHaveCount(29)->not->toContain('dashboard.view.own')
+    expect(permissionsOf('super_admin'))->toHaveCount(32)->not->toContain('dashboard.view.own')
         ->and(permissionsOf('requester'))->toBe([
-            'dashboard.view.own', 'incidents.create', 'incidents.update.own', 'incidents.view.own',
+            'dashboard.view.own', 'incidents.comment', 'incidents.create', 'incidents.reopen.request', 'incidents.update.own', 'incidents.view.own',
         ])
         ->and(permissionsOf('agent'))->toContain('incidents.take', 'incidents.status.assigned')
         ->not->toContain('incidents.assign', 'incidents.view.any')
-        ->and(permissionsOf('supervisor'))->toContain('incidents.assign', 'audit.incidents.view')
+        ->and(permissionsOf('supervisor'))->toContain('incidents.assign', 'audit.incidents.view', 'incidents.reopen.approve')
         ->not->toContain('system.logs.view', 'users.view', 'audit.admin.view')
         // Restablecer accesos queda solo para el super admin, salvo que se le conceda a una persona
         ->and(permissionsOf('admin'))->toContain('users.create', 'users.roles.assign', 'users.permissions.grant', 'audit.admin.view')
@@ -120,7 +120,7 @@ it('carga el volumen de incidentes pedido, coherente y sin duplicar al repetir',
         ->get(['incidents.code', 'incidents.resolved_at', 'statuses.code as status']);
 
     expect($incidents)->toHaveCount(60)
-        ->and($incidents->pluck('code')->every(fn (string $code): bool => preg_match('/^INC-\d{6}$/', $code) === 1))->toBeTrue()
+        ->and($incidents->pluck('code')->every(fn (string $code): bool => preg_match('/^TZ-\d{2}-\d{4,}$/', $code) === 1))->toBeTrue()
         ->and($incidents->whereIn('status', ['resolved', 'closed'])->whereNull('resolved_at'))->toBeEmpty()
         ->and($incidents->whereIn('status', ['open', 'in_progress', 'on_hold'])->whereNotNull('resolved_at'))->toBeEmpty()
         ->and(DB::table('incident_activities')->distinct()->count('incident_id'))->toBe(60);

@@ -9,7 +9,7 @@ order: 12
 # ADR-0002: CQRS ligero: escrituras por dominio, lecturas optimizadas
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El sistema debe operar con grandes volúmenes sin degradarse. Las pantallas de mayor carga (listado con filtros y dashboard) solo leen datos, mientras que las escrituras deben respetar reglas estrictas, como las transiciones de estado.

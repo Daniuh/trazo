@@ -27,8 +27,7 @@ Con las dos pestañas, arriba aparece el selector "Incidentes · Administración
 
 | Vista | Lista | Detalle |
 |---|---|---|
-| Monitor | Tabla (`AppDataTable`): fecha, hecho por, acción, sobre qué y el primer cambio | Al lado de la tabla; la columna "Cambio" se oculta mientras está abierto |
-| Portátil | Tabla | Panel desde la derecha (`AppSheet`) |
+| Portátil y monitor | Tabla (`AppDataTable`): fecha, hecho por, acción, sobre qué y el primer cambio | Panel que entra por la derecha, encima de la tabla (`AppSheet`). La tabla no cambia de tamaño ni pierde columnas, y la fila elegida queda marcada. Se cierra con la X, con Esc o con un clic fuera. |
 | Tablet y celular | Tarjetas | Panel inferior (`AppSheet`) |
 
 ### Filtros
@@ -41,7 +40,7 @@ Con las dos pestañas, arriba aparece el selector "Incidentes · Administración
   - En incidentes, el código (se aplica al dejar de escribir).
   - En administración, el rol afectado.
 - **En tablet y celular,** "Filtros (n)" abre el panel con los filtros en borrador. Ahí el código pasa al borrador de inmediato, para que tocar "Ver resultados" no lo pierda.
-- **Debajo de los filtros,** el rango que la API aplicó ("Del 24 de sept al 24 de oct").
+- **En la fila de los filtros, a la derecha,** el rango que la API aplicó ("Del 26 de sept al 26 de oct de 2026"; el año va una sola vez si las dos fechas son del mismo año). En celular y tablet queda junto al botón "Filtros" (en celular sin el ícono, para que quepa). Si la fila no tiene espacio, como en portátil con los cuatro filtros, pasa a la línea siguiente, siempre a la derecha.
 - **Un código de incidente mal escrito** muestra el mensaje junto al campo y, en el lugar de la lista, "Revisa el código del incidente" con "Quitar el código". En celular el campo queda dentro del panel, así que el aviso también se ve fuera.
 
 ### Lista y detalle
@@ -51,7 +50,7 @@ Con las dos pestañas, arriba aparece el selector "Incidentes · Administración
   - Cuándo (fecha y hace cuánto).
   - Hecho por, con "Ver su actividad", que filtra por esa persona.
   - Sobre qué, con "Abrir incidente", "Abrir ficha" o "Abrir rol" si `links` lo permite.
-  - "Qué cambió", campo por campo.
+  - "Qué cambió", campo por campo, y la nota que dejó la persona (la solución, el motivo de cancelar o de reabrir), si la hay.
   - "Desde dónde": IP y navegador. Los datos de demostración no traen IP y se lee "Sin registro (datos de demostración)".
 - **Los textos** salen de `auditTexts.ts`:
   - Cada campo se escribe como "valor anterior → valor nuevo".

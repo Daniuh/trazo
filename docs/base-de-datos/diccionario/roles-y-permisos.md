@@ -73,6 +73,9 @@ PK `(user_id, permission_id)`, e índices en `permission_id` y `granted_by`. Una
 | `incidents.view.assigned`, `incidents.view.unassigned`, `incidents.take`, `incidents.status.assigned` | | ✓ | ✓ | | ✓ |
 | `incidents.view.any`, `incidents.update.any`, `incidents.assign`, `incidents.status.any` | | | ✓ | | ✓ |
 | `incidents.delete`, `incidents.restore`, `incidents.export` | | | ✓ | | ✓ |
+| `incidents.reopen.request` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `incidents.reopen.approve` | | | ✓ | | ✓ |
+| `incidents.comment` | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `dashboard.view.own` | ✓ | ✓ | | ✓ | |
 | `dashboard.view.any` | | | ✓ | | ✓ |
 | `audit.incidents.view` | | | ✓ | | ✓ |

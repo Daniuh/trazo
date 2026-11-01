@@ -9,7 +9,7 @@ order: 56
 # ADR-0046: Pruebas E2E en las cuatro vistas, con axe bloqueante y sesión por la API
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0031](0031-estrategia-de-pruebas.md) definió Playwright con axe-core para los flujos críticos. Al construirlo quedaban tres puntos abiertos:

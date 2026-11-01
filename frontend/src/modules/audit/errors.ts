@@ -4,7 +4,7 @@ import type { MessageCatalog } from '@/shared/errors'
 
 const messages: MessageCatalog = {
   INVALID_CURSOR: 'No pudimos seguir cargando la lista. Vuelve a cargarla desde el principio.',
-  INCIDENT_CODE_FORMAT: 'Escribe el código del incidente, por ejemplo INC-000123 o solo 123.',
+  INCIDENT_CODE_FORMAT: 'Escribe el código del incidente con su año, por ejemplo 26-0142.',
 }
 
 export default messages

@@ -8,6 +8,7 @@ namespace App\Modules\Users\Application\Ports;
 
 use App\Modules\Users\Application\Data\NewUser;
 use App\Modules\Users\Application\Data\UserRecord;
+use App\Modules\Users\Domain\PersonName;
 
 interface UserRepository
 {
@@ -18,7 +19,7 @@ interface UserRepository
     // Crea la cuenta con una contraseña aleatoria que nadie conoce; la persona crea la suya desde el correo
     public function create(NewUser $user, int $roleId): UserRecord;
 
-    public function updateProfile(int $id, string $name, string $email): void;
+    public function updateProfile(int $id, PersonName $name, string $email): void;
 
     public function setActive(int $id, bool $active): void;
 

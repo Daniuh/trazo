@@ -29,6 +29,7 @@ interface EntryDto {
 interface IncidentEntryDto extends EntryDto {
   incident: IncidentAuditEntry['incident']
   changes: Record<string, Change> | null
+  note: string | null
   links: { incident: boolean }
 }
 
@@ -115,6 +116,7 @@ export const auditApi = {
       tab: 'incidents',
       incident: dto.incident,
       changes: dto.changes,
+      note: dto.note,
       links: dto.links,
     }))
   },

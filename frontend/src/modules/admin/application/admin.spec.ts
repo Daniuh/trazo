@@ -101,7 +101,7 @@ describe('ficha de una persona', () => {
     await detail.load()
     expect(detail.user.value).toBe(user)
 
-    await detail.updateProfile({ name: 'Laura Gómez', email: 'laura@trazo.test' })
+    await detail.updateProfile({ givenNames: 'Laura', familyNames: 'Gómez', email: 'laura@trazo.test' })
     await detail.changeRole('supervisor', '123456')
     await detail.changePermissions(['incidents.export'])
     await detail.setActive(false)

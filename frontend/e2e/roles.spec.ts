@@ -1,4 +1,5 @@
-// Roles en las cuatro vistas, con el Super admin: crear uno copiando permisos, editarlo y eliminarlo. En portátil,
+// Roles en las cuatro vistas, con el Super admin: crear uno copiando permisos, editarlo y eliminarlo (en celular se
+// abre antes el módulo de permisos que se toca, porque van plegados). En portátil,
 // volver opcional su verificación en dos pasos pide el código de la aplicación. Cada vista usa su propio nivel y lo
 // libera al empezar si una corrida anterior quedó a medias. Documentado en docs/calidad/estrategia-de-pruebas.md
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
@@ -19,6 +20,12 @@ async function freeLevel(request: APIRequestContext, level: number): Promise<voi
   }
 }
 
+// En celular los módulos de permisos van plegados: se abre el que se necesita
+async function openModule(page: Page, label: string): Promise<void> {
+  const toggle = page.getByRole('button', { name: new RegExp(`^${label} \\d+ de \\d+`) })
+  if ((await toggle.count()) > 0 && (await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click()
+}
+
 async function createRole(page: Page, code: string, name: string, level: number): Promise<void> {
   await page.goto('/administracion/roles')
   await expect(page.getByRole('heading', { level: 1, name: 'Roles' })).toBeVisible()
@@ -30,6 +37,7 @@ async function createRole(page: Page, code: string, name: string, level: number)
   await page.getByRole('textbox', { name: 'Nivel' }).fill(String(level))
   await page.getByRole('combobox', { name: /Copiar permisos de/ }).click()
   await page.getByRole('option', { name: 'Solicitante' }).click()
+  await openModule(page, 'Auditoría')
   await page.getByRole('checkbox', { name: 'Ver la auditoría de administración' }).click()
   await expectAccessible(page)
   await page.getByRole('button', { name: 'Crear rol' }).click()
@@ -45,6 +53,8 @@ test('crear un rol copiando permisos, editarlo y eliminarlo', async ({ page, req
   await freeLevel(request, level)
 
   await createRole(page, code, `Rol E2E ${info.project.name}`, level)
+  await openModule(page, 'Incidentes')
+  await openModule(page, 'Auditoría')
   await expect(page.getByRole('checkbox', { name: 'Crear incidentes' })).toBeChecked()
   await expect(page.getByRole('checkbox', { name: 'Ver la auditoría de administración' })).toBeChecked()
   await expectAccessible(page)

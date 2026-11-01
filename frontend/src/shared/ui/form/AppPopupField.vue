@@ -1,10 +1,12 @@
-<!-- Campo que se ve como un selector y abre un panel: menú bajo el campo en portátil y monitor,
+<!-- Campo que se ve como un selector y abre un panel: menú junto al campo en portátil y monitor (donde quepa entero, AppMenu),
      panel inferior de borde a borde en celular y tablet. Lo usan los campos de fecha. Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
-import { QDialog, QField, QMenu } from 'quasar'
+import { QDialog, QField } from 'quasar'
 import { useId } from 'vue'
 import type { IconName } from '@/design/icons/icons'
+import { layout } from '@/design/tokens/layout'
 import AppIcon from '../AppIcon.vue'
+import AppMenu from '../AppMenu.vue'
 import { useViewport } from '../useViewport'
 import AppField from './AppField.vue'
 
@@ -59,9 +61,9 @@ function openSheet(): void {
       </QField>
 
       <!-- El menú se ancla a este contenedor: QField no muestra lo que se pone dentro de él -->
-      <QMenu v-if="isLaptopUp" v-model="open" anchor="bottom left" self="top left" :offset="[0, 6]">
+      <AppMenu v-if="isLaptopUp" v-model="open" :max-height="layout.popupMaxHeight">
         <slot />
-      </QMenu>
+      </AppMenu>
     </div>
 
     <QDialog v-if="!isLaptopUp" v-model="open" position="bottom" full-width class="app-popup-sheet">
@@ -89,11 +91,6 @@ function openSheet(): void {
 // Sin valor, el texto de ejemplo va en gris, como en los demás campos
 .app-popup-field__control--empty .app-popup-field__value {
   color: $color-text-secondary;
-}
-
-// Quasar deja un margen alrededor de los diálogos; el panel inferior va de borde a borde
-:global(.app-popup-sheet .q-dialog__inner) {
-  padding: 0;
 }
 
 // El panel inferior ocupa el ancho y tiene las esquinas de arriba redondeadas

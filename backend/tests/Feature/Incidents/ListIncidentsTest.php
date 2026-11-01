@@ -46,19 +46,19 @@ it('pagina con un máximo de 100 por página e informa el total', function (): v
     $this->getJson('/api/v1/incidents?per_page=10&page=3')
         ->assertOk()
         ->assertJsonCount(5, 'data')
-        ->assertJsonPath('meta', ['page' => 3, 'per_page' => 10, 'total' => 25, 'last_page' => 3])
+        ->assertJsonPath('meta', ['page' => 3, 'per_page' => 10, 'total' => 25, 'last_page' => 3, 'groups' => []])
         ->assertJsonMissingPath('data.0.description');
 
     $this->getJson('/api/v1/incidents?per_page=101')->assertUnprocessable()->assertJsonPath('errors.per_page.0.code', 'OUT_OF_RANGE');
 });
 
 it('ordena por los campos permitidos y rechaza cualquier otro', function (): void {
-    incidentWith(['code' => 'INC-900001'], priority: 'low');
-    incidentWith(['code' => 'INC-900002'], priority: 'critical');
-    incidentWith(['code' => 'INC-900003'], priority: 'medium');
+    incidentWith(['code' => 'TZ-90-0001'], priority: 'low');
+    incidentWith(['code' => 'TZ-90-0002'], priority: 'critical');
+    incidentWith(['code' => 'TZ-90-0003'], priority: 'medium');
     actingAsDemo('supervisor@trazo.test');
 
-    expect(listCodes('sort=-priority'))->toBe(['INC-900002', 'INC-900003', 'INC-900001']);
+    expect(listCodes('sort=-priority'))->toBe(['TZ-90-0002', 'TZ-90-0003', 'TZ-90-0001']);
     $this->getJson('/api/v1/incidents?sort=password')->assertUnprocessable()->assertJsonPath('errors.sort.0.code', 'INVALID_OPTION');
 });
 
@@ -66,42 +66,42 @@ it('filtra por estado, prioridad, asignado, creador y vencidos', function (): vo
     $agent = demoUser('agente1@trazo.test');
     $creator = demoUser('solicitante2@trazo.test');
     // Vencimiento futuro explícito: la factory lo elige al azar y podría quedar vencido
-    incidentWith(['code' => 'INC-800001', 'assigned_to' => $agent->id, 'due_date' => now()->addDay()], 'in_progress', 'high');
-    incidentWith(['code' => 'INC-800002', 'created_by' => $creator->id, 'due_date' => now()->addDay()], 'open', 'low');
-    incidentWith(['code' => 'INC-800003', 'due_date' => now()->subDay()], 'on_hold', 'high');
-    incidentWith(['code' => 'INC-800004', 'due_date' => now()->subDay()], 'closed', 'high');
+    incidentWith(['code' => 'TZ-80-0001', 'assigned_to' => $agent->id, 'due_date' => now()->addDay()], 'in_progress', 'high');
+    incidentWith(['code' => 'TZ-80-0002', 'created_by' => $creator->id, 'due_date' => now()->addDay()], 'open', 'low');
+    incidentWith(['code' => 'TZ-80-0003', 'due_date' => now()->subDay()], 'on_hold', 'high');
+    incidentWith(['code' => 'TZ-80-0004', 'due_date' => now()->subDay()], 'closed', 'high');
     actingAsDemo('supervisor@trazo.test');
 
-    expect(listCodes('filter[status]=in_progress,on_hold&sort=code'))->toBe(['INC-800001', 'INC-800003'])
-        ->and(listCodes('filter[priority]=low'))->toBe(['INC-800002'])
-        ->and(listCodes("filter[assignee]={$agent->ulid}"))->toBe(['INC-800001'])
-        ->and(listCodes("filter[creator]={$creator->ulid}"))->toBe(['INC-800002'])
+    expect(listCodes('filter[status]=in_progress,on_hold&sort=code'))->toBe(['TZ-80-0001', 'TZ-80-0003'])
+        ->and(listCodes('filter[priority]=low'))->toBe(['TZ-80-0002'])
+        ->and(listCodes("filter[assignee]={$agent->ulid}"))->toBe(['TZ-80-0001'])
+        ->and(listCodes("filter[creator]={$creator->ulid}"))->toBe(['TZ-80-0002'])
         // Un cerrado con la fecha pasada no está vencido
-        ->and(listCodes('filter[overdue]=1'))->toBe(['INC-800003'])
-        ->and(listCodes('filter[assignee]=none&filter[status]=open'))->toBe(['INC-800002']);
+        ->and(listCodes('filter[overdue]=1'))->toBe(['TZ-80-0003'])
+        ->and(listCodes('filter[assignee]=none&filter[status]=open'))->toBe(['TZ-80-0002']);
 });
 
 it('filtra por rango de creación y de vencimiento', function (): void {
-    incidentWith(['code' => 'INC-700001', 'created_at' => now()->subDays(10), 'due_date' => now()->addDays(10)]);
-    incidentWith(['code' => 'INC-700002', 'created_at' => now()->subDays(2), 'due_date' => now()->addDay()]);
+    incidentWith(['code' => 'TZ-70-0001', 'created_at' => now()->subDays(10), 'due_date' => now()->addDays(10)]);
+    incidentWith(['code' => 'TZ-70-0002', 'created_at' => now()->subDays(2), 'due_date' => now()->addDay()]);
     actingAsDemo('supervisor@trazo.test');
     $from = now()->subDays(3)->toIso8601String();
     $to = now()->addDays(2)->toIso8601String();
 
-    expect(listCodes('filter[created_from]='.urlencode($from)))->toBe(['INC-700002'])
-        ->and(listCodes('filter[due_to]='.urlencode($to)))->toBe(['INC-700002']);
+    expect(listCodes('filter[created_from]='.urlencode($from)))->toBe(['TZ-70-0002'])
+        ->and(listCodes('filter[due_to]='.urlencode($to)))->toBe(['TZ-70-0002']);
 });
 
 it('muestra eliminados solo a quien puede restaurarlos', function (): void {
-    incidentWith(['code' => 'INC-600001']);
-    incidentWith(['code' => 'INC-600002'])->delete();
+    incidentWith(['code' => 'TZ-60-0001']);
+    incidentWith(['code' => 'TZ-60-0002'])->delete();
 
     actingAsDemo('solicitante1@trazo.test');
     $this->getJson('/api/v1/incidents?filter[deleted]=1')->assertForbidden();
 
     actingAsDemo('supervisor@trazo.test');
-    expect(listCodes('filter[deleted]=1'))->toBe(['INC-600002'])
-        ->and(listCodes())->toBe(['INC-600001']);
+    expect(listCodes('filter[deleted]=1'))->toBe(['TZ-60-0002'])
+        ->and(listCodes())->toBe(['TZ-60-0001']);
 });
 
 it('cada persona ve en el listado exactamente lo que el detalle le deja ver', function (): void {

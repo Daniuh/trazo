@@ -1,26 +1,36 @@
-<!-- Detalle de un incidente. Portátil y monitor: descripción e historial a la izquierda y datos a la derecha.
-     Celular y tablet: una sola columna. Los botones salen de lo que permite la API. Documentado en docs/frontend/incidents.md -->
+<!-- Detalle de un incidente (ADR-0083 y ADR-0084): encabezado con la descripción, el camino, el plazo y el siguiente
+     paso; abajo el historial reciente y la ficha, mitad y mitad en portátil y monitor (en celular y tablet, la ficha
+     primero). El chat y toda la actividad viven en un panel aparte. Los botones salen de lo que permite la API.
+     Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { onMounted } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
+import { useNotificationsStore } from '@/modules/notifications/application/useNotificationsStore'
 import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { messageFor } from '@/shared/errors'
 import { ApiError } from '@/shared/http'
+import AppBackLink from '@/shared/ui/AppBackLink.vue'
 import AppButton from '@/shared/ui/AppButton.vue'
-import AppCard from '@/shared/ui/AppCard.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import { useFeedback } from '@/shared/ui/feedback/useFeedback'
 import AppErrorState from '@/shared/ui/states/AppErrorState.vue'
 import AppSkeleton from '@/shared/ui/states/AppSkeleton.vue'
 import { useCatalogStore } from '../application/useCatalogStore'
+import { useConversation } from '../application/useConversation'
 import { useIncidentDetail } from '../application/useIncidentDetail'
+import { listReturnLocation } from '../application/listReturn'
 import AssignDialog from './components/AssignDialog.vue'
-import IncidentActions from './components/IncidentActions.vue'
-import IncidentBadges from './components/IncidentBadges.vue'
-import IncidentFacts from './components/IncidentFacts.vue'
-import IncidentHistory from './components/IncidentHistory.vue'
+import IncidentNoteDialog from './components/IncidentNoteDialog.vue'
+import ReopenRequestNotice from './components/ReopenRequestNotice.vue'
+import type { ActivityPanelTab } from '../domain/activityFeed'
+import IncidentActivityPanel from './detail/IncidentActivityPanel.vue'
+import IncidentHeader from './detail/IncidentHeader.vue'
+import IncidentHistory from './detail/IncidentHistory.vue'
+import IncidentProfile from './detail/IncidentProfile.vue'
+import { useNoteDialog } from './useNoteDialog'
+import { useReopenDecision } from './useReopenDecision'
 import { useStatusChange } from './useStatusChange'
 
 const route = useRoute()
@@ -29,21 +39,95 @@ const $q = useQuasar()
 const { confirm, notify } = useFeedback()
 const session = useSessionStore()
 const catalogs = useCatalogStore()
+const notifications = useNotificationsStore()
 
 const id = String(route.params.id)
 const detail = useIncidentDetail(id)
-const { incident, activities, loadError, actionError, conflict, loading, busy } = detail
+const { incident, activities, activityTotal, loadError, actionError, conflict, loading, busy } = detail
+const conversation = useConversation(id)
 const conflictMessage = messageFor(new ApiError('http', 'VERSION_CONFLICT'))
 
-onMounted(() => Promise.all([detail.load(), catalogs.load()]))
+// Panel de chat y actividad: se abre en una pestaña y, si se tocó algo del historial, en esa entrada
+const panel = ref<InstanceType<typeof IncidentActivityPanel> | null>(null)
+const panelOpen = ref(false)
+const panelTab = ref<ActivityPanelTab>('chat')
+const panelTarget = ref<string | null>(null)
+
+function openPanel(tab: ActivityPanelTab, target: string | null = null): void {
+  panelTab.value = tab
+  panelTarget.value = target
+  panelOpen.value = true
+}
+onMounted(() => Promise.all([detail.load(), catalogs.load(), conversation.refresh()]))
+
+// Con el detalle abierto, sus mensajes cuentan como leídos en el centro de notificaciones
+notifications.watchConversation(id)
+onBeforeUnmount(() => notifications.watchConversation(null))
 
 // Si otra persona lo cambia, se vuelve a leer con su historial; al reconectarse, por si se perdió un aviso
 useRealtime('incident', (change) => {
   if (change.id === id && !busy.value) void detail.load()
 })
-useRealtime('reconnected', () => void detail.load())
+useRealtime('comment', (change) => {
+  if (change.id === id) void conversation.refresh()
+})
+useRealtime('reconnected', () => {
+  void detail.load()
+  void conversation.refresh()
+})
 
-const changeStatus = useStatusChange(incident, detail.changeStatus)
+// Desde un aviso de mensajes (?conversacion=1): se quita el parámetro antes de abrir (el panel se cierra si cambia la
+// ruta) y se abre el chat, listo para escribir
+watch(
+  () => [route.query.conversacion, incident.value !== null] as const,
+  async ([value, ready]) => {
+    if (value !== '1' || !ready) return
+    await router.replace({ query: { ...route.query, conversacion: undefined } })
+    openPanel('chat')
+    await nextTick()
+    panel.value?.focusComposer()
+  },
+  { immediate: true },
+)
+
+// "Ver actividad anterior": lo que falte del historial y de los mensajes
+async function loadOlder(): Promise<void> {
+  await Promise.all([detail.loadAllActivities(), conversation.loadOlder()])
+}
+
+const noteDialog = useNoteDialog()
+const changeStatus = useStatusChange(incident, detail.changeStatus, noteDialog.ask)
+
+function onNoteDone(ok: boolean): void {
+  noteDialog.finish(ok)
+  if (!ok) detail.clearError()
+}
+
+async function requestReopen(): Promise<void> {
+  const sent = await noteDialog.ask({
+    title: 'Solicitar reapertura',
+    message: 'Quien supervisa revisará tu solicitud. Mientras tanto, el incidente sigue como está.',
+    submitLabel: 'Enviar solicitud',
+    label: '¿Por qué hay que reabrirlo?',
+    required: true,
+    run: (reason) => detail.requestReopen(reason ?? ''),
+  })
+  if (sent) notify('Enviamos tu solicitud de reapertura.')
+}
+
+async function reopen(): Promise<void> {
+  const done = await noteDialog.ask({
+    title: 'Reabrir el incidente',
+    message: 'Volverá a trabajarse y recibirá un vencimiento nuevo según su prioridad.',
+    submitLabel: 'Reabrir',
+    label: '¿Por qué se reabre?',
+    required: true,
+    run: (reason) => detail.reopen(reason ?? ''),
+  })
+  if (done) notify('El incidente se reabrió.')
+}
+
+const reopenDecision = useReopenDecision(detail, noteDialog)
 
 async function take(): Promise<void> {
   if (session.user && (await detail.assign(session.user.id))) notify('Tomaste el incidente.')
@@ -66,118 +150,108 @@ async function remove(): Promise<void> {
   })
   if (ok && (await detail.remove())) {
     notify('Incidente eliminado.')
-    await router.replace({ name: 'incidents' })
+    await router.replace(listReturnLocation())
   }
 }
 </script>
 
 <template>
   <div class="incident-detail">
+    <AppBackLink :to="listReturnLocation()" label="Incidentes" />
+
     <AppSkeleton v-if="loading && !incident" :lines="6" />
     <AppErrorState v-else-if="loadError" :error="loadError" @retry="detail.load" />
 
     <template v-else-if="incident">
-      <header class="incident-detail__header">
-        <div class="incident-detail__heading">
-          <p class="incident-detail__code">{{ incident.code }}</p>
-          <h1 class="incident-detail__title">{{ incident.title }}</h1>
-          <IncidentBadges :incident="incident" />
-        </div>
-        <IncidentActions
-          :incident="incident"
-          :busy="busy"
-          @status="changeStatus"
-          @take="take"
-          @assign="assign"
-          @edit="router.push({ name: 'incident-edit', params: { id } })"
-          @remove="remove"
-        />
-      </header>
+      <IncidentHeader
+        :incident="incident"
+        :catalog="catalogs.catalogs?.statuses ?? []"
+        :busy="busy"
+        @status="changeStatus"
+        @reopen="reopen"
+        @request-reopen="requestReopen"
+      />
 
       <AppAlert v-if="conflict">
         {{ conflictMessage }}
         <AppButton variant="link" icon="refresh" @click="detail.load">Recargar</AppButton>
       </AppAlert>
-      <AppAlert v-else-if="actionError">{{ messageFor(actionError) }}</AppAlert>
+      <AppAlert v-else-if="actionError && !noteDialog.open.value">{{ messageFor(actionError) }}</AppAlert>
+
+      <ReopenRequestNotice
+        v-if="incident.reopenRequest"
+        :request="incident.reopenRequest"
+        :can-decide="incident.actions.decideReopen"
+        :busy="busy"
+        @approve="reopenDecision.approve"
+        @reject="reopenDecision.reject"
+      />
 
       <div class="incident-detail__body">
-        <div class="incident-detail__main">
-          <AppCard title="Descripción">
-            <p class="incident-detail__description">{{ incident.description }}</p>
-          </AppCard>
-          <IncidentHistory :activities="activities" />
-        </div>
-        <IncidentFacts class="incident-detail__side" :incident="incident" />
+        <IncidentHistory
+          :activities="activities"
+          :comments="conversation.comments.value"
+          :total="activityTotal + conversation.total.value"
+          @message="openPanel('chat', $event)"
+          @note="openPanel('activity', $event)"
+          @all="openPanel('activity')"
+        />
+        <IncidentProfile
+          :incident="incident"
+          :message-count="conversation.total.value"
+          :busy="busy"
+          @assign="assign"
+          @take="take"
+          @chat="openPanel('chat')"
+          @edit="router.push({ name: 'incident-edit', params: { id } })"
+          @remove="remove"
+        />
       </div>
+
+      <IncidentActivityPanel
+        ref="panel"
+        v-model:open="panelOpen"
+        v-model:tab="panelTab"
+        :incident="incident"
+        :activities="activities"
+        :activity-total="activityTotal"
+        :conversation="conversation"
+        :target="panelTarget"
+        @load-older="loadOlder"
+      />
     </template>
+
+    <IncidentNoteDialog
+      v-model="noteDialog.open.value"
+      :request="noteDialog.request.value"
+      :failure="actionError"
+      :conflict="conflict"
+      @done="onNoteDone"
+    />
   </div>
 </template>
 
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
 
-.incident-detail,
-.incident-detail__main {
+.incident-detail {
   display: flex;
   flex-direction: column;
   gap: $space-4;
 }
 
-.incident-detail__header {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-}
-
-.incident-detail__heading {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-}
-
-.incident-detail__code {
-  margin: 0;
-  color: $color-text-secondary;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-}
-
-.incident-detail__title {
-  margin: 0;
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  line-height: $line-height-tight;
-  overflow-wrap: anywhere;
-}
-
-// La descripción respeta los saltos de línea tal como se escribieron
-.incident-detail__description {
-  margin: 0;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-// En celular los datos van antes de la descripción, como en el diseño aprobado
+// En celular y tablet, una columna: la ficha va antes del historial
 .incident-detail__body {
   display: flex;
   flex-direction: column-reverse;
   gap: $space-4;
 }
 
+// En portátil y monitor, historial y ficha mitad y mitad
 @include laptop {
-  .incident-detail__header {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .incident-detail__title {
-    font-size: $font-size-2xl;
-  }
-
   .incident-detail__body {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
   }
 }

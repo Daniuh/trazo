@@ -16,6 +16,7 @@ use App\Modules\Dashboard\Application\Data\WorkloadRow;
 use App\Modules\Dashboard\Application\Ports\DashboardQueries;
 use App\Modules\Dashboard\Application\Ports\MetricsCache;
 use App\Modules\Incidents\Application\Ports\IncidentCatalog;
+use App\Modules\Incidents\Domain\DueWindow;
 use App\Modules\Incidents\Domain\StatusFlags;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -23,6 +24,9 @@ use DateTimeZone;
 
 final readonly class MetricSources
 {
+    // Ventana del cumplimiento del plazo
+    public const ON_TIME_DAYS = 30;
+
     public function __construct(
         private DashboardQueries $queries,
         private MetricsCache $cache,
@@ -67,6 +71,44 @@ final readonly class MetricSources
                 'from' => $from->format('Y-m-d'),
                 'created' => $this->byDay($this->queries->countByHour($context->actor->id, $context->scope, 'created_at', $fromUtc), $zone),
                 'resolved' => $this->byDay($this->queries->countByHour($context->actor->id, $context->scope, 'resolved_at', $fromUtc), $zone),
+            ];
+        });
+    }
+
+    // Los que terminaron sin resolverse (cancelados) por día, en la misma ventana que activity
+    public function exits(MetricsContext $context, int $days): CachedMetric
+    {
+        $zone = new DateTimeZone($this->settings->timezone);
+        $today = $context->now->setTimezone($zone)->setTime(0, 0);
+        $from = $today->modify('-'.($days - 1).' days')->setTimezone(new DateTimeZone('UTC'));
+
+        return $this->cache->remember("exits:{$context->scopeKey}:{$days}:{$today->format('Y-m-d')}", fn (): array => $this->byDay(
+            $this->queries->exitsWithoutResolution($context->actor->id, $context->scope, $this->pendingStatusIds(), $from),
+            $zone,
+        ));
+    }
+
+    // De lo resuelto en los últimos 30 días, cuánto antes de su vencimiento
+    public function onTime(MetricsContext $context): CachedMetric
+    {
+        return $this->cache->remember("on-time:{$context->scopeKey}", fn (): array => $this->queries
+            ->onTimeResolutions($context->actor->id, $context->scope, $context->now->modify('-'.self::ON_TIME_DAYS.' days')));
+    }
+
+    /**
+     * Pendientes por prioridad y grupo de vencimiento, con los límites de los grupos para armar los filtros.
+     * Los límites cambian con la hora: la caché dura lo mismo que el resto (y se invalida con cada cambio).
+     */
+    public function risk(MetricsContext $context): CachedMetric
+    {
+        return $this->cache->remember("risk:{$context->scopeKey}", function () use ($context): array {
+            $window = DueWindow::at($context->now, new DateTimeZone($this->settings->timezone));
+
+            return [
+                'matrix' => $this->queries->riskMatrix($context->actor->id, $context->scope, $this->pendingStatusIds(), $window),
+                'now' => $this->iso($window->now),
+                'end_of_today' => $this->iso($window->endOfToday),
+                'end_of_week' => $this->iso($window->endOfWeek),
             ];
         });
     }
@@ -121,6 +163,27 @@ final readonly class MetricSources
     private function iso(DateTimeImmutable $date): string
     {
         return $date->setTimezone(new DateTimeZone('UTC'))->format(DateTimeInterface::ATOM);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function pendingCodes(): array
+    {
+        return array_map(fn (StatusFlags $status): string => $status->code, $this->pendingStatuses());
+    }
+
+    /**
+     * @param  array<int, array<int, int>>  $counts  [status_id][priority_id] => cantidad
+     */
+    public function pendingTotal(array $counts): int
+    {
+        $sum = 0;
+        foreach ($this->pendingStatusIds() as $statusId) {
+            $sum += array_sum($counts[$statusId] ?? []);
+        }
+
+        return $sum;
     }
 
     /**

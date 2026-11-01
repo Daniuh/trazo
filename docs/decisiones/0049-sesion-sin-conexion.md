@@ -9,7 +9,7 @@ order: 59
 # ADR-0049: La sesión solo se cierra cuando la API la rechaza
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-23
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Al recargar la página, la guarda de rutas pide el usuario a `GET /auth/me`. Si esa consulta fallaba por cualquier motivo, la app borraba el token y llevaba al login.

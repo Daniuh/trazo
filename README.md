@@ -18,12 +18,13 @@ Sistema de gestión de solicitudes e incidentes: creación y seguimiento de caso
 5. [Migraciones](#migraciones)
 6. [Seeders](#seeders)
 7. [Pruebas](#pruebas)
-8. [Servicios y puertos](#servicios-y-puertos)
-9. [Respaldos](#respaldos)
-10. [Actualizar](#actualizar)
-11. [Detener y limpiar](#detener-y-limpiar)
-12. [Problemas frecuentes](#problemas-frecuentes)
-13. [Documentación](#documentación)
+8. [Modo desarrollo](#modo-desarrollo)
+9. [Servicios y puertos](#servicios-y-puertos)
+10. [Respaldos](#respaldos)
+11. [Actualizar](#actualizar)
+12. [Detener y limpiar](#detener-y-limpiar)
+13. [Problemas frecuentes](#problemas-frecuentes)
+14. [Documentación](#documentación)
 
 ## Requisitos
 
@@ -56,11 +57,13 @@ docker compose ps
 
 Los servicios deben aparecer como `healthy` (el worker y el scheduler, como `running`), incluido `reverb`, el de tiempo real. `init` no aparece: prepara la base de datos y termina; se ve con `docker compose ps -a` como `exited (0)`.
 
+Este comando levanta Trazo tal como lo verá quien lo use: el build de la interfaz y la API con el código dentro de la imagen. Para trabajar en el código hay un [modo desarrollo](#modo-desarrollo) aparte.
+
 **No hace falta crear un `.env`.** Los valores por defecto sirven para correr en local. Solo si se quiere cambiar algo (un puerto, el volumen de datos de prueba), se copia `.env.example` a `.env` y se ajusta.
 
 ## Credenciales de prueba
 
-Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
+Todos los usuarios tienen la misma contraseña: **`Cometa.Demo.2026`**
 
 | Correo | Rol | Qué puede hacer |
 |---|---|---|
@@ -70,7 +73,7 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 | `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
 | `solicitante1@trazo.test`<br>`solicitante2@trazo.test`<br>`solicitante3@trazo.test` | Solicitante | Crear incidentes, seguir los suyos y editarlos mientras siguen en estado Abierto |
 
-Estos usuarios **solo existen fuera de producción**: el seeder no los crea cuando `APP_ENV=production`.
+Estos usuarios **solo existen fuera de producción**: el seeder no los crea cuando `APP_ENV=production`. En el sitio desplegado se entra con cuentas por rol creadas desde el entorno del servidor, cuyas contraseñas nunca se guardan en el repositorio ([cuentas de evaluación](docs/operacion/cuentas.md)).
 
 ### Verificación en dos pasos
 
@@ -80,20 +83,20 @@ Todos los roles la exigen, también en local, para que funcione igual que en pro
 2. **Desde el segundo ingreso** hay que configurarla: se escanea el código QR con la aplicación, se escribe el código de 6 dígitos que muestra y se guardan los 8 códigos de recuperación.
 3. **Después,** cada ingreso pide el código de la aplicación. Si no se tiene el teléfono a mano, sirve uno de los códigos de recuperación (cada uno una sola vez).
 
-Desde **Mi cuenta** (menú de la persona, arriba a la derecha) se ve su estado y se pueden generar códigos de recuperación nuevos. Cada cambio llega como aviso al correo de la cuenta; en local, a Mailpit (http://localhost:8025).
+Desde **Mi cuenta** (el círculo con las iniciales, al final de la barra de navegación inferior) se ve su estado y se pueden generar códigos de recuperación nuevos. Cada cambio llega como aviso al correo de la cuenta; en local, a Mailpit (http://localhost:8025).
 
 ### Contraseña
 
 - **¿La olvidaste?** En el login, "¿Olvidaste tu contraseña?" envía un código de 6 dígitos al correo (vale 15 minutos; en local llega a Mailpit). Si la cuenta tiene la verificación en dos pasos, también pide el código de la aplicación o uno de recuperación. Al terminar se cierran todas las sesiones abiertas.
 - **Cambiarla:** desde Mi cuenta, con la contraseña actual. Se cierran las demás sesiones y la actual sigue abierta.
-- **Requisitos:** de 12 a 128 caracteres y que no aparezca en filtraciones conocidas ni entre las más usadas.
-- En los dos casos llega un aviso "Tu contraseña cambió". Si cambias la contraseña de un usuario de demostración, ya no entrará con `Trazo.Demo.2026`.
+- **Requisitos:** de 12 a 128 caracteres, sin repeticiones, secuencias ni datos de la persona o de la marca, y que no aparezca en filtraciones conocidas ni entre las más usadas.
+- En los dos casos llega un aviso "Tu contraseña cambió". Si cambias la contraseña de un usuario de demostración, ya no entrará con `Cometa.Demo.2026`.
 
 ### Administración de usuarios
 
 En el menú **Usuarios** (Super admin y Administrador):
 
-- **Crear una cuenta:** nombre, correo y rol. No se define contraseña: a la persona le llega un correo de bienvenida (en local, a Mailpit) para crearla con "¿Olvidaste tu contraseña?".
+- **Crear una cuenta:** nombres, apellidos, correo y rol. No se define contraseña: a la persona le llega un correo de bienvenida (en local, a Mailpit) para crearla con "¿Olvidaste tu contraseña?".
 - **Jerarquía:** cada quien administra solo a las personas por debajo de su rol. El Administrador no toca a otro Administrador ni al Super admin.
 - **Permisos por persona:** en la ficha de cada persona, "Editar permisos" concede uno adicional o quita uno de su rol, sin crear roles nuevos.
 - **Acciones delicadas:** dar un rol o un permiso de administración, o restablecer la verificación en dos pasos o el acceso de alguien, piden el código de **tu** aplicación de autenticación. Por eso, quien administra debe tenerla activa.
@@ -156,8 +159,12 @@ Están todas en [`.env.example`](.env.example), con su valor por defecto para lo
 | `APP_KEY` | vacía | Clave de cifrado de Laravel. En local se genera sola y se guarda en un volumen. **En producción es obligatoria** |
 | `SESSION_MAX_MINUTES` | `480` | Duración máxima de una sesión (8 horas) |
 | `SESSION_IDLE_MINUTES` | `60` | La sesión se cierra tras este tiempo sin uso |
+| `EVALUATION_EMAIL_PATTERN`, `EVALUATION_PASSWORD` | vacías | Cuentas por rol para quienes evalúan el sitio desplegado. El correo lleva `{rol}`. Vacías: no se crean ([cuentas](docs/operacion/cuentas.md)) |
+| `OWNER_EMAIL_PATTERN`, `OWNER_PASSWORD`, `OWNER_LABEL` | vacías | Cuentas por rol propias del responsable del sitio, igual que las anteriores |
 | `SEED_INCIDENTS` | `600` | Incidentes de prueba que se cargan (la prueba técnica pide al menos 500) |
+| `INCIDENT_CODE_PREFIX` | `TZ` | Prefijo del código de los incidentes (TZ-26-0142). Se define antes de producción; cambiarlo después exige migrar los códigos |
 | `SYSTEM_EVENTS_RETENTION_DAYS` | `90` | Días que se guardan los eventos del sistema ya resueltos |
+| `NOTIFICATIONS_RETENTION_DAYS` | `90` | Días que se guardan las notificaciones de cada persona, leídas o no |
 | `API_RATE_LIMIT` | `120` | Peticiones por minuto a la API por persona. Solo se sube a mano para un escaneo o una prueba de carga local |
 | `DB_DATABASE`, `DB_USERNAME` | `trazo` | Base de datos y usuario de MySQL |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | `*_local_only` | Contraseñas de MySQL. **Solo para local**: en producción se definen otras |
@@ -198,8 +205,13 @@ Cada tabla tiene su migración y su ficha en el [diccionario de datos](docs/base
 |---|---|
 | `IncidentCatalogSeeder` | Prioridades, estados y sus transiciones permitidas, y tipos de actividad del historial |
 | `AccessControlSeeder` | Roles, permisos y qué permisos tiene cada rol |
+| `MfaPolicySeeder` | La política de verificación en dos pasos de cada rol |
+| `AdminActionTypeSeeder` | Tipos de acciones de administración que registra la auditoría |
+| `SystemEventTypeSeeder` | Tipos de eventos del sistema (fallas, infraestructura y seguridad) |
+| `NotificationTypeSeeder` | Tipos de notificaciones |
 | `DashboardWidgetSeeder` | Los widgets del dashboard con sus tamaños |
-| `DemoUserSeeder` | Los 8 usuarios de prueba (no en producción) |
+| `DemoUserSeeder` | Los 9 usuarios de prueba (no en producción) |
+| `AccountSetSeeder` | Cuentas por rol definidas en el entorno del servidor, si sus variables existen ([cuentas](docs/operacion/cuentas.md)) |
 | `IncidentVolumeSeeder` | 600 incidentes de prueba con su historial completo (no en producción) |
 
 Los incidentes de prueba cumplen lo que pide la prueba técnica: **más de 500, de varios usuarios y con todos los estados y prioridades.** Llegan a lo largo de los últimos 60 días, como en una mesa de ayuda real: lo reciente sigue abierto, lo antiguo ya se atendió y algunos quedaron vencidos. Cada uno trae su historial (creación, asignación y cambios de estado). Una prueba automática verifica todo esto.
@@ -221,7 +233,7 @@ Más detalle en [Seeders](docs/base-de-datos/seeders.md) y en [Rendimiento](docs
 
 ## Pruebas
 
-**API** (Pest, dentro del contenedor y contra una base aparte, `trazo_test`):
+**API** (Pest, dentro del contenedor y contra una base aparte, `trazo_test`). Las herramientas de prueba vienen solo en el [modo desarrollo](#modo-desarrollo), que debe estar levantado:
 
 ```bash
 # Solo las pruebas
@@ -260,6 +272,22 @@ Las pruebas de extremo a extremo hacen de "teléfono" para la verificación en d
 
 La [estrategia de pruebas](docs/calidad/estrategia-de-pruebas.md) explica qué cubre cada una.
 
+## Modo desarrollo
+
+Para trabajar en el código: lo monta desde la carpeta del equipo, la interfaz se recarga sola al guardar (Vite) y trae las herramientas de prueba y análisis.
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml up -d --build
+```
+
+Para no repetir los tres archivos, se puede dejar fijo en un `.env` (en Windows con `;` en lugar de `:`):
+
+```bash
+COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.dev.yml
+```
+
+En Windows y macOS es más lento que el modo normal, porque lee el código desde la carpeta del equipo. Para volver al modo normal: `docker compose -f docker-compose.yml -f docker-compose.override.yml up -d --build` (o quitar la línea del `.env`). Los datos se conservan al cambiar de modo. Detalle en [Docker](docs/operacion/docker.md#dos-modos).
+
 ## Servicios y puertos
 
 | Dirección | Qué es |
@@ -294,7 +322,7 @@ git pull
 docker compose up -d --build --renew-anon-volumes
 ```
 
-`--renew-anon-volumes` hace falta porque, en local, las dependencias del front (`node_modules`) viven en un volumen anónimo que Compose reutiliza al recrear el contenedor: sin esa opción, la imagen nueva trae las dependencias actualizadas, pero el contenedor sigue usando las anteriores. No toca los datos: la base, la caché y la clave están en volúmenes con nombre.
+`--renew-anon-volumes` hace falta en el modo desarrollo porque las dependencias del front (`node_modules`) viven en un volumen anónimo que Compose reutiliza al recrear el contenedor: sin esa opción, la imagen nueva trae las dependencias actualizadas, pero el contenedor sigue usando las anteriores. No toca los datos: la base, la caché y la clave están en volúmenes con nombre.
 
 ## Detener y limpiar
 

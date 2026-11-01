@@ -9,7 +9,7 @@ order: 70
 # ADR-0060: Pasada de calidad: CSP estricta, CORS cerrado, contrato OpenAPI, ZAP y cobertura exigida
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-25
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Con las funcionalidades terminadas, faltaba una revisión de conjunto: escaneo de seguridad con ZAP, accesibilidad de todas las pantallas, rendimiento real y cobertura medida. Además, varias piezas aprobadas seguían sin construir:

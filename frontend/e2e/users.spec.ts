@@ -9,9 +9,12 @@ import { expectAccessible, signInAs } from './support'
 
 const ROOT = 'superadmin@trazo.test'
 
+// El nombre completo se escribe en dos campos: la primera palabra como nombre y el resto como apellidos
 async function createAccount(page: Page, name: string, email: string, role: string): Promise<void> {
+  const [givenNames = '', ...familyNames] = name.split(' ')
   await page.goto('/administracion/usuarios/nuevo')
-  await page.getByRole('textbox', { name: 'Nombre completo' }).fill(name)
+  await page.getByRole('textbox', { name: 'Nombres' }).fill(givenNames)
+  await page.getByRole('textbox', { name: 'Apellidos' }).fill(familyNames.join(' '))
   await page.getByRole('textbox', { name: 'Correo' }).fill(email)
   await page.getByRole('radio', { name: new RegExp(`^${role}`) }).check()
   await expectAccessible(page)
@@ -39,10 +42,13 @@ test('crear una cuenta, darle un permiso adicional y desactivarla', async ({ pag
   expect(welcome).toContain('/recuperar')
   expect(welcome).not.toMatch(/contraseña es/i)
 
+  // Los permisos se editan en un panel; la tarjeta solo resume los cambios frente al rol
   await page.getByRole('button', { name: 'Editar permisos' }).click()
-  await page.getByRole('checkbox', { name: 'Ver la auditoría de administración' }).click()
+  const sheet = page.getByRole('dialog', { name: 'Editar permisos' })
+  await sheet.getByRole('checkbox', { name: 'Ver la auditoría de administración' }).click()
   await expectAccessible(page)
-  await page.getByRole('button', { name: 'Guardar permisos' }).click()
+  await sheet.getByRole('button', { name: 'Guardar permisos' }).click()
+  await expect(sheet).toHaveCount(0)
   await expect(page.getByText('Permisos de Agente con 1 cambio.')).toBeVisible()
   await expect(page.getByText('Adicional', { exact: true })).toBeVisible()
 

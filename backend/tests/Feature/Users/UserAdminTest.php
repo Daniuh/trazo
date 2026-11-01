@@ -27,11 +27,6 @@ function signInAsDemo(string $email): User
     return actingAsDemo($email);
 }
 
-function demoUlid(string $email): string
-{
-    return User::query()->where('email', $email)->value('ulid');
-}
-
 it('solo quien puede ver usuarios entra a la administración', function (): void {
     signInAsDemo('supervisor@trazo.test');
     $this->getJson('/api/v1/users')->assertForbidden()->assertJsonPath('code', 'FORBIDDEN_ACTION');
@@ -73,15 +68,22 @@ it('la ficha trae sus permisos y lo que quien administra puede hacer con ella', 
 it('crea una cuenta sin contraseña conocida y le envía la bienvenida', function (): void {
     $admin = signInAsDemo('admin@trazo.test');
 
-    $response = $this->postJson('/api/v1/users', ['name' => '  Ana   Torres ', 'email' => ' Ana.Torres@Empresa.COM ', 'role' => 'agent'])
+    $response = $this->postJson('/api/v1/users', [
+        'given_names' => '  Ana   María ',
+        'family_names' => ' Torres  De la Cruz',
+        'email' => ' Ana.Torres@Empresa.COM ',
+        'role' => 'agent',
+    ])
         ->assertCreated()
-        ->assertJsonPath('data.name', 'Ana Torres')
+        ->assertJsonPath('data.given_names', 'Ana María')
+        ->assertJsonPath('data.family_names', 'Torres De la Cruz')
+        ->assertJsonPath('data.name', 'Ana María Torres De la Cruz')
         ->assertJsonPath('data.email', 'ana.torres@empresa.com')
         ->assertJsonPath('data.role.code', 'agent')
         ->assertJsonPath('data.mfa_enabled', false);
 
     $user = User::query()->where('ulid', $response->json('data.id'))->firstOrFail();
-    expect(Hash::check('Trazo.Demo.2026', $user->getAuthPassword()))->toBeFalse()
+    expect(Hash::check('Cometa.Demo.2026', $user->getAuthPassword()))->toBeFalse()
         ->and(DB::table('admin_actions')->where('target_user_id', $user->id)->where('user_id', $admin->id)->exists())->toBeTrue();
 
     Mail::assertQueued(AccountWelcome::class, fn (AccountWelcome $mail): bool => $mail->hasTo('ana.torres@empresa.com')
@@ -91,17 +93,17 @@ it('crea una cuenta sin contraseña conocida y le envía la bienvenida', functio
 it('no deja crear con un correo repetido ni con un rol de su nivel o superior', function (): void {
     signInAsDemo('admin@trazo.test');
 
-    $this->postJson('/api/v1/users', ['name' => 'Otra', 'email' => 'AGENTE1@trazo.test', 'role' => 'agent'])
+    $this->postJson('/api/v1/users', ['given_names' => 'Otra', 'family_names' => 'Persona', 'email' => 'AGENTE1@trazo.test', 'role' => 'agent'])
         ->assertUnprocessable()->assertJsonPath('errors.email.0.code', 'ALREADY_TAKEN');
 
-    $this->postJson('/api/v1/users', ['name' => 'Otra', 'email' => 'otra@empresa.com', 'role' => 'admin'])
+    $this->postJson('/api/v1/users', ['given_names' => 'Otra', 'family_names' => 'Persona', 'email' => 'otra@empresa.com', 'role' => 'admin'])
         ->assertUnprocessable()->assertJsonPath('code', 'ROLE_NOT_ASSIGNABLE');
 });
 
 it('sin permiso no se puede averiguar si un correo existe', function (): void {
     signInAsDemo('agente1@trazo.test');
 
-    $this->postJson('/api/v1/users', ['name' => 'X', 'email' => 'supervisor@trazo.test', 'role' => 'agent'])
+    $this->postJson('/api/v1/users', ['given_names' => 'X', 'family_names' => 'Y', 'email' => 'supervisor@trazo.test', 'role' => 'agent'])
         ->assertForbidden()->assertJsonMissingPath('errors');
 });
 
@@ -109,14 +111,36 @@ it('edita nombre y correo, y avisa a la dirección anterior', function (): void 
     signInAsDemo('admin@trazo.test');
     $ulid = demoUlid('solicitante1@trazo.test');
 
-    $this->patchJson("/api/v1/users/{$ulid}", ['name' => 'Juan Pérez Gómez', 'email' => 'juan.perez@empresa.com'])
-        ->assertOk()->assertJsonPath('data.email', 'juan.perez@empresa.com');
+    $this->patchJson("/api/v1/users/{$ulid}", ['given_names' => 'Juan', 'family_names' => 'Pérez Gómez', 'email' => 'juan.perez@empresa.com'])
+        ->assertOk()->assertJsonPath('data.email', 'juan.perez@empresa.com')->assertJsonPath('data.name', 'Juan Pérez Gómez');
 
     Mail::assertQueued(AccountNotice::class, fn (AccountNotice $mail): bool => $mail->hasTo('solicitante1@trazo.test')
         && $mail->event->value === 'email_changed');
 
     // Su propio correo, sin chocar consigo mismo
-    $this->patchJson("/api/v1/users/{$ulid}", ['name' => 'Juan Pérez Gómez', 'email' => 'juan.perez@empresa.com'])->assertOk();
+    $this->patchJson("/api/v1/users/{$ulid}", ['given_names' => 'Juan', 'family_names' => 'Pérez Gómez', 'email' => 'juan.perez@empresa.com'])->assertOk();
+});
+
+it('exige nombres y apellidos, y el nombre completo no se escribe', function (): void {
+    signInAsDemo('admin@trazo.test');
+
+    $this->postJson('/api/v1/users', ['given_names' => ' ', 'email' => 'nueva@empresa.com', 'role' => 'agent'])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.given_names.0.code', 'REQUIRED')
+        ->assertJsonPath('errors.family_names.0.code', 'REQUIRED');
+
+    $this->postJson('/api/v1/users', ['name' => 'Nueva Persona', 'given_names' => 'Nueva', 'family_names' => 'Persona', 'email' => 'nueva@empresa.com', 'role' => 'agent'])
+        ->assertUnprocessable()->assertJsonPath('errors.name.0.code', 'NOT_ALLOWED');
+});
+
+it('ordena por apellido y busca por cualquier parte del nombre', function (): void {
+    signInAsDemo('superadmin@trazo.test');
+
+    $names = array_column($this->getJson('/api/v1/users?sort=name&per_page=100')->assertOk()->json('data'), 'family_names');
+    $sorted = $names;
+    usort($sorted, fn (string $a, string $b): int => strcmp(mb_strtolower($a), mb_strtolower($b)));
+    expect($names)->toBe($sorted)
+        ->and(array_column($this->getJson('/api/v1/users?search=laura gómez')->json('data'), 'name'))->toBe(['Laura Gómez']);
 });
 
 it('al desactivar cierra sus sesiones al instante y no la deja entrar', function (): void {
@@ -133,7 +157,7 @@ it('al desactivar cierra sus sesiones al instante y no la deja entrar', function
 
     app('auth')->forgetGuards();
     $this->withToken($token)->getJson('/api/v1/auth/me')->assertUnauthorized();
-    $this->postJson('/api/v1/auth/login', ['email' => 'agente2@trazo.test', 'password' => 'Trazo.Demo.2026'])->assertUnauthorized();
+    $this->postJson('/api/v1/auth/login', ['email' => 'agente2@trazo.test', 'password' => 'Cometa.Demo.2026'])->assertUnauthorized();
 });
 
 it('desactivar a quien ya lo está choca con su estado', function (): void {
@@ -155,7 +179,7 @@ it('la ficha cuenta sus incidentes pendientes asignados, para avisar antes de de
 });
 
 it('un ingreso completo anota la fecha del último ingreso', function (): void {
-    $this->postJson('/api/v1/auth/login', ['email' => 'solicitante2@trazo.test', 'password' => 'Trazo.Demo.2026'])->assertOk();
+    $this->postJson('/api/v1/auth/login', ['email' => 'solicitante2@trazo.test', 'password' => 'Cometa.Demo.2026'])->assertOk();
 
     expect(User::query()->where('email', 'solicitante2@trazo.test')->value('last_login_at'))->not->toBeNull();
 });

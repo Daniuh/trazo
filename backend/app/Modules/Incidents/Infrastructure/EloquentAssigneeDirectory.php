@@ -27,7 +27,7 @@ final class EloquentAssigneeDirectory implements AssigneeDirectory
 
     public function all(): array
     {
-        return array_values($this->eligible()->orderBy('users.name')->get()
+        return array_values($this->eligible()->orderBy('users.family_names')->orderBy('users.given_names')->get()
             ->map(fn (User $user): Person => new Person($user->id, $user->ulid, $user->name))
             ->all());
     }

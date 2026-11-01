@@ -9,7 +9,7 @@ order: 76
 # ADR-0066: Llave de la app sin depender del entrypoint
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-31
 
 ## Contexto
 En local, la `APP_KEY` se genera una vez y se guarda en el volumen `trazo_app-key` ([ADR-0025](0025-docker.md)). El entrypoint de la imagen la lee y la exporta antes de arrancar cada servicio. Pero `docker compose exec app php artisan ...` no pasa por el entrypoint, así que ese comando corría sin llave. Funcionaba lo que no cifra, y fallaba lo que sí: descifrar un secreto del MFA, encolar un correo cifrado o probar algo en `tinker`.

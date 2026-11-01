@@ -26,10 +26,10 @@ const columns: DataColumn[] = [
   { key: 'status', label: 'Estado' },
 ]
 const rows = [
-  { code: 'INC-000123', title: 'No carga el módulo de facturación', status: 'Abierto' },
-  { code: 'INC-000124', title: 'Impresora del piso 3 sin tóner', status: 'En progreso' },
+  { code: 'TZ-26-0123', title: 'No carga el módulo de facturación', status: 'Abierto' },
+  { code: 'TZ-26-0124', title: 'Impresora del piso 3 sin tóner', status: 'En progreso' },
 ]
-const selected = ref<string | null>('INC-000123')
+const selected = ref<string | null>('TZ-26-0123')
 const descending = ref(true)
 const page = ref(2)
 

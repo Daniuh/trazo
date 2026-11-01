@@ -13,6 +13,19 @@ const messages: MessageCatalog = {
     'Ese cambio de estado no está permitido desde el estado actual. Recarga la página para ver las opciones disponibles.',
   VERSION_CONFLICT:
     'Alguien más guardó cambios en este incidente mientras lo tenías abierto. Recarga para ver la versión actual antes de seguir.',
+  STATUS_NOTE_REQUIRED:
+    'Para este cambio de estado hace falta una nota. Escribe brevemente qué pasó y vuelve a intentarlo.',
+  INCIDENT_NOT_FINALIZED:
+    'Este incidente sigue en curso, así que no hay nada que reabrir. Recarga la página para ver su estado actual.',
+  REOPEN_ALREADY_REQUESTED:
+    'Ya hay una solicitud para reabrir este incidente esperando respuesta. Recarga la página para verla.',
+  REOPEN_NOT_REQUESTED:
+    'Esta solicitud de reapertura ya fue respondida por otra persona. Recarga la página para ver cómo quedó.',
+  REOPEN_OWN_REQUEST: 'No puedes decidir tu propia solicitud de reapertura. Otra persona con ese permiso debe hacerlo.',
+  COMMENT_NOT_OWN: 'Solo quien escribió un mensaje puede borrarlo.',
+  COMMENT_DELETE_EXPIRED:
+    'Ya pasaron más de 5 minutos desde que escribiste este mensaje, así que no se puede borrar. Si hace falta, escribe una aclaración.',
+  COMMENT_ALREADY_DELETED: 'Este mensaje ya estaba borrado.',
   INVALID_ASSIGNEE: 'Esta persona no puede recibir incidentes. Elige a alguien de la lista.',
   EXPORT_TOO_LARGE:
     'Con estos filtros salen {total} incidentes y el máximo por archivo es {max}. Acota los filtros, por ejemplo con un rango de fechas, y vuelve a exportar.',

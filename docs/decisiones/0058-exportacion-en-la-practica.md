@@ -9,7 +9,7 @@ order: 68
 # ADR-0058: Exportación en la práctica: CSV para Excel en español, tope de filas y registro en la auditoría
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-25
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El [ADR-0036](0036-exportacion-csv.md) ya había fijado lo esencial: CSV generado por partes, UTF-8 con BOM, los mismos filtros del listado y un límite de frecuencia (5 por minuto, aprobado con la API). Al construirlo quedaban por decidir:

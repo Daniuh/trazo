@@ -1,0 +1,72 @@
+# Modo desarrollo (opcional): código montado, Vite con recarga en caliente y herramientas de Composer. No se carga solo;
+# se activa con: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml up -d
+# Es más lento en Windows y macOS (lee el código desde la carpeta del equipo). Documentado en docs/operacion/docker.md
+
+x-laravel-dev: &laravel-dev
+  image: trazo/api:dev
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: dev
+  environment:
+    APP_DEBUG: "true"
+    LOG_LEVEL: debug
+  volumes:
+    - ./backend:/var/www/html
+    # Las dependencias viven en un volumen de Docker: leerlas desde la carpeta de Windows hace lento cada arranque de PHP
+    - vendor:/var/www/html/vendor
+    - app-key:/run/trazo
+
+services:
+  # En desarrollo ajusta permisos e instala dependencias antes de migrar
+  init:
+    <<: *laravel-dev
+    user: root
+    # El script se monta desde el repositorio, como el código: un cambio en él no exige reconstruir la imagen
+    command: ["sh", "/usr/local/bin/trazo-dev-init"]
+    volumes:
+      - ./backend:/var/www/html
+      - vendor:/var/www/html/vendor
+      - app-key:/run/trazo
+      - ./docker/php/dev-init.sh:/usr/local/bin/trazo-dev-init:ro
+
+  app:
+    <<: *laravel-dev
+
+  worker:
+    <<: *laravel-dev
+
+  scheduler:
+    <<: *laravel-dev
+
+  reverb:
+    <<: *laravel-dev
+
+  frontend:
+    image: trazo/web:dev
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      target: dev
+    environment:
+      VITE_HMR_CLIENT_PORT: ${TRAZO_HTTP_PORT:-8088}
+      VITE_USE_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      start_period: 20s
+    # Vite en desarrollo necesita mucha más memoria que el Nginx de producción
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1G }
+
+  gateway:
+    volumes:
+      - ./docker/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/upstream.dev.conf:/etc/nginx/conf.d/upstream.conf:ro
+      - ./docker/nginx/snippets:/etc/nginx/snippets:ro
+
+volumes:
+  vendor: {}

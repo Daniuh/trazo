@@ -22,8 +22,8 @@ Sin una herramienta común, los casos llegan por correo, chat o de palabra: se p
 | Reportar un problema | Un formulario con título, descripción y prioridad. La fecha de vencimiento se sugiere sola según la prioridad |
 | Saber quién se encarga | Cada incidente tiene una persona asignada, que lo toma o a quien se lo asigna su supervisor |
 | Seguir el avance | Seis estados, del reporte al cierre, con reglas sobre a qué estado se puede pasar desde cada uno ([ciclo de vida](ciclo-de-vida.md)) |
-| Encontrar casos rápido | Búsqueda por texto o por código (`INC-000123`) y filtros por estado, prioridad, responsable y fechas |
-| Ver cómo va la operación | Un resumen con totales, vencidos, casos por estado y por prioridad, y la tendencia de creados contra resueltos |
+| Encontrar casos rápido | Búsqueda por texto o por código (`TZ-26-0142`) y filtros por estado, prioridad, responsable y fechas |
+| Ver cómo va la operación | Un resumen centrado en el riesgo: el pulso del día con el cumplimiento del plazo, un mapa de lo que está por vencer según la prioridad, el flujo de estados y si el backlog sube o baja |
 | Enterarse sin recargar | Los cambios de otras personas aparecen en pantalla al momento |
 | Llevar los datos a Excel | Exportación del listado filtrado a un archivo que Excel abre directamente |
 | Saber quién hizo qué | Historial de cada incidente y una auditoría general de los cambios y de la administración |
@@ -37,7 +37,7 @@ Hay cinco roles, de menos a más permisos: Solicitante, Agente, Supervisor, Admi
 ## Cómo protege la información
 
 - **Ingreso con dos pasos.** Además de la contraseña, cada persona confirma su ingreso con un código de la aplicación de autenticación de su teléfono. Si alguien roba una contraseña, no le basta para entrar.
-- **Contraseñas fuertes.** Mínimo 12 caracteres. Se rechazan las contraseñas conocidas por filtraciones públicas, y los intentos fallidos seguidos bloquean el ingreso por un tiempo que va creciendo.
+- **Contraseñas fuertes.** Mínimo 12 caracteres. Se rechazan las contraseñas conocidas por filtraciones públicas y las fáciles de adivinar (caracteres repetidos, secuencias como "123456" o "qwerty", o el nombre o el correo de la persona), y los intentos fallidos seguidos bloquean el ingreso por un tiempo que va creciendo.
 - **Cada quien ve lo suyo.** Los permisos se revisan en el servidor en cada acción, no solo en la pantalla.
 - **Todo queda registrado.** Cada cambio de un incidente y cada acción de administración dejan constancia de quién, cuándo y desde dónde.
 - **Avisos por correo.** La persona recibe un aviso cuando cambia su contraseña, se activa o desactiva su verificación en dos pasos o se modifica su cuenta.

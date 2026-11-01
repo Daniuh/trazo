@@ -73,7 +73,7 @@ watch(
       v-model="code"
       label="Incidente"
       type="search"
-      placeholder="INC-000123"
+      placeholder="26-0142"
       :maxlength="20"
       :error="incidentError"
     />

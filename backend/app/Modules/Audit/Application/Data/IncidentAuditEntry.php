@@ -26,6 +26,7 @@ final readonly class IncidentAuditEntry
         public string $incidentTitle,
         public IncidentState $incident,
         public ?array $changes,
+        public ?string $note,
         public ?string $ipAddress,
         public ?string $userAgent,
     ) {}

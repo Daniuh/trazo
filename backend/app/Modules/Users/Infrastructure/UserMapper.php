@@ -24,7 +24,7 @@ final class UserMapper
     public function query(): Builder
     {
         return User::query()
-            ->select(['users.id', 'users.ulid', 'users.name', 'users.email', 'users.is_active', 'users.last_login_at', 'users.created_at'])
+            ->select(['users.id', 'users.ulid', 'users.name', 'users.given_names', 'users.family_names', 'users.email', 'users.is_active', 'users.last_login_at', 'users.created_at'])
             ->selectRaw(self::MFA_ENABLED_SQL.' AS mfa_enabled')
             ->with('roles:id,code,name,level');
     }
@@ -35,6 +35,8 @@ final class UserMapper
             $user->id,
             $user->ulid,
             $user->name,
+            $user->given_names,
+            $user->family_names,
             $user->email,
             $user->is_active,
             array_values($user->roles->map(fn (Role $role): RoleInfo => new RoleInfo($role->id, $role->code, $role->name, $role->level))->all()),

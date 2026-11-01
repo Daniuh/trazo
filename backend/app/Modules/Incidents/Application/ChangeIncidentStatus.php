@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 // Caso de uso: mover un incidente por su ciclo de vida, solo por las transiciones que define el catálogo.
-// Documentado en docs/backend/incidents.md
+// Los estados que lo piden en el catálogo (Resuelto, Cancelado) exigen una nota. Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Application;
 
@@ -32,20 +32,22 @@ final readonly class ChangeIncidentStatus
         private IncidentRules $rules,
     ) {}
 
-    public function handle(Actor $actor, string $ulid, int $version, string $statusCode, RequestContext $context): IncidentRecord
+    public function handle(Actor $actor, string $ulid, int $version, string $statusCode, ?string $note, RequestContext $context): IncidentRecord
     {
         $incident = $this->gate->load($actor, $ulid, IncidentAction::ChangeStatus);
         $this->gate->ensureVersion($incident, $version);
 
         $target = $this->allowedTarget($incident, $statusCode);
+        if ($target->requiresNote && $note === null) {
+            throw IncidentExceptions::noteRequired($target->code);
+        }
         $resolvedAt = $this->rules->resolvedAt($target, $incident->resolvedAt, $this->clock->now());
-        $snapshot = fn (StatusFlags $status): array => ['code' => $status->code, 'name' => $status->name];
 
-        $this->transaction->run(function () use ($incident, $version, $target, $resolvedAt, $actor, $snapshot, $context): void {
+        $this->transaction->run(function () use ($incident, $version, $target, $resolvedAt, $actor, $note, $context): void {
             $this->incidents->update($incident, $version, ['status_id' => $target->id, 'resolved_at' => $resolvedAt]);
             $this->activity->record($incident->id, $actor->id, 'status_changed', [
-                'status' => ['from' => $snapshot($incident->status), 'to' => $snapshot($target)],
-            ], $context);
+                'status' => ['from' => $incident->status->snapshot(), 'to' => $target->snapshot()],
+            ], $context, $note);
         });
 
         return $this->incidents->find($ulid) ?? $incident;

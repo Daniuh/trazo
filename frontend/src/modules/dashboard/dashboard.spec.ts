@@ -57,6 +57,18 @@ describe('mappers', () => {
     expect(metrics.due_soon?.items[0]).toMatchObject({ dueDate: '2026-10-22T10:00:00+00:00', isOverdue: false })
     expect(metrics.due_soon?.filter).toEqual({ dueFrom: 'x', dueTo: 'y' })
   })
+
+  it('renombra las claves del pulso de la operación', () => {
+    const metrics = toMetrics({
+      operation_pulse: {
+        overdue: { value: 3, share_of_pending: 20, filter: { overdue: true } },
+        on_time: { days: 30, resolved: 10, percent: 80 },
+      },
+    })
+
+    expect(metrics.operation_pulse?.overdue.shareOfPending).toBe(20)
+    expect(metrics.operation_pulse?.onTime).toEqual({ days: 30, resolved: 10, percent: 80 })
+  })
 })
 
 describe('incidentListLocation', () => {

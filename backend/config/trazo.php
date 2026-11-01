@@ -7,7 +7,22 @@ declare(strict_types=1);
 return [
 
     // Contraseña de los usuarios de demostración (solo fuera de producción). Cumple la política de 12+ caracteres.
-    'demo_user_password' => env('DEMO_USER_PASSWORD', 'Trazo.Demo.2026'),
+    'demo_user_password' => env('DEMO_USER_PASSWORD', 'Cometa.Demo.2026'),
+
+    // Juegos de cuentas, una por rol, que se crean también en producción (AccountSetSeeder, ADR-0087). El patrón del
+    // correo lleva {rol}. Sin patrón o sin contraseña, el juego no se crea. Las contraseñas viven solo en el entorno.
+    'account_sets' => [
+        'evaluation' => [
+            'label' => 'Evaluación',
+            'email_pattern' => env('EVALUATION_EMAIL_PATTERN'),
+            'password' => env('EVALUATION_PASSWORD'),
+        ],
+        'owner' => [
+            'label' => env('OWNER_LABEL', 'Daniel Naranjo'),
+            'email_pattern' => env('OWNER_EMAIL_PATTERN'),
+            'password' => env('OWNER_PASSWORD'),
+        ],
+    ],
 
     // Peticiones por minuto a la API, por persona o por IP. Documentado en docs/backend/shared.md
     'api_rate_limit' => (int) env('API_RATE_LIMIT', 120),
@@ -69,6 +84,18 @@ return [
     'system' => [
         // Los eventos resueltos se borran pasado este tiempo
         'events_retention_days' => (int) env('SYSTEM_EVENTS_RETENTION_DAYS', 90),
+    ],
+
+    // Centro de notificaciones. Documentado en docs/backend/notifications.md
+    'notifications' => [
+        // Las notificaciones (leídas o no) se borran pasado este tiempo
+        'retention_days' => (int) env('NOTIFICATIONS_RETENTION_DAYS', 90),
+    ],
+
+    // Incidentes. Documentado en docs/backend/incidents.md
+    'incidents' => [
+        // Prefijo del código (TZ-26-0142). Se define antes de salir a producción: cambiarlo después exige migrar los códigos
+        'code_prefix' => env('INCIDENT_CODE_PREFIX', 'TZ'),
     ],
 
     // Exportación de incidentes en CSV. Documentado en docs/backend/incidents.md

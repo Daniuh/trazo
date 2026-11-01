@@ -9,7 +9,7 @@ order: 57
 # ADR-0047: Métricas del dashboard con la visibilidad del listado y caché invalidada por cambios
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba pide total, incidentes por estado, vencidos y por prioridad, y que el sistema rinda con mucho volumen. [ADR-0014](0014-crecimiento.md) ya decidió cachear el dashboard desde el día uno.

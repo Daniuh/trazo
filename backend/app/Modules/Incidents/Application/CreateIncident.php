@@ -16,6 +16,7 @@ use App\Modules\Incidents\Application\Ports\IncidentCatalog;
 use App\Modules\Incidents\Application\Ports\IncidentRepository;
 use App\Modules\Incidents\Domain\Actor;
 use App\Modules\Incidents\Domain\Exceptions\IncidentExceptions;
+use App\Modules\Incidents\Domain\IncidentAccess;
 use App\Modules\Incidents\Domain\IncidentRules;
 use App\Modules\Shared\Application\Data\RequestContext;
 use App\Modules\Shared\Application\Ports\Clock;
@@ -34,6 +35,7 @@ final readonly class CreateIncident
         private Transaction $transaction,
         private Clock $clock,
         private IncidentRules $rules,
+        private IncidentAccess $access,
     ) {}
 
     public function handle(Actor $actor, IncidentInput $input, ?string $assigneeUlid, RequestContext $context): IncidentRecord
@@ -65,14 +67,19 @@ final readonly class CreateIncident
         return $this->find($ulid);
     }
 
-    // Asignar al crear es una asignación más: requiere el mismo permiso y una persona que pueda recibirlo
+    // Asignar al crear: a cualquiera con "asignar"; a sí mismo con "tomar". Quien no puede asignar a otros recibe
+    // siempre 403, para no revelar a quién se podría asignar
     private function assignee(Actor $actor, string $ulid): Person
     {
-        if (! $actor->can('incidents.assign')) {
+        $person = $this->assignees->find($ulid);
+        if ($person === null) {
+            throw $actor->can('incidents.assign') ? IncidentExceptions::invalidAssignee() : new ForbiddenException;
+        }
+        if (! $this->access->canAssignOnCreate($actor, $person->id)) {
             throw new ForbiddenException;
         }
 
-        return $this->assignees->find($ulid) ?? throw IncidentExceptions::invalidAssignee();
+        return $person;
     }
 
     private function find(string $ulid): IncidentRecord

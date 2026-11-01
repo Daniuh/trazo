@@ -19,7 +19,7 @@ Todos los errores salen con `Content-Type: application/problem+json` siguiendo e
   "status": 422,
   "code": "VALIDATION_FAILED",
   "errors": {
-    "title": [{ "code": "TOO_LONG", "params": { "max": "150" } }],
+    "title": [{ "code": "TOO_LONG", "params": { "max": "80" } }],
     "email": [{ "code": "INVALID_EMAIL" }]
   },
   "trace_id": "01JB7Q3W0Z5K8R2M4N6P9T1V3X"
@@ -71,7 +71,7 @@ Los códigos de negocio de cada módulo (por ejemplo `INVALID_STATUS_TRANSITION`
 | `DATE_TOO_EARLY` / `DATE_TOO_LATE` | Fecha fuera del rango permitido | `date` |
 | `NOT_ALLOWED` | Campo que no se puede enviar | — |
 
-Una regla no listada se expone con su nombre en mayúsculas (`ACTIVE_URL`). Las reglas propias implementan `HasErrorCode` para definir su código.
+Una regla no listada se expone con su nombre en mayúsculas (`ACTIVE_URL`). Las reglas propias implementan `HasErrorCode` para definir su código. Si una regla puede fallar por varios motivos (por ejemplo, `NotWeakPassword`), implementa `HasErrorCodes`: falla con el código como mensaje y declara todos los posibles, y el formateador usa el que corresponda.
 
 ## Dónde está en el código
 

@@ -1,8 +1,10 @@
-<!-- Listado de incidentes. Monitor: tabla con vista previa al elegir una fila. Portátil: tabla; elegir una fila abre el detalle.
-     Tablet y celular: tarjetas. Los filtros viven en la URL. Documentado en docs/frontend/incidents.md -->
+<!-- Listado de incidentes. Por defecto, lista agrupada (por vencimiento, estado, prioridad o asignado) en las cuatro vistas;
+     "Tabla" muestra la tabla en portátil y monitor y tarjetas en tablet y celular. En monitor, elegir uno lo muestra en la
+     vista previa; en las demás, abre el detalle. Los filtros, la vista y el grupo viven en la URL.
+     Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { useRealtime } from '@/modules/realtime/application/realtimeBus'
 import { formatNumber } from '@/shared/format/numbers'
@@ -15,21 +17,32 @@ import AppErrorState from '@/shared/ui/states/AppErrorState.vue'
 import AppSkeleton from '@/shared/ui/states/AppSkeleton.vue'
 import { useViewport } from '@/shared/ui/useViewport'
 import { useIncidentList } from '../application/useIncidentList'
+import { rememberListLocation } from '../application/listReturn'
 import { useListFilterOptions } from '../application/useListFilterOptions'
 import { activeFilterCount, DEFAULT_CRITERIA, PER_PAGE_OPTIONS, type SortField } from '../domain/listing'
 import ActiveFilters from './list/ActiveFilters.vue'
 import IncidentCards from './list/IncidentCards.vue'
+import IncidentGroupedList from './list/IncidentGroupedList.vue'
+import IncidentListBar from './list/IncidentListBar.vue'
 import IncidentPreview from './list/IncidentPreview.vue'
 import IncidentTable from './list/IncidentTable.vue'
 import IncidentToolbar from './list/IncidentToolbar.vue'
 
 const router = useRouter()
+const route = useRoute()
+
+// El detalle y el formulario vuelven aquí con los mismos filtros; al salir, la ruta ya es otra y no cuenta
+watch(
+  () => (route.name === 'incidents' ? route.fullPath : null),
+  (path) => path && rememberListLocation(path),
+  { immediate: true },
+)
 const session = useSessionStore()
 const { confirm, notify, notifyError } = useFeedback()
 const { isLaptopUp, isDesktop } = useViewport()
 
 const list = useIncidentList()
-const { criteria, items, total, lastPage, loading, error, exporting } = list
+const { criteria, items, groups, total, lastPage, loading, error, exporting } = list
 const options = useListFilterOptions()
 
 const previewId = ref<string | null>(null)
@@ -81,7 +94,8 @@ function refresh(): void {
 }
 
 function clearFilters(): void {
-  list.update({ ...DEFAULT_CRITERIA, sort: criteria.value.sort, descending: criteria.value.descending })
+  const { sort, descending, view, groupBy } = criteria.value
+  list.update({ ...DEFAULT_CRITERIA, sort, descending, view, groupBy })
 }
 </script>
 
@@ -89,9 +103,20 @@ function clearFilters(): void {
   <div class="incident-list">
     <header class="incident-list__header">
       <h1 class="incident-list__title">{{ criteria.deleted ? 'Incidentes eliminados' : 'Incidentes' }}</h1>
-      <AppButton v-if="session.can('incidents.create')" icon="plus" @click="router.push({ name: 'incident-create' })">
-        Nuevo incidente
-      </AppButton>
+      <div class="incident-list__actions">
+        <!-- Solo quien puede tener incidentes asignados tiene su tablero -->
+        <AppButton
+          v-if="session.can('incidents.view.assigned')"
+          variant="secondary"
+          icon="board"
+          :to="{ name: 'my-incidents' }"
+        >
+          Mis incidentes
+        </AppButton>
+        <AppButton v-if="session.can('incidents.create')" icon="plus" @click="router.push({ name: 'incident-create' })">
+          Nuevo incidente
+        </AppButton>
+      </div>
     </header>
 
     <IncidentToolbar
@@ -120,6 +145,8 @@ function clearFilters(): void {
       <AppButton variant="link" icon="refresh" @click="refresh">Actualizar</AppButton>
     </AppAlert>
 
+    <IncidentListBar v-if="!error" :criteria="criteria" :total="total" @change="list.update" />
+
     <div class="incident-list__body" :class="{ 'incident-list__body--preview': showPreview }">
       <section class="incident-list__results" :aria-busy="loading" aria-label="Resultados">
         <AppErrorState v-if="error" :error="error" @retry="list.load" />
@@ -142,8 +169,18 @@ function clearFilters(): void {
         </AppEmptyState>
 
         <template v-else>
+          <IncidentGroupedList
+            v-if="criteria.view === 'list'"
+            :items="items"
+            :group-by="criteria.groupBy"
+            :totals="groups"
+            :selected-id="showPreview ? previewId : null"
+            :deleted="criteria.deleted"
+            @open="open"
+            @restore="restore"
+          />
           <IncidentTable
-            v-if="isLaptopUp"
+            v-else-if="isLaptopUp"
             :items="items"
             :criteria="criteria"
             :selected-id="showPreview ? previewId : null"
@@ -200,6 +237,12 @@ function clearFilters(): void {
   align-items: center;
   justify-content: space-between;
   gap: $space-3;
+}
+
+.incident-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
 }
 
 .incident-list__title {

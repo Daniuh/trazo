@@ -9,7 +9,7 @@ order: 65
 # ADR-0055: Edición de roles: rol de la cima bloqueado, nivel único, roles de sistema y sin correo masivo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Con la jerarquía por nivel y los permisos por persona ([ADR-0053](0053-administracion-de-usuarios.md)), faltaba poder crear, editar y eliminar roles desde la pantalla. Había que decidir:

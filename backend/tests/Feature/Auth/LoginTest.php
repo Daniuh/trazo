@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
-const DEMO_PASSWORD = 'Trazo.Demo.2026';
+const DEMO_PASSWORD = 'Cometa.Demo.2026';
 
 it('entrega token, vencimiento y el usuario con sus permisos', function (): void {
     $response = $this->postJson('/api/v1/auth/login', ['email' => 'supervisor@trazo.test', 'password' => DEMO_PASSWORD]);

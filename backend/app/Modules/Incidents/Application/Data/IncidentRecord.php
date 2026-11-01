@@ -29,6 +29,8 @@ final readonly class IncidentRecord
         public DateTimeImmutable $updatedAt,
         public ?DateTimeImmutable $deletedAt,
         public int $version,
+        // Solicitud de reapertura pendiente, si la consulta la cargó
+        public ?ReopenRequestInfo $reopenRequest = null,
     ) {}
 
     public function state(): IncidentState
@@ -39,6 +41,7 @@ final readonly class IncidentRecord
             $this->status->isInitial,
             $this->status->isFinal,
             $this->deletedAt !== null,
+            $this->reopenRequest?->requester->id,
         );
     }
 }

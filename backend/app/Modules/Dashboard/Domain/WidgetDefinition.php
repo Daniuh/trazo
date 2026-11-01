@@ -23,6 +23,8 @@ final readonly class WidgetDefinition
         public int $maxH,
         public int $defaultW,
         public int $defaultH,
+        // Forma parte del diseño original; si no, se ofrece en "Agregar widget" y aparece oculto
+        public bool $inDefaultLayout = true,
     ) {}
 
     // Sin permiso propio, lo ve todo el que entra al dashboard

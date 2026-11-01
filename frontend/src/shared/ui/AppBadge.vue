@@ -18,7 +18,7 @@ defineProps<{ tone: Tone }>()
   display: inline-flex;
   align-items: center;
   padding: 0.125rem $space-3;
-  border-radius: $radius-pill;
+  border-radius: $radius-badge;
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
   line-height: $line-height-base;

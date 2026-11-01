@@ -3,7 +3,7 @@
 import { computed, reactive, ref, shallowRef } from 'vue'
 import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
 import { ApiError, toApiError } from '@/shared/http'
-import { DESCRIPTION_MAX, TITLE_MAX, type Incident, type IncidentDraft } from '../domain/incident'
+import { DESCRIPTION_MAX, TITLE_MAX, TITLE_MIN, type Incident, type IncidentDraft } from '../domain/incident'
 import { incidentsApi } from '../infrastructure/incidentsApi'
 import { useCatalogStore } from './useCatalogStore'
 
@@ -64,9 +64,10 @@ export function useIncidentForm(id: string | null) {
 
   function validate(): boolean {
     const errors: Record<string, string> = {}
-    if (!form.title.trim()) errors.title = fieldMessageFor({ code: 'REQUIRED' })
-    else if (form.title.length > TITLE_MAX)
-      errors.title = fieldMessageFor({ code: 'TOO_LONG', params: { max: TITLE_MAX } })
+    const title = form.title.trim()
+    if (!title) errors.title = fieldMessageFor({ code: 'REQUIRED' })
+    else if (title.length < TITLE_MIN) errors.title = fieldMessageFor({ code: 'TOO_SHORT', params: { min: TITLE_MIN } })
+    else if (title.length > TITLE_MAX) errors.title = fieldMessageFor({ code: 'TOO_LONG', params: { max: TITLE_MAX } })
     if (!form.description.trim()) errors.description = fieldMessageFor({ code: 'REQUIRED' })
     else if (form.description.length > DESCRIPTION_MAX) {
       errors.description = fieldMessageFor({ code: 'TOO_LONG', params: { max: DESCRIPTION_MAX } })
@@ -117,5 +118,17 @@ export function useIncidentForm(id: string | null) {
     }
   }
 
-  return { form, status, loadError, fieldErrors, formError, conflict, submitting, suggestedDueDate, prepare, submit }
+  return {
+    form,
+    existing,
+    status,
+    loadError,
+    fieldErrors,
+    formError,
+    conflict,
+    submitting,
+    suggestedDueDate,
+    prepare,
+    submit,
+  }
 }

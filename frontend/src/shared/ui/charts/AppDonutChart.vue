@@ -78,6 +78,21 @@ const segments = computed(() => {
   height: $chart-donut-size;
 }
 
+// Con espacio de sobra (una tarjeta pareja con una vecina más alta), la dona crece hasta llenar el alto, con un tope.
+// Solo en portátil y monitor: en tablet la leyenda baja bajo la dona y crecer la volvería demasiado alta
+@include laptop {
+  .app-donut__figure {
+    align-self: stretch;
+    width: auto;
+    min-width: $chart-donut-size;
+    max-width: $chart-donut-max;
+    height: auto;
+    min-height: $chart-donut-size;
+    max-height: $chart-donut-max;
+    aspect-ratio: 1;
+  }
+}
+
 .app-donut__svg {
   display: block;
   width: 100%;

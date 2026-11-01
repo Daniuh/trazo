@@ -18,7 +18,8 @@ final class ResetPasswordRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email', 'max:191'],
             'ticket' => ['required', 'string', 'size:64'],
-            'password' => NewPassword::rules(),
+            // Solo el correo que ya trae la petición: buscar el nombre antes de validar el pase revelaría datos de la cuenta
+            'password' => NewPassword::rules([$this->string('email')->toString()]),
             'mfa_code' => ['nullable', 'string', 'digits:6', 'prohibits:recovery_code'],
             'recovery_code' => ['nullable', 'string', 'max:20'],
         ];

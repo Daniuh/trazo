@@ -21,6 +21,7 @@ final class IncidentExceptions
         return match ($denial) {
             Denial::NotVisible => new ResourceNotFoundException($denial->value),
             Denial::Forbidden => new ForbiddenException,
+            Denial::OwnReopenRequest, Denial::CommentNotOwn => new ForbiddenException($denial->value),
             default => new ConflictException($denial->value),
         };
     }
@@ -34,6 +35,12 @@ final class IncidentExceptions
     public static function invalidTransition(string $from, string $to): ConflictException
     {
         return new ConflictException('INVALID_STATUS_TRANSITION', ['from' => $from, 'to' => $to]);
+    }
+
+    // El estado de destino pide explicar el cambio (cómo se resolvió, por qué se cancela)
+    public static function noteRequired(string $status): RuleViolationException
+    {
+        return new RuleViolationException('STATUS_NOTE_REQUIRED', ['status' => $status]);
     }
 
     // La exportación pasa del tope: hay que acotar los filtros

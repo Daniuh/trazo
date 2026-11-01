@@ -1,4 +1,5 @@
-<!-- Grilla del dashboard. Portátil y monitor: 12 columnas con el lugar y el tamaño que eligió la persona.
+<!-- Grilla del dashboard. Portátil y monitor: 12 columnas con el lugar y el ancho que eligió la persona; el alto lo pone
+     el contenido (las tarjetas de una fila quedan parejas, sin espacio vacío abajo).
      Tablet: 2 columnas en su orden (los anchos ocupan la fila). Celular: indicadores de a dos y el resto a lo ancho.
      Documentado en docs/frontend/dashboard.md -->
 <script setup lang="ts">
@@ -71,7 +72,9 @@ const place = (widget: DashboardWidget) => ({
 @include laptop {
   .dashboard-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-auto-rows: $dashboard-row-height;
+
+    // Filas al alto del contenido: una tarjeta mide lo que su gráfico, con el mismo margen abajo que arriba
+    grid-auto-rows: auto;
   }
 
   .dashboard-grid__item,

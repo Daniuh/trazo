@@ -11,8 +11,8 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 uses(DatabaseTruncation::class);
 
 beforeEach(function (): void {
-    Incident::factory()->create(['code' => 'INC-000042', 'title' => 'La impresora del piso 3 no imprime', 'description' => 'Papel atascado.']);
-    Incident::factory()->create(['code' => 'INC-000043', 'title' => 'La VPN se desconecta', 'description' => 'Pasa en la tarde.']);
+    Incident::factory()->create(['code' => 'TZ-00-0042', 'title' => 'La impresora del piso 3 no imprime', 'description' => 'Papel atascado.']);
+    Incident::factory()->create(['code' => 'TZ-00-0043', 'title' => 'La VPN se desconecta', 'description' => 'Pasa en la tarde.']);
     actingAsDemo('supervisor@trazo.test');
 });
 
@@ -22,22 +22,22 @@ function searchCodes(string $text): array
 }
 
 it('busca por prefijo: "impre" encuentra "impresora"', function (): void {
-    expect(searchCodes('impre'))->toBe(['INC-000042']);
+    expect(searchCodes('impre'))->toBe(['TZ-00-0042']);
 });
 
 it('exige todas las palabras, en el título o en la descripción', function (): void {
-    expect(searchCodes('vpn tarde'))->toBe(['INC-000043'])
+    expect(searchCodes('vpn tarde'))->toBe(['TZ-00-0043'])
         ->and(searchCodes('vpn papel'))->toBe([]);
 });
 
 it('reconoce un código, con o sin ceros y guion', function (): void {
-    expect(searchCodes('inc-43'))->toBe(['INC-000043'])
-        ->and(searchCodes('INC000042'))->toBe(['INC-000042']);
+    expect(searchCodes('tz-00-43'))->toBe(['TZ-00-0043'])
+        ->and(searchCodes('00-42'))->toBe(['TZ-00-0042']);
 });
 
 it('ignora los operadores de búsqueda que alguien intente colar', function (): void {
-    expect(searchCodes('impresora -piso'))->toBe(['INC-000042'])
-        ->and(searchCodes('"vpn" +(tarde)'))->toBe(['INC-000043']);
+    expect(searchCodes('impresora -piso'))->toBe(['TZ-00-0042'])
+        ->and(searchCodes('"vpn" +(tarde)'))->toBe(['TZ-00-0043']);
 });
 
 it('pide al menos una palabra de 3 letras', function (): void {

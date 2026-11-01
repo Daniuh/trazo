@@ -9,7 +9,7 @@ order: 58
 # ADR-0048: Diseño del dashboard guardado widget por widget, con los ocultos en su lugar
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0030](0030-dashboard-personalizable.md) decidió guardar el diseño en tablas relacionales (`dashboard_widgets` y `user_dashboard_widgets`). Faltaba definir cuatro cosas:

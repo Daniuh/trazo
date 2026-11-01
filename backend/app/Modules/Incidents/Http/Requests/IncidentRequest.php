@@ -15,6 +15,11 @@ use Illuminate\Validation\Rule;
 
 final class IncidentRequest extends FormRequest
 {
+    // Un título concreto: cabe en una línea del listado, de una tarjeta y de un aviso (ADR-0073)
+    public const int TITLE_MIN = 5;
+
+    public const int TITLE_MAX = 80;
+
     /**
      * @return array<string, list<mixed>>
      */
@@ -23,7 +28,7 @@ final class IncidentRequest extends FormRequest
         $creating = $this->isMethod('POST');
 
         return [
-            'title' => ['required', 'string', 'max:150'],
+            'title' => ['required', 'string', 'min:'.self::TITLE_MIN, 'max:'.self::TITLE_MAX],
             'description' => ['required', 'string', 'max:5000'],
             'priority' => ['required', 'string', Rule::exists('priorities', 'code')->where('is_active', true)],
             // Un vencimiento nuevo no puede quedar en el pasado

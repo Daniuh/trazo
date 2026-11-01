@@ -44,9 +44,16 @@ it('ofrece a cada rol solo los widgets que su permiso alcanza, en el diseño ori
     actingAsDemo('supervisor@trazo.test');
     $supervisor = $this->getJson('/api/v1/dashboard')->assertOk();
 
+    $widgets = array_column($supervisor->json('data.widgets'), null, 'code');
     expect($supervisor->json('data.scope'))->toBe('general')
-        ->and($supervisor->json('data.widgets'))->toHaveCount(10)
-        ->and($supervisor->json('data.widgets.0'))->toMatchArray(['code' => 'total_incidents', 'visible' => true, 'x' => 0, 'y' => 0]);
+        ->and($widgets)->toHaveCount(14)
+        // El diseño original es el centrado en el riesgo (ADR-0081); los de antes quedan ocultos, debajo
+        ->and($widgets['operation_pulse'])->toMatchArray(['visible' => true, 'x' => 0, 'y' => 0, 'w' => 12])
+        ->and($widgets['risk_map'])->toMatchArray(['visible' => true, 'x' => 0, 'y' => 2])
+        ->and($widgets['status_flow'])->toMatchArray(['visible' => true, 'x' => 7, 'y' => 2])
+        ->and($widgets['backlog_balance'])->toMatchArray(['visible' => true, 'x' => 0, 'y' => 6])
+        ->and($widgets['total_incidents']['visible'])->toBeFalse()
+        ->and($widgets['incidents_by_priority']['visible'])->toBeFalse();
 });
 
 it('guarda el diseño, conserva el lugar de los ocultos y lo devuelve igual', function (): void {
@@ -71,7 +78,7 @@ it('deja ocultos, debajo de todo, los widgets que no se enviaron', function (): 
         ->assertOk();
 
     $saved = dashboardWidgets();
-    expect($saved)->toHaveCount(10)
+    expect($saved)->toHaveCount(14)
         ->and($saved['overdue_incidents']['visible'])->toBeTrue()
         ->and($saved['total_incidents'])->toMatchArray(['visible' => false, 'y' => 2]);
 });

@@ -18,6 +18,8 @@ const props = defineProps<{
   criteria: ListCriteria
   selectedId: string | null
   compact: boolean
+  // En "Mis incidentes" todos son de la misma persona: la columna sobra
+  hideAssignee?: boolean
 }>()
 const emit = defineEmits<{ open: [id: string]; sort: [field: SortField, descending: boolean]; restore: [id: string] }>()
 
@@ -28,7 +30,7 @@ const columns = computed<DataColumn[]>(() => [
   { key: 'priority', label: COLUMN_LABELS.priority, sortable: true },
   { key: 'due_date', label: COLUMN_LABELS.due_date, sortable: true },
   ...(props.compact ? [] : [{ key: 'created_at', label: COLUMN_LABELS.created_at, sortable: true }]),
-  { key: 'assignee', label: 'Asignado' },
+  ...(props.hideAssignee ? [] : [{ key: 'assignee', label: 'Asignado' }]),
   ...(props.criteria.deleted ? [{ key: 'actions', label: 'Acciones', hiddenLabel: true }] : []),
 ])
 </script>
@@ -46,6 +48,7 @@ const columns = computed<DataColumn[]>(() => [
   >
     <template #cell-status="{ row }">
       <AppBadge :tone="statusTone(row.status.code)">{{ row.status.name }}</AppBadge>
+      <span v-if="row.reopenRequested" class="incident-table__reopen">Reapertura pendiente</span>
     </template>
     <template #cell-priority="{ row }">
       <AppDot :tone="priorityTone(row.priority.code)">{{ row.priority.name }}</AppDot>
@@ -71,6 +74,14 @@ const columns = computed<DataColumn[]>(() => [
 
 .incident-table__muted {
   color: $color-text-secondary;
+}
+
+// Debajo del estado, para no ensanchar la columna
+.incident-table__reopen {
+  display: block;
+  margin-top: $space-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
 }
 
 .incident-table__overdue {

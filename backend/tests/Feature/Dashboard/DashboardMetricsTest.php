@@ -151,3 +151,70 @@ it('hace las mismas consultas con pocos o muchos incidentes (sin N+1)', function
 
     expect($count())->toBe($few);
 });
+
+it('el pulso, el mapa de riesgo y el flujo cuadran con el listado filtrado', function (string $email): void {
+    actingAsDemo($email);
+    $data = metrics('operation_pulse,risk_map,status_flow');
+
+    $pulse = $data['operation_pulse'];
+    foreach (['total', 'pending', 'overdue', 'critical'] as $figure) {
+        expect($pulse[$figure]['value'])->toBe(listedTotal($pulse[$figure]['filter']), "{$figure} de {$email}");
+    }
+    foreach ($data['risk_map']['rows'] as $row) {
+        foreach ($row['cells'] as $cell) {
+            expect($cell['count'])->toBe(listedTotal($cell['filter']), "{$row['code']}/{$cell['bucket']} de {$email}");
+        }
+        expect($row['total']['count'])->toBe(listedTotal($row['total']['filter']), "total {$row['code']} de {$email}");
+    }
+    foreach ([...$data['status_flow']['stages'], ...$data['status_flow']['exits']] as $stage) {
+        expect($stage['count'])->toBe(listedTotal($stage['filter']), "{$stage['code']} de {$email}");
+    }
+})->with(['supervisor@trazo.test', 'agente1@trazo.test', 'solicitante1@trazo.test']);
+
+it('arma el mapa de riesgo de la prioridad más alta a la más baja, y el flujo con Cancelado como salida', function (): void {
+    actingAsDemo('supervisor@trazo.test');
+    $data = metrics('risk_map,status_flow');
+
+    expect($data['risk_map']['columns'])->toBe(['overdue', 'today', 'week', 'later'])
+        ->and(array_column($data['risk_map']['rows'], 'code'))->toBe(['critical', 'high', 'medium', 'low'])
+        // El crítico vence en 5 horas: hoy o mañana según la hora del negocio, nunca vencido
+        ->and($data['risk_map']['rows'][0]['cells'][0]['count'])->toBe(0)
+        ->and(array_column($data['status_flow']['stages'], 'code'))->toBe(['open', 'in_progress', 'on_hold', 'resolved', 'closed'])
+        ->and(array_column($data['status_flow']['exits'], 'code'))->toBe(['cancelled']);
+});
+
+it('calcula el cumplimiento del plazo con lo resuelto en los últimos 30 días', function (): void {
+    metricsIncident('closed', attributes: ['due_date' => now()->subDays(2), 'resolved_at' => now()->subDays(3)]);
+    metricsIncident('resolved', attributes: ['due_date' => now()->subDays(5), 'resolved_at' => now()->subDays(4)]);
+    // Fuera de la ventana: no cuenta
+    metricsIncident('closed', attributes: ['due_date' => now()->subDays(50), 'resolved_at' => now()->subDays(40)]);
+    actingAsDemo('supervisor@trazo.test');
+
+    // Del beforeEach: un cerrado tarde (vence hace 3 días, resuelto ayer) y un resuelto hace 3 h con vencimiento al azar
+    $onTime = metrics('operation_pulse')['operation_pulse']['on_time'];
+    $resolvedRecently = Incident::query()->where('resolved_at', '>=', now()->subDays(30))->get();
+    $expected = (int) round($resolvedRecently->filter(fn (Incident $i): bool => $i->resolved_at <= $i->due_date)->count() * 100 / $resolvedRecently->count());
+
+    expect($onTime)->toMatchArray(['days' => 30, 'resolved' => $resolvedRecently->count(), 'percent' => $expected]);
+});
+
+it('reconstruye el backlog de cada día: hoy son los pendientes de ahora y hacia atrás suma lo que salió', function (): void {
+    config(['trazo.dashboard.timezone' => 'America/Bogota']);
+    $this->travelTo(new DateTimeImmutable('2026-10-22 15:00:00', new DateTimeZone('UTC')));
+    $yesterday = new DateTimeImmutable('2026-10-21 15:00:00', new DateTimeZone('UTC'));
+    // Ayer se resolvió uno y se canceló otro sin resolverse; hoy se creó uno
+    metricsIncident('closed', attributes: ['created_at' => $yesterday->modify('-5 days'), 'resolved_at' => $yesterday]);
+    metricsIncident('cancelled', attributes: ['created_at' => $yesterday->modify('-5 days'), 'updated_at' => $yesterday, 'resolved_at' => null]);
+    metricsIncident('open', attributes: ['created_at' => new DateTimeImmutable('2026-10-22 14:00:00', new DateTimeZone('UTC'))]);
+    actingAsDemo('supervisor@trazo.test');
+
+    $balance = metrics('backlog_balance', '&trend_days=7')['backlog_balance'];
+    $series = collect($balance['series'])->keyBy('date');
+    $today = $series['2026-10-22'];
+
+    expect($series)->toHaveCount(7)
+        ->and($today['pending'])->toBe(listedTotal($balance['filter']))
+        ->and($series['2026-10-21']['pending'])->toBe($today['pending'] - $today['created'] + $today['exited'])
+        ->and($series['2026-10-21']['exited'])->toBeGreaterThanOrEqual(2)
+        ->and($balance['change'])->toBe($today['pending'] - $series->first()['pending']);
+});

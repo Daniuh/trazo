@@ -3,18 +3,33 @@
 import { expect, test } from '@playwright/test'
 import { expectAccessible, signInAs } from './support'
 
-test('el supervisor ve el resumen general, accesible, y "Vencidos" lleva al listado filtrado', async ({ page }) => {
-  await signInAs(page, 'supervisor@trazo.test')
+// El superadmin parte del diseño original (las pruebas de Personalizar lo restauran); el supervisor puede tener uno guardado
+test('el resumen general muestra el diseño centrado en el riesgo, accesible, y cada celda lleva al listado', async ({
+  page,
+}) => {
+  await signInAs(page, 'superadmin@trazo.test')
   await page.goto('/')
 
   await expect(page.getByRole('heading', { level: 1, name: 'Resumen general' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Carga por agente' })).toBeVisible()
-  await expect(page.getByRole('list', { name: 'Incidentes por estado' })).toBeVisible()
+  for (const name of [
+    'Pulso de la operación',
+    'Mapa de riesgo',
+    'Flujo de estados',
+    'Balance del backlog',
+    'Carga por agente',
+  ]) {
+    await expect(page.getByRole('heading', { name })).toBeVisible()
+  }
+  // Lo que pide la prueba: total, por estado, vencidos y por prioridad
+  await expect(page.getByRole('link', { name: /^Total: / })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Etapas del flujo' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Crítica, total en cualquier estado: / })).toBeVisible()
   await expectAccessible(page)
 
-  await page.getByRole('link', { name: /^Vencidos: .*Ver en el listado$/ }).click()
+  await page.getByRole('link', { name: /^Crítica, vencido: .*Ver en el listado$/ }).click()
 
-  await expect(page).toHaveURL(/\/incidentes\?overdue=1$/)
+  await expect(page).toHaveURL(/priority=critical/)
+  await expect(page).toHaveURL(/overdue=1/)
   await expect(page.getByRole('button', { name: 'Quitar filtro Vencidos' })).toBeVisible()
 })
 
@@ -23,13 +38,14 @@ test('el solicitante ve su resumen sin los widgets de gestión', async ({ page }
   await page.goto('/')
 
   await expect(page.getByRole('heading', { level: 1, name: 'Mi resumen' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Total de incidentes' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Pulso de la operación' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Mapa de riesgo' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Carga por agente' })).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Sin asignar' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Asignados a mí' })).toHaveCount(0)
 })
 
 // agente2 y no agente1: el login de auth.spec usa agente1 por el formulario y ambos comparten el límite de 5 por minuto
-test('la tendencia cambia de período', async ({ page }) => {
+test('el balance del backlog cambia de período', async ({ page }) => {
   await signInAs(page, 'agente2@trazo.test')
   await page.goto('/')
 
@@ -55,7 +71,7 @@ test.describe('modo Personalizar', () => {
       await page.getByRole('alertdialog').getByRole('button', { name: 'Restaurar', exact: true }).click()
       await expect(page.getByRole('heading', { level: 1, name: 'Resumen general' })).toBeVisible()
     }
-    const total = page.getByRole('heading', { name: 'Total de incidentes' })
+    const riskMap = page.getByRole('heading', { name: 'Mapa de riesgo' })
 
     // Parte siempre del diseño original, aunque una ejecución anterior se haya cortado. Se recarga para que el aviso
     // de "restaurado" no quede a medio aparecer cuando axe revisa el contraste
@@ -68,21 +84,20 @@ test.describe('modo Personalizar', () => {
     await expectAccessible(page)
 
     // Con teclado: el menú ⋯ de cada widget hace lo mismo que arrastrar
-    await page.getByRole('button', { name: /^Opciones de Total de incidentes/ }).click()
-    await expect(page.getByRole('menuitem', { name: 'Mover arriba' })).toBeDisabled()
+    await page.getByRole('button', { name: /^Opciones de Mapa de riesgo/ }).click()
     await page.getByRole('menuitem', { name: 'Quitar del inicio' }).click()
     await page.getByRole('button', { name: 'Guardar' }).click()
 
     await expect(page.getByRole('heading', { level: 1, name: 'Resumen general' })).toBeVisible()
-    await expect(total).toHaveCount(0)
+    await expect(riskMap).toHaveCount(0)
 
     await page.getByRole('button', { name: 'Personalizar', exact: true }).click()
     await page.getByRole('button', { name: 'Agregar widget' }).click()
-    await page.getByRole('menuitem', { name: /^Total de incidentes/ }).click()
+    await page.getByRole('menuitem', { name: /^Mapa de riesgo/ }).click()
     await page.getByRole('button', { name: 'Guardar' }).click()
 
     await expect(page.getByRole('heading', { level: 1, name: 'Resumen general' })).toBeVisible()
-    await expect(total).toBeVisible()
+    await expect(riskMap).toBeVisible()
 
     await restoreOriginal()
   })
@@ -93,8 +108,8 @@ test.describe('modo Personalizar', () => {
     await page.goto('/')
 
     await page.getByRole('button', { name: 'Personalizar', exact: true }).click()
-    await page.getByRole('button', { name: /^Opciones de Pendientes/ }).click()
-    await page.getByRole('menuitem', { name: 'Más alto' }).click()
+    await page.getByRole('button', { name: /^Opciones de Mapa de riesgo/ }).click()
+    await page.getByRole('menuitem', { name: 'Mover a la derecha' }).click()
     await page.getByRole('link', { name: 'Incidentes', exact: true }).click()
 
     const dialog = page.getByRole('alertdialog')

@@ -1,11 +1,11 @@
-<!-- Diálogo para corregir el nombre y el correo de una persona (sobre AppFormDialog). Los errores, como un correo en
+<!-- Diálogo para corregir los nombres, los apellidos y el correo de una persona (sobre AppFormDialog). Los errores, como un correo en
      uso, se muestran en su campo sin cerrar el diálogo. Documentado en docs/frontend/admin.md -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { fieldMessagesFor, messageFor } from '@/shared/errors'
 import { toApiError } from '@/shared/http'
 import AppFormDialog from '@/shared/ui/feedback/AppFormDialog.vue'
-import { profileErrors } from '../../application/profileRules'
+import { cleanProfile, profileErrors } from '../../application/profileRules'
 import type { ProfileDraft } from '../../domain/user'
 import UserProfileFields from './UserProfileFields.vue'
 
@@ -32,7 +32,7 @@ async function save(): Promise<void> {
   saving.value = true
   error.value = null
   try {
-    await props.action({ name: draft.value.name.trim(), email: draft.value.email.trim() })
+    await props.action(cleanProfile(draft.value))
     open.value = false
   } catch (raw) {
     const failure = toApiError(raw)

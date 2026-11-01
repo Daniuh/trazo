@@ -29,11 +29,6 @@ function realtimeAs(string $email): User
     return actingAsDemo($email);
 }
 
-function ulidOfDemo(string $email): string
-{
-    return (string) User::query()->where('email', $email)->value('ulid');
-}
-
 /**
  * @return list<string>
  */
@@ -61,8 +56,8 @@ describe('suscripción a canales', function (): void {
 
     it('cada rol recibe firma solo de los canales que su visibilidad permite, todos en una petición', function (string $email, bool $all, bool $unassigned): void {
         realtimeAs($email);
-        $own = 'private-users.'.ulidOfDemo($email);
-        $other = 'private-users.'.ulidOfDemo('superadmin@trazo.test');
+        $own = 'private-users.'.demoUlid($email);
+        $other = 'private-users.'.demoUlid('superadmin@trazo.test');
 
         $signatures = $this->postJson('/api/v1/broadcasting/auth', [
             'socket_id' => '123.456',
@@ -115,15 +110,15 @@ describe('avisos de incidentes', function (): void {
 
         Event::assertDispatched(IncidentSignal::class, function (IncidentSignal $signal) use ($id): bool {
             return $signal->broadcastWith() === ['id' => $id, 'change' => 'created']
-                && channelsOf($signal) === ['private-incidents.all', 'private-incidents.unassigned', 'private-users.'.ulidOfDemo('supervisor@trazo.test')];
+                && channelsOf($signal) === ['private-incidents.all', 'private-incidents.unassigned', 'private-users.'.demoUlid('supervisor@trazo.test')];
         });
         Event::assertNotDispatched(AssignedSignal::class);
     });
 
     it('asignar avisa también a quien lo recibe, y le llega el aviso personal de asignación', function (): void {
         realtimeAs('supervisor@trazo.test');
-        $incident = $this->postJson('/api/v1/incidents', ['title' => 'Red', 'description' => 'Sin red', 'priority' => 'low'])->json('data');
-        $agent = ulidOfDemo('agente1@trazo.test');
+        $incident = $this->postJson('/api/v1/incidents', ['title' => 'Sin red en el piso 3', 'description' => 'Sin red', 'priority' => 'low'])->json('data');
+        $agent = demoUlid('agente1@trazo.test');
 
         $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => $agent, 'version' => $incident['version']])->assertOk();
 
@@ -139,7 +134,7 @@ describe('avisos de incidentes', function (): void {
         $incident = $this->postJson('/api/v1/incidents', ['title' => 'Correo', 'description' => 'No llega', 'priority' => 'low'])->json('data');
 
         realtimeAs('agente1@trazo.test');
-        $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => ulidOfDemo('agente1@trazo.test'), 'version' => $incident['version']])
+        $this->putJson("/api/v1/incidents/{$incident['id']}/assignee", ['assignee' => demoUlid('agente1@trazo.test'), 'version' => $incident['version']])
             ->assertOk();
 
         Event::assertNotDispatched(AssignedSignal::class);
@@ -151,7 +146,7 @@ describe('avisos de sesión', function (): void {
 
     it('cambiar el rol o desactivar a alguien le avisa por su canal personal', function (): void {
         realtimeAs('admin@trazo.test');
-        $agent = ulidOfDemo('agente2@trazo.test');
+        $agent = demoUlid('agente2@trazo.test');
 
         $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'requester'])->assertOk();
         $this->postJson("/api/v1/users/{$agent}/deactivate")->assertOk();

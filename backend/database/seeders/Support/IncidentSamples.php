@@ -38,12 +38,12 @@ final class IncidentSamples
 
     public static function title(): string
     {
-        return fake()->randomElement(self::SUBJECTS).' '.fake()->randomElement(self::PROBLEMS);
+        return DemoRandom::randomElement(self::SUBJECTS).' '.DemoRandom::randomElement(self::PROBLEMS);
     }
 
     public static function description(): string
     {
-        return implode(' ', fake()->randomElements(self::DETAILS, fake()->numberBetween(1, 3)));
+        return implode(' ', DemoRandom::randomElements(self::DETAILS, DemoRandom::numberBetween(1, 3)));
     }
 
     /**
@@ -53,7 +53,7 @@ final class IncidentSamples
      */
     public static function weighted(array $weights): string
     {
-        $pick = fake()->numberBetween(1, array_sum($weights));
+        $pick = DemoRandom::numberBetween(1, array_sum($weights));
         foreach ($weights as $key => $weight) {
             $pick -= $weight;
             if ($pick <= 0) {

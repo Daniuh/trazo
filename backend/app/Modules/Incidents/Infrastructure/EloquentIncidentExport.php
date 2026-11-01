@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Exportación en SQL: la misma consulta y el mismo orden del listado (IncidentFilters), leída en bloques con solo las
+// Exportación en SQL: la misma consulta y el mismo orden del listado (IncidentFilters, y el grupo con IncidentGroups), leída en bloques con solo las
 // columnas del archivo. Así la memoria no crece con el número de filas. Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Infrastructure;
@@ -22,6 +22,7 @@ final readonly class EloquentIncidentExport implements IncidentExportQuery
 {
     public function __construct(
         private IncidentFilters $filters,
+        private IncidentGroups $groups,
         private IncidentCatalog $catalog,
         private int $chunkSize,
     ) {}
@@ -33,7 +34,7 @@ final readonly class EloquentIncidentExport implements IncidentExportQuery
 
     public function rows(int $actorId, VisibilityScope $scope, IncidentListCriteria $criteria): iterable
     {
-        $query = $this->filters->sort($this->filters->query($actorId, $scope, $criteria), $criteria)
+        $query = $this->filters->sort($this->groups->order($this->filters->query($actorId, $scope, $criteria), $criteria->group), $criteria)
             ->toBase()
             ->join('users as creators', 'creators.id', '=', 'incidents.created_by')
             ->leftJoin('users as assignees', 'assignees.id', '=', 'incidents.assigned_to')

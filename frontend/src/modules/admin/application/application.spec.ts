@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_USER_CRITERIA, type UserListCriteria } from '../domain/listing'
 import { toListParams } from '../infrastructure/usersApi'
 import { fromUserQuery, toUserQuery } from './listQuery'
-import { profileErrors } from './profileRules'
+import { cleanProfile, profileErrors } from './profileRules'
 
 const full: UserListCriteria = {
   page: 2,
@@ -51,10 +51,18 @@ describe('listQuery de usuarios', () => {
 
 describe('revisión visual de los datos', () => {
   it('pide nombre y un correo con forma de correo', () => {
-    expect(profileErrors({ name: ' ', email: 'ana' })).toEqual({
-      name: 'Este campo es obligatorio.',
+    expect(profileErrors({ givenNames: ' ', familyNames: '', email: 'ana' })).toEqual({
+      givenNames: 'Este campo es obligatorio.',
+      familyNames: 'Este campo es obligatorio.',
       email: 'Escribe un correo válido, por ejemplo nombre@empresa.com.',
     })
-    expect(profileErrors({ name: 'Ana Torres', email: 'ana@empresa.com' })).toEqual({})
+    expect(profileErrors({ givenNames: 'Ana', familyNames: 'Torres', email: 'ana@empresa.com' })).toEqual({})
+    expect(
+      cleanProfile({ givenNames: '  Ana   María ', familyNames: ' De la  Torre', email: ' ana@empresa.com ' }),
+    ).toEqual({
+      givenNames: 'Ana María',
+      familyNames: 'De la Torre',
+      email: 'ana@empresa.com',
+    })
   })
 })

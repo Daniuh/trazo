@@ -16,5 +16,17 @@ final readonly class StatusFlags
         public bool $isInitial,
         public bool $isPending,
         public bool $isFinal,
+        // Llegar a este estado exige una nota (cómo se resolvió, por qué se cancela)
+        public bool $requiresNote = false,
     ) {}
+
+    /**
+     * Forma que se guarda en el historial: legible aunque el estado cambie de nombre después.
+     *
+     * @return array{code: string, name: string}
+     */
+    public function snapshot(): array
+    {
+        return ['code' => $this->code, 'name' => $this->name];
+    }
 }

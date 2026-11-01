@@ -9,7 +9,7 @@ order: 66
 # ADR-0056: Auditoría global: dos registros con permisos separados, alcance por jerarquía y paginación por cursor
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Trazo ya guardaba dos registros de solo escritura:

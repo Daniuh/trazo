@@ -1,14 +1,27 @@
 <!-- Casilla de verificación con el estilo de Trazo (envuelve la de Quasar). Alto táctil en celular y tablet.
+     `indeterminate` la muestra a medias (p. ej. "Todos" con solo una parte marcada); al tocarla queda marcada.
      Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import { QCheckbox } from 'quasar'
 
-defineProps<{ label: string; disabled?: boolean }>()
+const props = defineProps<{ label: string; disabled?: boolean; indeterminate?: boolean }>()
 const model = defineModel<boolean>({ default: false })
+
+function update(value: boolean | null): void {
+  model.value = value ?? true
+}
 </script>
 
 <template>
-  <QCheckbox v-model="model" class="app-checkbox" :label="label" :disable="disabled" color="primary" dense />
+  <QCheckbox
+    :model-value="props.indeterminate ? null : model"
+    class="app-checkbox"
+    :label="label"
+    :disable="disabled"
+    color="primary"
+    dense
+    @update:model-value="update"
+  />
 </template>
 
 <style scoped lang="scss">

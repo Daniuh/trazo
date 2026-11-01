@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 use App\Modules\Incidents\Application\Data\IncidentListCriteria as C;
 use App\Modules\Incidents\Application\Ports\IncidentListQuery;
+use App\Modules\Incidents\Domain\IncidentGroup as G;
 use App\Modules\Incidents\Domain\IncidentSort as S;
 use App\Modules\Incidents\Domain\VisibilityScope as V;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,13 @@ $cases = [
     'asignado a una persona' => [$agent, $all, new C(assignees: [DB::table('users')->where('id', $agent)->value('ulid')])],
     'rango de vencimiento' => [$agent, $all, new C(sort: S::DueDate, dueFrom: new DateTimeImmutable('-3 days'), dueTo: new DateTimeImmutable('+3 days'))],
     'búsqueda de texto' => [$agent, $all, new C(search: 'impresora')],
+    // Lista agrupada (ADR-0080): orden por grupo y conteo por grupo
+    'agrupado por vencimiento' => [$agent, $all, new C(group: G::Due)],
+    'agente, agrupado por vencimiento' => [$agent, $agentScope, new C(group: G::Due)],
+    'agrupado por estado' => [$agent, $all, new C(group: G::Status)],
+    'agrupado por prioridad' => [$agent, $all, new C(group: G::Priority)],
+    'agrupado por asignado' => [$agent, $all, new C(group: G::Assignee)],
+    'pendientes agrupados por vencimiento, orden por vencimiento' => [$agent, $all, new C(sort: S::DueDate, descending: false, statuses: ['open', 'in_progress', 'on_hold'], group: G::Due)],
 ];
 $q->search($agent, $all, new C); // calienta la caché antes de medir
 foreach ($cases as $name => [$actor, $scope, $criteria]) {
@@ -42,7 +50,13 @@ foreach ($cases as $name => [$actor, $scope, $criteria]) {
     }
     echo "\n### {$name} — total {$page->total}, {$ms} ms, ".count($log)." consultas\n";
     foreach ($log as $entry) {
-        $kind = str_starts_with($entry['query'], 'select count(*)') ? 'conteo' : (str_contains($entry['query'], 'limit 20') ? 'página' : null);
+        $kind = match (true) {
+            str_contains($entry['query'], 'group_key') => 'grupos',
+            str_starts_with($entry['query'], 'select `incidents`.`id`') => 'página del grupo',
+            str_starts_with($entry['query'], 'select count(*)') => 'conteo',
+            str_contains($entry['query'], 'limit 20') => 'página',
+            default => null,
+        };
         if ($kind === null) {
             continue;
         }

@@ -9,7 +9,7 @@ order: 63
 # ADR-0053: Administración de usuarios: jerarquía por nivel, permisos por persona y reautenticación
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 [ADR-0021](0021-permisos-granulares.md) definió roles construidos sobre permisos granulares, con dos reglas: siempre existe un Super admin activo y nadie cambia su propio rol. Al construir la administración de usuarios aparecieron necesidades que esa decisión no cubría:
@@ -61,7 +61,7 @@ Confirmar acciones sensibles:
 - **Cuenta nueva sin contraseña conocida.**
   - La cuenta se crea con una contraseña aleatoria y llega una bienvenida que explica cómo crear la contraseña con el flujo de recuperación ([ADR-0052](0052-recuperacion-y-cambio-de-contrasena.md)).
   - Restablecer el acceso funciona igual: invalida la contraseña, cierra sesiones y avisa cómo crear una nueva.
-- **Un rol por persona.** Al cambiarlo se quitan las excepciones que el rol nuevo vuelve innecesarias.
+- **Un rol por persona.** Al cambiarlo se quitan las excepciones que el rol nuevo vuelve innecesarias. (Reemplazado por el [ADR-0069](0069-cambio-de-rol-con-permisos-exactos.md): ahora se borran todas.)
 - **Reautenticación con el código de la aplicación** para:
   - Dar o quitar un rol que trae permisos de usuarios, roles o sistema.
   - Tocar esos mismos permisos uno por uno.

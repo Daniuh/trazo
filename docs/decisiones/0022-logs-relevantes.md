@@ -9,7 +9,7 @@ order: 32
 # ADR-0022: Logs del sistema: solo eventos relevantes, agrupados por huella
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El super admin necesita ver las fallas reales y los riesgos de seguridad sin perderse entre eventos normales.

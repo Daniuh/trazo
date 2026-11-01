@@ -39,6 +39,7 @@ final readonly class AuditResource
                 'deleted' => $entry->incident->deleted,
             ],
             'changes' => $entry->changes,
+            'note' => $entry->note,
             'ip_address' => $entry->ipAddress,
             'user_agent' => $entry->userAgent,
             'links' => ['incident' => $this->incidents->denial(IncidentAction::View, $actor, $entry->incident) === null],

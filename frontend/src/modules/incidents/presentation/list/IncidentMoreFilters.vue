@@ -1,4 +1,5 @@
-<!-- Filtros adicionales: rangos de creación y vencimiento, solo vencidos, creados por mí y eliminados.
+<!-- Filtros adicionales: rangos de creación y vencimiento, solo vencidos, creados por mí, con reapertura pendiente y
+     eliminados.
      En portátil van en el menú "Más filtros"; en celular y tablet, dentro del panel de filtros. Documentado en docs/frontend/incidents.md -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -21,6 +22,7 @@ const dueFrom = bind('dueFrom')
 const dueTo = bind('dueTo')
 const overdue = bind('overdue')
 const deleted = bind('deleted')
+const reopenRequested = bind('reopenRequested')
 const mine = computed({
   get: () => props.criteria.creator !== null && props.criteria.creator === props.myId,
   set: (value: boolean) => emit('change', { creator: value ? props.myId : null }),
@@ -39,6 +41,7 @@ const mine = computed({
     <div class="more-filters__checks">
       <AppCheckbox v-model="overdue" label="Solo vencidos" />
       <AppCheckbox v-if="myId" v-model="mine" label="Creados por mí" />
+      <AppCheckbox v-model="reopenRequested" label="Con reapertura pendiente" />
       <AppCheckbox v-if="canSeeDeleted" v-model="deleted" label="Ver eliminados" />
     </div>
   </div>

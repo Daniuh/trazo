@@ -9,7 +9,7 @@ order: 29
 # ADR-0019: Cifrado en tránsito y en reposo
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Los datos deben protegerse sin romper funciones obligatorias, como la búsqueda por texto.

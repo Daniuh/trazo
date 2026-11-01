@@ -5,6 +5,8 @@ import { toParams } from '../infrastructure/listApi'
 import { fromQuery, toQuery } from './listQuery'
 
 const full: ListCriteria = {
+  view: 'table',
+  groupBy: 'status',
   page: 3,
   perPage: 50,
   sort: 'due_date',
@@ -20,6 +22,7 @@ const full: ListCriteria = {
   dueTo: '2026-10-31T04:59:59.999Z',
   overdue: true,
   deleted: false,
+  reopenRequested: true,
 }
 
 describe('listQuery', () => {
@@ -47,19 +50,30 @@ describe('listQuery', () => {
       'filter[status]': 'open,in_progress',
       'filter[assignee]': 'none,01m5fr6tv8fq2b3bqkbdc26zjh',
       'filter[overdue]': 1,
+      'filter[reopen_requested]': 1,
     })
     expect(toParams(DEFAULT_CRITERIA)).not.toHaveProperty('filter[deleted]')
   })
 
+  it('pide el grupo solo en la lista y lo lleva a la URL en español', () => {
+    expect(toParams(DEFAULT_CRITERIA)).toMatchObject({ group_by: 'due' })
+    expect(toParams({ ...DEFAULT_CRITERIA, groupBy: 'none' })).not.toHaveProperty('group_by')
+    // La tabla sigue el orden de sus columnas, sin grupo
+    expect(toParams(full)).not.toHaveProperty('group_by')
+    expect(toQuery(full)).toMatchObject({ vista: 'tabla', agrupar: 'estado' })
+    expect(fromQuery({ vista: 'otra', agrupar: 'color' })).toMatchObject({ view: 'list', groupBy: 'due' })
+  })
+
   it('cuenta los filtros activos sin contar búsqueda, orden ni página', () => {
     expect(activeFilterCount(DEFAULT_CRITERIA)).toBe(0)
-    expect(activeFilterCount(full)).toBe(7)
+    expect(activeFilterCount(full)).toBe(8)
   })
 
   it('acepta búsquedas de 3 letras o un código', () => {
     expect(isSearchable('ab')).toBe(false)
     expect(isSearchable('vpn')).toBe(true)
-    expect(isSearchable('inc-42')).toBe(true)
+    expect(isSearchable('26-42')).toBe(true)
+    expect(isSearchable('TZ-26-0142')).toBe(true)
     expect(isSearchable('')).toBe(true)
   })
 })

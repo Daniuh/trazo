@@ -9,7 +9,7 @@ order: 64
 # ADR-0054: La matriz de permisos se siembra solo para roles y permisos nuevos
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El servicio de inicialización corre `migrate --seed` en cada arranque. `AccessControlSeeder` volvía a insertar toda la matriz de rol y permiso, ignorando las parejas que ya existían. Eso no duplicaba nada, pero tenía un efecto oculto: si la administración le quitaba un permiso a un rol, el permiso volvía en el siguiente reinicio. Con la edición de roles y permisos desde la pantalla, ese comportamiento ya no se puede aceptar.

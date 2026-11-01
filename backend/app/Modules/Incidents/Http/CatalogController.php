@@ -35,6 +35,7 @@ final readonly class CatalogController
                 'is_initial' => $status->isInitial,
                 'is_pending' => $status->isPending,
                 'is_final' => $status->isFinal,
+                'requires_note' => $status->requiresNote,
                 'next' => array_map(fn (StatusFlags $next): string => $next->code, $this->catalog->nextStatuses($status->id)),
             ], $this->catalog->statuses())),
         ];

@@ -62,10 +62,10 @@ it('entrega un CSV para Excel en español, con las fechas en la hora del negocio
     $this->travelTo('2026-03-01 12:00:00');
     $agent = exportUser('agente1@trazo.test');
     exportIncident([
-        'code' => 'INC-900001', 'title' => 'Impresora sin tóner; piso 3', 'assigned_to' => $agent->id,
+        'code' => 'TZ-90-0001', 'title' => 'Impresora sin tóner; piso 3', 'assigned_to' => $agent->id,
         'created_at' => '2026-02-10 15:00:00', 'due_date' => '2026-02-20 15:30:00',
     ], 'in_progress', 'high');
-    exportIncident(['code' => 'INC-900002', 'title' => 'Correo caído', 'due_date' => '2026-03-05 10:00:00'], 'open', 'low');
+    exportIncident(['code' => 'TZ-90-0002', 'title' => 'Correo caído', 'due_date' => '2026-03-05 10:00:00'], 'open', 'low');
     actingAsDemo('supervisor@trazo.test');
 
     $response = $this->get('/api/v1/incidents/export?sort=code')
@@ -79,7 +79,7 @@ it('entrega un CSV para Excel en español, con las fechas en la hora del negocio
         'Creado (UTC-05:00)', 'Vencimiento (UTC-05:00)', 'Resuelto (UTC-05:00)', 'Vencido',
     ])
         ->and($rows[1])->toBe([
-            'INC-900001', 'Impresora sin tóner; piso 3', 'En progreso', 'Alta', $rows[1][4], 'Laura Gómez',
+            'TZ-90-0001', 'Impresora sin tóner; piso 3', 'En progreso', 'Alta', $rows[1][4], 'Laura Gómez',
             '2026-02-10 10:00', '2026-02-20 10:30', '', 'Sí',
         ])
         ->and($rows[2][5])->toBe('Sin asignar')

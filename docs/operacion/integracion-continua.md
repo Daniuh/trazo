@@ -73,7 +73,7 @@ Mientras el repositorio no esté publicado, estas validaciones se corren en loca
 |---|---|
 | Documentación | `node scripts/docs/check-links.mjs` |
 | Frontend | `npm run check` y `npm run build` (en `frontend/`) |
-| Backend | `docker compose -p trazo exec app composer check` |
+| Backend | `docker compose -p trazo exec app composer check` (con el modo desarrollo arriba) |
 | E2E | `npm run test:e2e` (en `frontend/`, con el stack arriba) |
 | Imágenes de producción | `docker compose -p trazo -f docker-compose.yml build` |
 | Secretos | `node scripts/git/scan-secrets.mjs` (cambios preparados); el CI revisa todo el historial |

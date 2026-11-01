@@ -1,10 +1,13 @@
-<!-- Botón base. Variantes: principal, secundario, peligro y enlace; mientras carga queda bloqueado. -->
+<!-- Botón base. Variantes: principal, secundario, peligro y enlace; mientras carga queda bloqueado. Con `to` es un
+     enlace de la app con el mismo aspecto (para navegar, no para acciones). -->
 <!-- Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
+import { computed } from 'vue'
+import { RouterLink, type RouteLocationRaw } from 'vue-router'
 import type { IconName } from '@/design/icons/icons'
 import AppIcon from './AppIcon.vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     variant?: 'primary' | 'secondary' | 'danger' | 'link'
     icon?: IconName
@@ -12,19 +15,20 @@ withDefaults(
     disabled?: boolean
     block?: boolean
     type?: 'button' | 'submit'
+    to?: RouteLocationRaw
   }>(),
-  { variant: 'primary', icon: undefined, loading: false, disabled: false, block: false, type: 'button' },
+  { variant: 'primary', icon: undefined, loading: false, disabled: false, block: false, type: 'button', to: undefined },
 )
+
+const classes = computed(() => ['app-button', `app-button--${props.variant}`, { 'app-button--block': props.block }])
 </script>
 
 <template>
-  <button
-    class="app-button"
-    :class="[`app-button--${variant}`, { 'app-button--block': block }]"
-    :type="type"
-    :disabled="disabled || loading"
-    :aria-busy="loading"
-  >
+  <RouterLink v-if="to" :class="classes" :to="to">
+    <AppIcon v-if="icon" :name="icon" size="sm" />
+    <slot />
+  </RouterLink>
+  <button v-else :class="classes" :type="type" :disabled="disabled || loading" :aria-busy="loading">
     <span v-if="loading" class="app-button__spinner" aria-hidden="true" />
     <AppIcon v-else-if="icon" :name="icon" size="sm" />
     <slot />
@@ -47,6 +51,7 @@ withDefaults(
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   cursor: pointer;
+  text-decoration: none;
   transition: filter $duration-fast;
 
   &:hover:not(:disabled) {
@@ -104,7 +109,7 @@ withDefaults(
 // Con mouse el botón puede ser más compacto que el mínimo táctil
 @include laptop {
   .app-button {
-    min-height: 2.25rem;
+    min-height: $control-height-compact;
   }
 }
 </style>
