@@ -38,7 +38,7 @@ No hace falta instalar PHP, Composer, Node ni MySQL en el equipo: todo corre den
 ## Instalación
 
 ```bash
-git clone <url-del-repositorio> trazo
+git clone https://github.com/Daniuh/trazo.git trazo
 cd trazo
 docker compose up -d
 ```
