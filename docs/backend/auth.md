@@ -125,7 +125,7 @@ flowchart TD
 
 - Mientras dure el bloqueo, ni siquiera la contraseña correcta permite ingresar.
 - Un ingreso correcto reinicia el contador. Si no, el contador vence 24 horas después del primer fallo.
-- **Dónde vive:** en Redis, con la huella SHA-256 del correo como clave, nunca el correo en claro.
+- **Dónde vive:** en Redis, en la base de los contadores de seguridad (aparte de la caché de datos, ver [Shared](shared.md#límite-general-de-peticiones)), con la huella SHA-256 del correo como clave, nunca el correo en claro.
 - **Ajustes:** los escalones son datos en `config/trazo.php`.
 - **Registro en el log:** cada bloqueo se registra como advertencia, con la huella, la IP y la cantidad de fallos. Los fallos aislados no se registran, para no llenar el log de ruido.
 - **Evento del sistema:** el bloqueo queda además como evento `login_locked`, agrupado por cuenta y con el correo enmascarado (`da***@gmail.com`), para que el Super admin lo vea en [Sistema](system.md#eventos). Lo mismo pasa con un ingreso cortado por códigos MFA (`mfa_attempts_exceeded`), un código de recuperación anulado (`reset_code_voided`) y Have I Been Pwned sin responder (`external_service_unavailable`).
@@ -225,6 +225,7 @@ sequenceDiagram
 | Application | `UserAccounts`, `PasswordResets`, `ResetCodeSender`, `BreachedPasswords` | Puertos de la contraseña |
 | Infrastructure | `EloquentUserAccounts`, `DatabasePasswordResets`, `MailResetCodeSender`, `Mail/PasswordResetCode`, `HibpBreachedPasswords` | Cuentas, solicitudes con HMAC, correo del código y revisión de contraseñas filtradas |
 | Infrastructure | `AuthServiceProvider` | Conexión de los puertos, límites del login, del MFA y de la contraseña, inactividad, alcance del token de un ingreso a medias y morph map |
+| Infrastructure | `Console/DevTokenCommand` | `trazo:dev-token {correo}`: un token de sesión sin MFA para el escaneo de [ZAP](../seguridad/zap.md). Solo en desarrollo; en producción no se registra |
 | Http | `AuthController`, `MfaController`, `LoginRequest`, `VerifyMfaRequest`, `MfaCodeRequest`, `SessionPayload`, `SessionUserResource` | Endpoints, validación de entrada y forma de la respuesta |
 | Http | `PasswordController`, `ForgotPasswordRequest`, `VerifyResetCodeRequest`, `ResetPasswordRequest`, `ChangePasswordRequest`, `Rules/NewPassword`, `Rules/NotBreachedPassword` | Endpoints de la contraseña y la regla única de contraseñas nuevas |
 

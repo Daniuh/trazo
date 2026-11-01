@@ -52,6 +52,9 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Ramas `hotfix/*` | Correcciones urgentes sin pasar por todo el flujo |
 | Avisos de eventos críticos | Un correo o una marca en el menú cuando aparece un evento crítico, sin tener que entrar a Sistema ([ADR-0059](../decisiones/0059-sistema-en-la-practica.md)) |
 | Monitoreo externo (Sentry, Grafana) | Trazas completas de los errores, métricas en el tiempo y alertas fuera de la app |
+| Interfaz visual del contrato OpenAPI, autoalojada | Explorar la API desde el navegador sin cargar scripts de una CDN, compatible con la CSP ([ADR-0060](../decisiones/0060-pasada-de-calidad.md)) |
+| CSS de Quasar solo con los componentes usados | Bajar los 38 kB comprimidos de la carga inicial, casi todos de estilos que no se usan |
+| Escaneo de ZAP en el CI | Repetir el escaneo pasivo en cada Pull Request, contra el stack del propio CI |
 | Despliegue sin caída (blue/green) | Actualizaciones sin interrupción |
 | Commits firmados | Garantía de autoría de cada cambio |
 | Pruebas de mutación | Verifican que las pruebas detectan errores reales |

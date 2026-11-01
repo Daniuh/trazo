@@ -1,4 +1,5 @@
-<!-- Guía visual (solo en desarrollo): muestra cada componente base y sus estados para revisarlos en las 4 vistas. -->
+<!-- Guía visual (solo en desarrollo): muestra cada componente base y sus estados para revisarlos en las 4 vistas.
+     Las secciones más nuevas viven en design-guide/ para que el archivo no crezca. -->
 <!-- Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -17,6 +18,9 @@ import AppEmptyState from '@/shared/ui/states/AppEmptyState.vue'
 import AppErrorState from '@/shared/ui/states/AppErrorState.vue'
 import AppSkeleton from '@/shared/ui/states/AppSkeleton.vue'
 import type { Tone } from '@/shared/ui/tones'
+import GuideDataSection from './design-guide/GuideDataSection.vue'
+import GuideFormSection from './design-guide/GuideFormSection.vue'
+import GuideOverlaySection from './design-guide/GuideOverlaySection.vue'
 
 const { confirm, notify, notifyError } = useFeedback()
 
@@ -133,6 +137,15 @@ function simulateSave() {
       </AppCard>
       <AppCard title="Error"><AppErrorState :error="networkError" /></AppCard>
     </div>
+
+    <h2 class="guide__section">Formularios</h2>
+    <GuideFormSection />
+
+    <h2 class="guide__section">Datos</h2>
+    <GuideDataSection />
+
+    <h2 class="guide__section">Avisos y capas</h2>
+    <GuideOverlaySection />
   </div>
 </template>
 
@@ -148,6 +161,12 @@ function simulateSave() {
 .guide__title {
   margin: 0;
   font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+}
+
+.guide__section {
+  margin: $space-4 0 0;
+  font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
 }
 

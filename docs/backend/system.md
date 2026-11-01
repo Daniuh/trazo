@@ -24,6 +24,7 @@ Le da al Super admin una pantalla para ver si algo falla y resolverlo sin entrar
 | `DELETE` | `/system/failed-jobs/{uuid}` | Descartar uno | Acción |
 | `POST` | `/system/actions/{action}` | `restart-workers`, `restart-realtime` o `clear-cache` | Acción |
 | `PUT` | `/system/maintenance` | Activar o desactivar (`enabled`) | Acción |
+| `GET` | `/docs` | Contrato OpenAPI en JSON ([API](../api/index.md#referencia-openapi)) | `system.health.view` |
 
 Todas van bajo `/api/v1` y exigen sesión. Los tres permisos son solo del Super admin, salvo que se concedan a una persona. "Acción" quiere decir:
 
@@ -81,7 +82,7 @@ La respuesta trae el estado general (el peor de todos), cada componente con sus 
 | Acción | Qué hace | Tipo en `admin_actions` |
 |---|---|---|
 | Reiniciar workers | `queue:restart`: cada worker termina el job en curso y Docker lo levanta | `system_workers_restarted` |
-| Reiniciar el tiempo real | `reverb:restart`: Reverb se cierra y Docker lo levanta; las pantallas se reconectan solas | `system_realtime_restarted` |
+| Reiniciar el tiempo real | Deja en la caché la misma señal que `reverb:restart` (`laravel:reverb:restart`): Reverb la revisa, se cierra y Docker lo levanta; las pantallas se reconectan solas. Se escribe directo porque Reverb solo registra sus comandos en la consola, no en una petición web | `system_realtime_restarted` |
 | Limpiar la caché de datos | Sube la generación de la caché del dashboard. Bloqueos, límites y sesiones no se tocan | `system_cache_cleared` |
 | Activar o desactivar mantenimiento | Marca en Redis con quién y desde cuándo | `system_maintenance_enabled` / `_disabled` |
 | Reintentar jobs | `queue:retry` de los elegidos o de todos | `system_jobs_retried` (`count`) |
@@ -115,7 +116,7 @@ La respuesta trae el estado general (el peor de todos), cada componente con sus 
 | Domain | `Operator` (permisos), `HealthRules`, `HealthStatus`, `EventStatus`, `SystemAction`, `Fingerprint`, `Exceptions/SystemExceptions` |
 | Application | `ReadHealth`, `ManageSystemEvents`, `ManageFailedJobs`, `RunSystemAction`, `SetMaintenance`, `CheckSystem`, `SystemGuard` (permiso y reautenticación); datos (`HealthReport`, `HealthMeasurements`, `ComponentHealth`, `MaintenanceState`, `EventRecord`, `EventPage`, `EventCriteria`, `EventType`, `FailedJob`, `FailedJobList`); puertos `HealthProbe`, `Heartbeats`, `MaintenanceSwitch`, `SystemControls`, `FailedJobs`, `SystemEventLog`, `IdentityCheck` |
 | Infrastructure | `DatabaseSystemEvents` (implementa el puerto compartido), `DatabaseEventLog`, `LaravelHealthProbe`, `CacheHeartbeats`, `WorkerHeartbeat`, `CacheMaintenanceSwitch`, `LaravelSystemControls`, `DatabaseFailedJobs`, `UsersIdentityCheck`, `FailureEvents`, `Console/CheckSystemCommand`, `Console/PruneSystemEventsCommand`, `SystemServiceProvider` |
-| Http | `SystemController`, `SystemResource`, `RequestOperator`, `Requests/*`, `Middleware/EnforceMaintenance`, `Middleware/WatchDeniedAccess` |
+| Http | `SystemController`, `ApiDocsController` (contrato OpenAPI), `SystemResource`, `RequestOperator`, `Requests/*`, `Middleware/EnforceMaintenance`, `Middleware/WatchDeniedAccess` |
 
 ## Dónde está en el código
 

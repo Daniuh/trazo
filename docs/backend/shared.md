@@ -56,7 +56,11 @@ Las peticiones a `/api/*` se tratan siempre como JSON, aunque el cliente no env�
 
 ## Límite general de peticiones
 
-Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay sesión, y por IP si no la hay. Lo define `AppServiceProvider`. Las rutas sensibles, como el login, suman su propio límite, más estricto.
+Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay sesión, y por IP si no la hay. Lo define `AppServiceProvider` (`trazo.api_rate_limit`). En producción se queda en 120; la variable `API_RATE_LIMIT` solo se sube a mano para un escaneo o una prueba de carga en local. Las rutas sensibles, como el login, suman su propio límite, más estricto.
+
+**Dónde viven los contadores.** Los límites de frecuencia (`RateLimiter`) y los bloqueos del login usan su propio almacén (`cache.limiter = limits`), en la base 2 de Redis (`REDIS_LIMITS_DB`), aparte de la caché de datos (base 1). Limpiar la caché de datos nunca levanta un bloqueo.
+
+En desarrollo, `php artisan trazo:reset-limits` vacía solo esa base: la suite E2E lo usa al empezar para poder repetirse sin esperar 15 minutos. En producción el comando no se registra.
 
 ## Puertos que comparten los módulos
 

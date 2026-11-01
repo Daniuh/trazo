@@ -3,11 +3,10 @@
 // Documentado en docs/frontend/admin.md
 import { ref, shallowRef } from 'vue'
 import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
-import { toApiError, type ApiError } from '@/shared/http'
+import { needsCode, toApiError, type ApiError } from '@/shared/http'
 import { draftOf, EMPTY_ROLE_DRAFT, type Role, type RoleDraft } from '../domain/role'
 import { rolesApi } from '../infrastructure/rolesApi'
 import { useAccessCatalogStore } from './useAccessCatalogStore'
-import { needsCode } from '@/shared/http'
 
 export function useRoleList() {
   const roles = shallowRef<Role[]>([])

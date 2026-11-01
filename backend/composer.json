@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "dedoc/scramble": "^0.13.50",
         "laravel/framework": "^13.17",
         "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.3",
@@ -52,6 +53,12 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "coverage": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan config:clear --ansi",
+            "@php vendor/bin/pest --coverage-clover storage/coverage/clover.xml",
+            "@php tests/coverage-check.php storage/coverage/clover.xml"
         ],
         "lint": "@php vendor/bin/pint --test",
         "format": "@php vendor/bin/pint",

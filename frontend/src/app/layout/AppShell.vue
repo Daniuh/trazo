@@ -27,6 +27,10 @@ const navigation = computed(() => visibleNavigation(session.can))
 useRealtimeConnection()
 useRealtimeNotices()
 
+// El foco va al contenido sin cambiar la URL (el router usa el historial, no el #)
+const content = ref<HTMLElement>()
+const focusContent = () => content.value?.focus()
+
 // En celular el menú se cierra al elegir una sección
 const closeOnMobile = () => {
   if (isMobile.value) drawerOpen.value = false
@@ -35,6 +39,8 @@ const closeOnMobile = () => {
 
 <template>
   <QLayout view="hHh LpR fFf">
+    <!-- Primer elemento al usar Tab: lleva directo al contenido sin recorrer el menú (WCAG 2.4.1) -->
+    <a class="shell-skip" href="#contenido" @click.prevent="focusContent">Saltar al contenido</a>
     <QHeader class="shell-header">
       <div class="shell-header__bar">
         <button
@@ -66,7 +72,7 @@ const closeOnMobile = () => {
     </QDrawer>
 
     <QPageContainer>
-      <main class="shell-content">
+      <main id="contenido" ref="content" class="shell-content" tabindex="-1">
         <div v-if="loading" class="shell-loading" role="status">
           <AppLogo spinning />
           <span class="shell-loading__label">Cargando</span>
@@ -87,6 +93,33 @@ const closeOnMobile = () => {
 
 <style scoped lang="scss">
 @use '@/design/tokens' as *;
+
+// Solo para lectores y teclado hasta que recibe el foco; entonces aparece arriba a la izquierda, sobre el encabezado
+.shell-skip {
+  @include visually-hidden;
+
+  &:focus {
+    position: fixed;
+    z-index: $z-skip-link;
+    top: $space-2;
+    left: $space-2;
+    width: auto;
+    height: auto;
+    padding: $space-2 $space-3;
+    overflow: visible;
+    clip-path: none;
+    border-radius: $radius-control;
+    background: $color-primary;
+    color: $color-on-dark;
+    font-weight: $font-weight-medium;
+    white-space: normal;
+  }
+}
+
+// El contenido recibe el foco solo por el enlace: sin borde de foco propio
+.shell-content:focus {
+  outline: none;
+}
 
 .shell-header {
   border-bottom: 1px solid $color-border;

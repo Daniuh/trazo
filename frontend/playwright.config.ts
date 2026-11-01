@@ -11,6 +11,9 @@ const VIEWPORTS = {
 
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
+  // Las pruebas @operacion reinician contenedores reales: solo corren con npm run test:e2e:ops
+  grepInvert: process.argv.some((arg) => arg.includes('@operacion')) ? undefined : /@operacion/,
   // Comparten la misma base de datos (y el límite de intentos del login): una prueba a la vez
   workers: 1,
   fullyParallel: false,

@@ -19,6 +19,9 @@ return [
 
     'default' => env('CACHE_STORE', 'database'),
 
+    // Dónde guarda Laravel los límites de frecuencia (RateLimiter); el bloqueo del login usa el mismo almacén
+    'limiter' => env('CACHE_LIMITER_STORE', 'limits'),
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores
@@ -86,6 +89,13 @@ return [
             'driver' => 'redis',
             'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
             'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
+        ],
+
+        // Límites de frecuencia y bloqueos del login, separados de la caché de datos
+        'limits' => [
+            'driver' => 'redis',
+            'connection' => 'limits',
+            'lock_connection' => 'limits',
         ],
 
         'dynamodb' => [

@@ -68,8 +68,11 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      - name: Tipos, lint, estilos, formato y pruebas
-        run: npm run check
+      - name: Tipos, lint, estilos y formato
+        run: npm run typecheck && npm run lint
+      # Falla si dominio y aplicación quedan por debajo del 90 % (umbral en vite.config.ts)
+      - name: Pruebas con cobertura
+        run: npm run test:coverage
       - name: Build de producción
         run: npm run build
 
@@ -84,8 +87,11 @@ jobs:
           persist-credentials: false
       - name: Levantar el stack
         run: docker compose -p trazo up -d --build --wait
-      - name: Pint, Larastan y Pest
-        run: docker compose -p trazo exec -T app composer check
+      - name: Pint y Larastan
+        run: docker compose -p trazo exec -T app sh -c "composer lint && composer analyse"
+      # Falla si dominio y aplicación quedan por debajo del 90 % o el total por debajo del 80 % (tests/coverage-check.php)
+      - name: Pest con cobertura
+        run: docker compose -p trazo exec -T app composer coverage
       - name: El gateway responde
         run: |
           curl --fail --silent --show-error http://localhost:8088/up > /dev/null

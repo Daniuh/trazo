@@ -50,8 +50,9 @@ flowchart LR
 | `reverb` | `trazo/api` | Websockets del tiempo real. Sin puerto propio: se llega por el gateway en `/ws` ([Tiempo real](tiempo-real.md)) |
 | `frontend` | `trazo/web` | En local, Vite con recarga en caliente. En producción, el build servido por Nginx sin root. |
 | `mysql` | MySQL 8.4 | Base de datos (`trazo` y `trazo_test` para pruebas) |
-| `redis` | Redis 8.4 | Caché y colas |
+| `redis` | Redis 8.4 | Caché (base 1), colas (base 0) y contadores de seguridad: límites de frecuencia y bloqueos del login (base 2) |
 | `mailpit` | Mailpit | Buzón de correo local (solo en local) |
+| `zap` | OWASP ZAP 2.16 | Escaneo de seguridad. Perfil opcional: no arranca con `up -d`; se corre a mano ([ZAP](../seguridad/zap.md)) |
 
 ## Archivos
 
@@ -124,6 +125,9 @@ En la misma máquina pueden correr otros proyectos con Docker. Para no interferi
 | Ejecutar un comando de Laravel | `docker compose exec app php artisan <comando>` |
 | Detener sin borrar datos | `docker compose down` |
 | Borrar también los datos de Trazo | `docker compose down -v` (solo afecta volúmenes de Trazo) |
+| Pruebas del back con cobertura | `docker compose exec app composer coverage` (PCOV viene solo en la imagen de desarrollo) |
+| Vaciar los límites de frecuencia y bloqueos (solo desarrollo) | `docker compose exec app php artisan trazo:reset-limits` |
+| Escanear con ZAP | Ver [Escaneo con OWASP ZAP](../seguridad/zap.md) |
 
 ## Dónde está en el código
 

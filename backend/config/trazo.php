@@ -9,6 +9,9 @@ return [
     // Contraseña de los usuarios de demostración (solo fuera de producción). Cumple la política de 12+ caracteres.
     'demo_user_password' => env('DEMO_USER_PASSWORD', 'Trazo.Demo.2026'),
 
+    // Peticiones por minuto a la API, por persona o por IP. Documentado en docs/backend/shared.md
+    'api_rate_limit' => (int) env('API_RATE_LIMIT', 120),
+
     // Incidentes de demostración que se cargan fuera de producción (la prueba pide al menos 500)
     'seed_incidents' => (int) env('SEED_INCIDENTS', 600),
 

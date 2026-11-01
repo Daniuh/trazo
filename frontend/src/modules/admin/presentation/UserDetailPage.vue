@@ -95,11 +95,18 @@ async function savePermissions(permissions: string[]): Promise<boolean> {
 
 // Acciones de la tarjeta de acceso: los errores se avisan sin salir de la ficha
 async function attempt(work: () => Promise<boolean>, success: string): Promise<void> {
-  busy.value = true
   try {
     if (await work()) notify(success)
   } catch (raw) {
     notifyError(toApiError(raw))
+  }
+}
+
+// Bloquea los botones solo mientras va la petición: con un diálogo abierto, el foco debe poder volver al botón
+async function tracked<T>(work: () => Promise<T>): Promise<T> {
+  busy.value = true
+  try {
+    return await work()
   } finally {
     busy.value = false
   }
@@ -117,16 +124,16 @@ async function deactivate(): Promise<void> {
     confirmLabel: 'Desactivar',
     danger: true,
   })
-  if (ok) await attempt(() => detail.setActive(false).then(() => true), 'Cuenta desactivada.')
+  if (ok) await attempt(() => tracked(() => detail.setActive(false).then(() => true)), 'Cuenta desactivada.')
 }
 
-const activate = () => attempt(() => detail.setActive(true).then(() => true), 'Cuenta activada.')
+const activate = () => attempt(() => tracked(() => detail.setActive(true).then(() => true)), 'Cuenta activada.')
 
 const resetMfa = () =>
   attempt(
     () =>
       run(
-        (code) => detail.resetMfa(code),
+        (code) => tracked(() => detail.resetMfa(code)),
         {
           title: '¿Restablecer la verificación en dos pasos?',
           message:
@@ -143,7 +150,7 @@ const resetAccess = () =>
   attempt(
     () =>
       run(
-        (code) => detail.resetAccess(code),
+        (code) => tracked(() => detail.resetAccess(code)),
         {
           title: '¿Restablecer el acceso?',
           message:

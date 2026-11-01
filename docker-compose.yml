@@ -31,6 +31,7 @@ x-laravel: &laravel
     SESSION_MAX_MINUTES: ${SESSION_MAX_MINUTES:-480}
     SESSION_IDLE_MINUTES: ${SESSION_IDLE_MINUTES:-60}
     SEED_INCIDENTS: ${SEED_INCIDENTS:-600}
+    API_RATE_LIMIT: ${API_RATE_LIMIT:-120}
     SYSTEM_EVENTS_RETENTION_DAYS: ${SYSTEM_EVENTS_RETENTION_DAYS:-90}
     # Tiempo real: la app le habla a Reverb por la red interna; el navegador llega por el gateway en /ws
     BROADCAST_CONNECTION: reverb
