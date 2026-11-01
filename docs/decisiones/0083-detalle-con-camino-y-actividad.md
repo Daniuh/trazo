@@ -3,6 +3,7 @@ title: "ADR-0083: Detalle del incidente con su camino, el siguiente paso y una s
 description: "El detalle muestra el camino de estados, la barra del plazo y un botón con el siguiente paso; historial y conversación se unen en una actividad con el campo para escribir"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 93
 ---
 

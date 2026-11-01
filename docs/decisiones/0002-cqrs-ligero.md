@@ -3,6 +3,7 @@ title: "ADR-0002: CQRS ligero: escrituras por dominio, lecturas optimizadas"
 description: "CQRS ligero: escrituras por dominio, lecturas optimizadas"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 12
 ---
 

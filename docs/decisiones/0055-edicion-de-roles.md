@@ -3,6 +3,7 @@ title: "ADR-0055: Edición de roles: rol de la cima bloqueado, nivel único, rol
 description: "Edición de roles: rol de la cima bloqueado, nivel único, roles de sistema y sin correo masivo"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 65
 ---
 

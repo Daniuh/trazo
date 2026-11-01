@@ -3,6 +3,7 @@ title: "ADR-0032: Análisis estático, estilo y seguridad automatizada"
 description: "Análisis estático, estilo y seguridad automatizada"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 42
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0070: Rechazar contraseñas predecibles aunque sean largas"
 description: "Además del largo y de las filtraciones, se rechazan las contraseñas repetitivas, secuenciales o con datos de la persona o de la marca"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 80
 ---
 

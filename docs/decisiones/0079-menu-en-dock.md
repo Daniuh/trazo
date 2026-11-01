@@ -3,6 +3,7 @@ title: "ADR-0079: Menú en un dock abajo y centrado, sin encabezado"
 description: "El menú lateral y el encabezado se reemplazan por un dock que flota abajo y centrado en las cuatro vistas; los avisos pasan arriba a la derecha"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 89
 ---
 

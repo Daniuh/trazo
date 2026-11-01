@@ -3,6 +3,7 @@ title: "ADR-0044: Listado de incidentes filtrado en SQL con la misma regla de vi
 description: "Listado de incidentes filtrado en SQL con la misma regla de visibilidad"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 54
 ---
 

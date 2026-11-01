@@ -3,6 +3,7 @@ title: "ADR-0030: Dashboard personalizable guardado en el servidor"
 description: "Dashboard personalizable guardado en el servidor"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 40
 ---
 

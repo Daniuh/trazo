@@ -3,6 +3,7 @@ title: "ADR-0017: MFA con TOTP para todos los usuarios"
 description: "MFA con TOTP para todos los usuarios"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 27
 ---
 

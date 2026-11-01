@@ -3,6 +3,7 @@ title: "ADR-0084: Detalle con historial reciente, ficha a la par y un panel de c
 description: "La actividad sale de la página: el detalle muestra las 5 entradas más recientes junto a la ficha, y el chat y toda la actividad viven en un panel con pestañas"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 94
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0042: Duración de la sesión y bloqueo progresivo por huella del co
 description: "Duración de la sesión y bloqueo progresivo por huella del correo"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 52
 ---
 

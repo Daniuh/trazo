@@ -3,6 +3,7 @@ title: "ADR-0081: Dashboard centrado en el riesgo"
 description: "El diseño original del dashboard pasa a pulso con cumplimiento del plazo, mapa de riesgo, flujo de estados y balance del backlog; los widgets anteriores siguen disponibles"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 91
 ---
 

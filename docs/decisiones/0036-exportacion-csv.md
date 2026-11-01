@@ -3,6 +3,7 @@ title: "ADR-0036: Exportación en CSV"
 description: "Exportación en CSV"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 46
 ---
 

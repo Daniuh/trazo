@@ -3,6 +3,7 @@ title: "ADR-0087: Cuentas por rol creadas desde el entorno del servidor"
 description: "Dos juegos de cuentas (evaluación y propias), una por rol, creados también en producción con contraseñas que solo viven en el entorno"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 97
 ---
 

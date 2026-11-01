@@ -3,6 +3,7 @@ title: "ADR-0047: Métricas del dashboard con la visibilidad del listado y cach�
 description: "Métricas del dashboard con la visibilidad del listado y caché invalidada por cambios"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 57
 ---
 

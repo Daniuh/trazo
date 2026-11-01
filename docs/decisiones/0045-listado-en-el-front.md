@@ -3,6 +3,7 @@ title: "ADR-0045: Listado en el front con los filtros en la URL y una presentaci
 description: "Listado en el front con los filtros en la URL y una presentación por vista"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 55
 ---
 

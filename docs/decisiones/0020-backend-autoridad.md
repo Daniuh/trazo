@@ -3,6 +3,7 @@ title: "ADR-0020: El backend como única autoridad"
 description: "El backend como única autoridad"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 30
 ---
 

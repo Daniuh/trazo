@@ -3,6 +3,7 @@ title: "ADR-0005: Quasar como librería de interfaz"
 description: "Quasar como librería de interfaz"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 15
 ---
 

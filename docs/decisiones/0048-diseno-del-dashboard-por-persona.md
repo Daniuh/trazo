@@ -3,6 +3,7 @@ title: "ADR-0048: Diseño del dashboard guardado widget por widget, con los ocul
 description: "Diseño del dashboard guardado widget por widget, con los ocultos en su lugar"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 58
 ---
 

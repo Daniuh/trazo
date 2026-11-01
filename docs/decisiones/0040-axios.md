@@ -3,6 +3,7 @@ title: "ADR-0040: Axios como base del cliente HTTP"
 description: "Axios como base del cliente HTTP"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 50
 ---
 

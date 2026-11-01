@@ -1,5 +1,10 @@
 # Trazo
 
+> [!IMPORTANT]
+> ## Documentación: [trazo-docs.daniuh.dev](https://trazo-docs.daniuh.dev)
+>
+> Toda la documentación de Trazo en una sola web, con buscador: arquitectura, los flujos en diagramas, la base de datos, la API, el sistema de diseño, las decisiones y la guía de soporte. Se genera a partir de la carpeta [`docs/`](docs/index.md) de este repositorio.
+
 Sistema de gestión de solicitudes e incidentes: creación y seguimiento de casos, prioridades, control del ciclo de vida, filtros avanzados e indicadores, preparado para operar con grandes volúmenes de datos.
 
 | Parte | Tecnología |
@@ -355,7 +360,7 @@ docker compose up -d
 
 ## Documentación
 
-La carpeta [`docs/`](docs/index.md) explica el producto y cada decisión técnica.
+La forma más cómoda de leerla es la web **[trazo-docs.daniuh.dev](https://trazo-docs.daniuh.dev)**, con buscador y diagramas. Se arma a partir de la carpeta [`docs/`](docs/index.md), que explica el producto y cada decisión técnica.
 
 - [Índice general](docs/index.md)
 - [Arquitectura](docs/arquitectura/index.md)

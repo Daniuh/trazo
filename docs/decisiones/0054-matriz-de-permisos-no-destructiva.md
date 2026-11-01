@@ -3,6 +3,7 @@ title: "ADR-0054: La matriz de permisos se siembra solo para roles y permisos nu
 description: "La matriz de permisos se siembra solo para roles y permisos nuevos"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 64
 ---
 

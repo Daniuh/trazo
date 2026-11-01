@@ -3,6 +3,7 @@ title: "ADR-0025: Contenedores: gateway de origen único y una sola imagen de La
 description: "Contenedores: gateway de origen único y una sola imagen de Laravel"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 35
 ---
 

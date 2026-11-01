@@ -3,6 +3,7 @@ title: "ADR-0021: Roles construidos sobre permisos granulares"
 description: "Roles construidos sobre permisos granulares"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 31
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0004: TypeScript en el frontend"
 description: "TypeScript en el frontend"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 14
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0008: Estado y prioridad como tablas catálogo"
 description: "Estado y prioridad como tablas catálogo"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 18
 ---
 

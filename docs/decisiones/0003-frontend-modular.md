@@ -3,6 +3,7 @@ title: "ADR-0003: Frontend modular por funcionalidad con capas"
 description: "Frontend modular por funcionalidad con capas"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 13
 ---
 

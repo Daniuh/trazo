@@ -3,6 +3,7 @@ title: "ADR-0073: Largo del título de un incidente"
 description: "El título va de 5 a 80 caracteres, para que sea concreto y quepa en una línea"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 83
 ---
 

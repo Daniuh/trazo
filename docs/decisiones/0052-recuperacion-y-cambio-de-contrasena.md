@@ -3,6 +3,7 @@ title: "ADR-0052: Recuperación y cambio de contraseña: pase de un solo uso, HM
 description: "Recuperación y cambio de contraseña: pase de un solo uso, HMAC, Have I Been Pwned y segundo factor"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 62
 ---
 

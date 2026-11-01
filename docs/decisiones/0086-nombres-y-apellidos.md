@@ -3,6 +3,7 @@ title: "ADR-0086: Nombres y apellidos por separado, con el nombre completo calcu
 description: "La persona tiene dos campos, Nombres y Apellidos; users.name pasa a ser una columna calculada y las listas se ordenan por apellido"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 96
 ---
 

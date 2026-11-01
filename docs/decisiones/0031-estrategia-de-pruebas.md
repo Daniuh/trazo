@@ -3,6 +3,7 @@ title: "ADR-0031: Estrategia de pruebas"
 description: "Estrategia de pruebas"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 41
 ---
 

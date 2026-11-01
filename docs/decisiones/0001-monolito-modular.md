@@ -3,6 +3,7 @@ title: "ADR-0001: Monolito modular con capas limpias en el backend"
 description: "Monolito modular con capas limpias en el backend"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 11
 ---
 

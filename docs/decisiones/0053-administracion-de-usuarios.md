@@ -3,6 +3,7 @@ title: "ADR-0053: Administración de usuarios: jerarquía por nivel, permisos po
 description: "Administración de usuarios: jerarquía por nivel, permisos por persona y reautenticación"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 63
 ---
 

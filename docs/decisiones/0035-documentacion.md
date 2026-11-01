@@ -3,6 +3,7 @@ title: "ADR-0035: Documentación en Markdown, con ADR y trazabilidad al código"
 description: "Documentación en Markdown, con ADR y trazabilidad al código"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 45
 ---
 
