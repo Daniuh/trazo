@@ -5,7 +5,7 @@ FROM mlocati/php-extension-installer:2.12.3 AS ext-installer
 FROM composer:2.10.3 AS composer
 
 # Base común: PHP-FPM con las extensiones que necesita Laravel
-FROM php:8.4.26-fpm-alpine AS base
+FROM php:8.4.27-fpm-alpine AS base
 
 COPY --from=ext-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN install-php-extensions pdo_mysql redis intl zip bcmath pcntl \
