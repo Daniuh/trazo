@@ -49,9 +49,9 @@ GET /api/v1/users/01m5nzqhhgqs8myzj3rq3smqex
     "last_login_at": "2026-10-24T15:46:00+00:00",
     "created_at": "2026-10-23T22:37:00+00:00",
     "permissions": {
-      "effective": ["audit.view", "dashboard.view.own", "incidents.create", "…"],
+      "effective": ["audit.admin.view", "dashboard.view.own", "incidents.create", "…"],
       "role": ["dashboard.view.own", "incidents.create", "incidents.take", "…"],
-      "granted": ["audit.view"],
+      "granted": ["audit.admin.view"],
       "denied": ["incidents.take"]
     },
     "pending_assigned_incidents": 7,

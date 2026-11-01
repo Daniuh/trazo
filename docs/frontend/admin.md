@@ -54,6 +54,7 @@ Portátil y monitor: dos columnas iguales, con Datos, Rol y Acceso a la izquierd
 | Acceso | Estado, verificación en dos pasos, último ingreso, fecha de creación e incidentes pendientes asignados (con "Ver sus incidentes" si quien administra puede ver todos) | Activar o desactivar, restablecer la verificación en dos pasos y restablecer el acceso |
 | Permisos | Resumen ("Permisos de Agente con 1 cambio") y los permisos agrupados por módulo; los que difieren del rol llevan "Adicional" o "Quitado del rol" | "Editar permisos": una casilla por permiso, "Volver a los del rol", Cancelar y Guardar |
 
+- **"Ver su actividad"** (bajo el nombre, con permiso de auditoría): lleva a la auditoría filtrada por esa persona, en la pestaña de administración o, si solo se tiene la de incidentes, en esa ([Módulo de auditoría](audit.md)).
 - **La cuenta propia:** un aviso explica que solo puede corregir sus datos. El resto lo cambia otra persona.
 - **Desactivar** pide confirmación. Si la persona tiene incidentes pendientes asignados, la confirmación lo dice: no se reasignan solos.
 - **En el editor de permisos**, un permiso que quien administra no tiene, y que la persona tampoco tiene, queda deshabilitado. El ícono de información explica por qué. Quitarlo sí se puede.

@@ -2,7 +2,7 @@
 <!-- Documentado en docs/frontend/sistema-de-diseno/componentes.md -->
 <script setup lang="ts" generic="T extends string | number">
 import { QSelect } from 'quasar'
-import { computed, useId } from 'vue'
+import { computed, ref, useId } from 'vue'
 import AppIcon from '../AppIcon.vue'
 import AppField from './AppField.vue'
 import type { SelectOption } from './types'
@@ -15,10 +15,30 @@ const props = defineProps<{
   required?: boolean
   multiple?: boolean
   placeholder?: string
+  // Para listas largas (p. ej. personas): se escribe para filtrar, sin importar tildes ni mayúsculas
+  filterable?: boolean
 }>()
 
 const model = defineModel<T | T[] | null>({ default: null })
 const id = useId()
+
+const query = ref('')
+const plain = (text: string) =>
+  text
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+const visibleOptions = computed(() =>
+  props.filterable && query.value
+    ? props.options.filter((option) => plain(option.label).includes(plain(query.value)))
+    : props.options,
+)
+
+function onFilter(value: string, update: (apply: () => void) => void): void {
+  update(() => {
+    query.value = value
+  })
+}
 
 // El selector de Quasar no muestra el texto de ejemplo cuando está vacío: se muestra aquí, en gris
 const isEmpty = computed(() => model.value === null || (Array.isArray(model.value) && model.value.length === 0))
@@ -36,8 +56,10 @@ const displayValue = computed(() => (isEmpty.value ? props.placeholder : isPendi
       v-model="model"
       :class="{ 'app-select--empty': isEmpty }"
       :for="id"
-      :options="options"
+      :options="visibleOptions"
       :multiple="multiple"
+      :use-input="filterable"
+      input-debounce="0"
       :display-value="displayValue"
       :aria-invalid="Boolean(error)"
       :aria-describedby="error ? `${id}-error` : undefined"
@@ -48,6 +70,7 @@ const displayValue = computed(() => (isEmpty.value ? props.placeholder : isPendi
       hide-bottom-space
       options-dense
       hide-dropdown-icon
+      @filter="onFilter"
     >
       <!-- Flecha propia de Trazo en lugar del ícono de Quasar -->
       <template #append><AppIcon name="chevron-down" size="sm" /></template>

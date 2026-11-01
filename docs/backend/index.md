@@ -15,6 +15,7 @@ La API es un monolito modular en Laravel 13 sobre PHP 8.4. Cada módulo agrupa u
 ```
 backend/
 ├── app/Modules/
+│   ├── Audit/             → auditoría global de solo lectura (incidentes y administración)
 │   ├── Auth/              → sesión: login, logout, bloqueo progresivo
 │   ├── Dashboard/         → widgets, métricas en caché y diseño por persona
 │   ├── Incidents/         → ciclo de vida de los incidentes y catálogos
@@ -41,6 +42,7 @@ backend/
 | Incidents | CRUD, estados, asignación, historial y listado listos | [Incidents](incidents.md) |
 | Dashboard | Widgets, métricas y diseño por persona listos | [Dashboard](dashboard.md) |
 | Users | Administración de personas y de roles, jerarquía y permisos por persona listos | [Users](users.md) |
+| Audit | Auditoría de incidentes y de administración lista | [Audit](audit.md) |
 | System | Pendiente | — |
 
 ## Cómo se agrega un módulo

@@ -125,13 +125,13 @@ describe('permisos por persona', function (): void {
         adminAs('admin@trazo.test');
         $agent = managedUlid('agente1@trazo.test');
         $current = $this->getJson("/api/v1/users/{$agent}")->json('data.permissions.effective');
-        $desired = [...array_diff($current, ['incidents.take']), 'audit.view'];
+        $desired = [...array_diff($current, ['incidents.take']), 'audit.admin.view'];
 
         $this->putJson("/api/v1/users/{$agent}/permissions", ['permissions' => array_values($desired)])->assertOk()
-            ->assertJsonPath('data.permissions.granted', ['audit.view'])
+            ->assertJsonPath('data.permissions.granted', ['audit.admin.view'])
             ->assertJsonPath('data.permissions.denied', ['incidents.take']);
 
-        expect(freshPermissionsOf('agente1@trazo.test'))->toContain('audit.view')->not->toContain('incidents.take');
+        expect(freshPermissionsOf('agente1@trazo.test'))->toContain('audit.admin.view')->not->toContain('incidents.take');
         expect(DB::table('user_permissions')->where('effect', 'grant')->value('granted_by'))
             ->toBe(User::query()->where('email', 'admin@trazo.test')->value('id'));
         Mail::assertQueued(AccountNotice::class, fn (AccountNotice $mail): bool => $mail->event->value === 'permissions_changed');
@@ -180,12 +180,12 @@ describe('permisos por persona', function (): void {
     });
 
     it('al cambiar de rol se quitan las excepciones que el rol nuevo vuelve innecesarias', function (): void {
-        adminAs('admin@trazo.test');
+        adminAs('superadmin@trazo.test');
         $agent = managedUlid('agente1@trazo.test');
         $current = $this->getJson("/api/v1/users/{$agent}")->json('data.permissions.effective');
-        $this->putJson("/api/v1/users/{$agent}/permissions", ['permissions' => [...$current, 'audit.view']])->assertOk();
+        $this->putJson("/api/v1/users/{$agent}/permissions", ['permissions' => [...$current, 'audit.incidents.view']])->assertOk();
 
-        // El supervisor ya trae audit.view: el concedido sobra
+        // El supervisor ya trae la auditoría de incidentes: el concedido sobra
         $this->putJson("/api/v1/users/{$agent}/roles", ['role' => 'supervisor'])->assertOk()
             ->assertJsonPath('data.permissions.granted', []);
     });
@@ -255,7 +255,7 @@ it('la regla de permisos en SQL coincide con la de la sesión para cada persona 
     $admin = User::query()->where('email', 'admin@trazo.test')->firstOrFail();
     $permission = fn (string $code): int => (int) DB::table('permissions')->where('code', $code)->value('id');
     DB::table('user_permissions')->insert([
-        ['user_id' => $agent->id, 'permission_id' => $permission('audit.view'), 'effect' => 'grant', 'granted_by' => $admin->id],
+        ['user_id' => $agent->id, 'permission_id' => $permission('audit.admin.view'), 'effect' => 'grant', 'granted_by' => $admin->id],
         ['user_id' => $agent->id, 'permission_id' => $permission('incidents.take'), 'effect' => 'deny', 'granted_by' => $admin->id],
         // Concedido y a la vez quitado por su rol no aplica aquí; un quitado que el rol no trae no cambia nada
         ['user_id' => $admin->id, 'permission_id' => $permission('incidents.assign'), 'effect' => 'deny', 'granted_by' => $agent->id],

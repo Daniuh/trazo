@@ -75,7 +75,8 @@ PK `(user_id, permission_id)`, e índices en `permission_id` y `granted_by`. Una
 | `incidents.delete`, `incidents.restore`, `incidents.export` | | | ✓ | | ✓ |
 | `dashboard.view.own` | ✓ | ✓ | | ✓ | |
 | `dashboard.view.any` | | | ✓ | | ✓ |
-| `audit.view` | | | ✓ | ✓ | ✓ |
+| `audit.incidents.view` | | | ✓ | | ✓ |
+| `audit.admin.view` | | | | ✓ | ✓ |
 | `users.view`, `users.create`, `users.update`, `users.activate`, `users.roles.assign`, `users.permissions.grant` | | | | ✓ | ✓ |
 | `users.mfa.reset`, `users.access.reset` | | | | | ✓ |
 | `roles.manage` | | | | | ✓ |
@@ -86,8 +87,8 @@ Es la matriz con la que nace cada rol base. Después la administración la puede
 
 ## Dónde está en el código
 
-- Migraciones: [`000002`](../../../backend/database/migrations/2026_10_21_000002_create_roles_table.php) a [`000005`](../../../backend/database/migrations/2026_10_21_000005_create_user_role_table.php), [`000023` (nivel)](../../../backend/database/migrations/2026_10_24_000023_add_level_to_roles.php), [`000025` (user_permissions)](../../../backend/database/migrations/2026_10_24_000025_create_user_permissions_table.php), [`000028` (quita `users.manage`)](../../../backend/database/migrations/2026_10_24_000028_remove_users_manage_permission.php) y [`000029` (roles de sistema y nivel único)](../../../backend/database/migrations/2026_10_24_000029_add_is_system_and_unique_level_to_roles.php)
+- Migraciones: [`000002`](../../../backend/database/migrations/2026_10_21_000002_create_roles_table.php) a [`000005`](../../../backend/database/migrations/2026_10_21_000005_create_user_role_table.php), [`000023` (nivel)](../../../backend/database/migrations/2026_10_24_000023_add_level_to_roles.php), [`000025` (user_permissions)](../../../backend/database/migrations/2026_10_24_000025_create_user_permissions_table.php), [`000028` (quita `users.manage`)](../../../backend/database/migrations/2026_10_24_000028_remove_users_manage_permission.php) , [`000029` (roles de sistema y nivel único)](../../../backend/database/migrations/2026_10_24_000029_add_is_system_and_unique_level_to_roles.php) y [`000031` (divide `audit.view`)](../../../backend/database/migrations/2026_10_24_000031_split_audit_view_permission.php)
 - Modelos: [`Role.php`](../../../backend/app/Modules/Users/Infrastructure/Models/Role.php) y [`Permission.php`](../../../backend/app/Modules/Users/Infrastructure/Models/Permission.php)
 - Permisos efectivos: [`UserPermissions.php`](../../../backend/app/Modules/Users/Infrastructure/UserPermissions.php) y [`PermissionSql.php`](../../../backend/app/Modules/Users/Infrastructure/PermissionSql.php)
 - Matriz: [`AccessControlSeeder.php`](../../../backend/database/seeders/AccessControlSeeder.php)
-- Decisiones: [ADR-0021](../../decisiones/0021-permisos-granulares.md), [ADR-0053](../../decisiones/0053-administracion-de-usuarios.md) y [ADR-0054](../../decisiones/0054-matriz-de-permisos-no-destructiva.md)
+- Decisiones: [ADR-0021](../../decisiones/0021-permisos-granulares.md), [ADR-0053](../../decisiones/0053-administracion-de-usuarios.md) , [ADR-0054](../../decisiones/0054-matriz-de-permisos-no-destructiva.md) y [ADR-0056](../../decisiones/0056-auditoria-global.md)

@@ -61,9 +61,9 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 
 | Correo | Rol | Qué puede hacer |
 |---|---|---|
-| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera, crear y editar roles y, cuando estén listas, auditoría y sistema |
-| `admin@trazo.test` | Administrador | Crear y administrar a las personas por debajo de su nivel: datos, rol, permisos por persona, activar y desactivar. Ve la auditoría y sus propios incidentes |
-| `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado y ver el resumen general |
+| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera, crear y editar roles, ver toda la auditoría y, cuando esté listo, el sistema |
+| `admin@trazo.test` | Administrador | Crear y administrar a las personas por debajo de su nivel: datos, rol, permisos por persona, activar y desactivar. Ve la auditoría de la administración y sus propios incidentes |
+| `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado, ver el resumen general y la auditoría de incidentes |
 | `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
 | `solicitante1@trazo.test`<br>`solicitante2@trazo.test`<br>`solicitante3@trazo.test` | Solicitante | Crear incidentes, seguir los suyos y editarlos mientras siguen en estado Abierto |
 
@@ -100,6 +100,15 @@ En el menú **Roles** (Super admin):
 - **Crear un rol:** código (no cambia después), nombre, nivel único entre 1 y 99, permisos (se pueden copiar de otro rol) y si exige la verificación en dos pasos.
 - **Editar:** los cambios aplican de inmediato a todas las personas con ese rol; antes de guardar se muestra a cuántas afecta. El rol Super admin no se edita.
 - **Eliminar:** solo un rol creado que nadie tenga. Los cinco roles base no se eliminan.
+
+### Auditoría
+
+En el menú **Auditoría** se ve quién hizo qué, cuándo y desde dónde (IP y navegador):
+
+- **Incidentes** (Supervisor y Super admin): cada cambio de cada incidente, también de los eliminados.
+- **Administración** (Administrador y Super admin): lo que se hizo sobre personas y roles. El Administrador ve lo suyo y lo que toca a quien está por debajo de su nivel.
+- Sin fechas muestra los últimos 30 días. Se filtra por persona, acción, incidente (por su código), persona o rol afectado, y se avanza con "Cargar más".
+- Los incidentes de demostración se crean con el seeder, así que su historial no tiene IP. Los cambios que hagas tú sí la traen.
 
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 

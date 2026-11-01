@@ -82,6 +82,8 @@ Los mensajes de campo no repiten el nombre del campo porque se muestran a su lad
 
 La usan los listados de incidentes y de usuarios.
 
+`useCursorList` es la variante para listas que crecen sin fin, como la auditoría. Los criterios también salen de la URL y cada cambio vuelve a empezar. La diferencia es que no hay páginas: "cargar más" pide la siguiente tanda con el cursor que entregó la API y la agrega al final. El cursor no va en la URL, así que una recarga vuelve al principio. Recibe `fromQuery`, `toQuery` y un `fetch` que, además de los criterios, recibe el cursor.
+
 ## Revisiones visuales compartidas
 
 `shared/validation/email.ts` (`looksLikeEmail`) es la única revisión de la forma de un correo antes de enviarlo: la usan el login, la recuperación de contraseña y la administración. Solo evita un viaje innecesario; la API valida de verdad.
@@ -92,5 +94,5 @@ La usan los listados de incidentes y de usuarios.
 - [`shared/http/apiError.ts`](../../frontend/src/shared/http/apiError.ts): normalización de errores.
 - [`shared/http/tokenStore.ts`](../../frontend/src/shared/http/tokenStore.ts) y [`events.ts`](../../frontend/src/shared/http/events.ts).
 - [`shared/errors/`](../../frontend/src/shared/errors/): catálogo, mensajes y `formatWait`.
-- [`shared/listing/useRouteList.ts`](../../frontend/src/shared/listing/useRouteList.ts), [`shared/routing/queryValues.ts`](../../frontend/src/shared/routing/queryValues.ts) y [`shared/validation/email.ts`](../../frontend/src/shared/validation/email.ts).
+- [`shared/listing/useRouteList.ts`](../../frontend/src/shared/listing/useRouteList.ts), [`shared/listing/useCursorList.ts`](../../frontend/src/shared/listing/useCursorList.ts), [`shared/routing/queryValues.ts`](../../frontend/src/shared/routing/queryValues.ts) y [`shared/validation/email.ts`](../../frontend/src/shared/validation/email.ts).
 - Pruebas: archivos `*.spec.ts` junto a cada uno.
