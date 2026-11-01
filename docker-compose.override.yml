@@ -16,7 +16,7 @@ services:
   # Escaneo de seguridad con OWASP ZAP. Perfil opcional: "docker compose up -d" no lo levanta. Se corre a mano, solo
   # contra el stack local; los reportes quedan en ./zap-reports (fuera de Git). Documentado en docs/seguridad/zap.md
   zap:
-    image: ghcr.io/zaproxy/zaproxy:2.16.1
+    image: ghcr.io/zaproxy/zaproxy:2.17.0
     profiles: [zap]
     working_dir: /zap/wrk
     volumes:
