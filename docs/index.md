@@ -22,6 +22,7 @@ Trazo es un sistema de gestión de solicitudes e incidentes. Esta documentación
 | Sección | Contenido |
 |---|---|
 | [Arquitectura](arquitectura/index.md) | Visión general, capas y flujos |
+| [Flujos](flujos/index.md) | Cada flujo en carriles por actor, con sus errores y dónde está en el código |
 | [Backend](backend/index.md) | Módulos de la API |
 | [Frontend](frontend/index.md) | Módulos de la SPA y sistema de diseño |
 | [Base de datos](base-de-datos/index.md) | Modelo, diccionario de datos y crecimiento |
