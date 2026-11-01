@@ -1,6 +1,6 @@
 ---
 title: Módulo de sistema (frontend)
-description: Pantalla de sistema del Super admin: panel de salud con sus acciones, eventos agrupados y aviso de mantenimiento.
+description: "Pantalla de sistema del Super admin: panel de salud con sus acciones, eventos agrupados y aviso de mantenimiento."
 audience: tecnico
 area: frontend
 module: system

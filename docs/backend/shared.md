@@ -1,6 +1,6 @@
 ---
 title: Módulo Shared
-description: Piezas transversales de la API: excepciones de dominio, errores y identificador de petición.
+description: "Piezas transversales de la API: excepciones de dominio, errores y identificador de petición."
 audience: tecnico
 area: backend
 module: shared
