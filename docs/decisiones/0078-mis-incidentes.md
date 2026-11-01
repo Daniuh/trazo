@@ -3,6 +3,7 @@ title: "ADR-0078: Mis incidentes (Kanban, Lista, Calendario y Mi día)"
 description: "Quien atiende incidentes tiene un tablero con lo que tiene asignado, en Kanban (arrastrando para cambiar de estado), Lista, Calendario o Mi día"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 88
 ---
 

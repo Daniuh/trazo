@@ -3,6 +3,7 @@ title: "ADR-0033: Flujo de Git con cuatro ramas"
 description: "Flujo de Git con cuatro ramas"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 43
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0037: Idempotency-Key en la creación de incidentes"
 description: "Idempotency-Key en la creación de incidentes"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 47
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0049: La sesión solo se cierra cuando la API la rechaza"
 description: "La sesión solo se cierra cuando la API la rechaza"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 59
 ---
 

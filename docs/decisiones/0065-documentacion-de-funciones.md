@@ -3,6 +3,7 @@ title: "ADR-0065: Documentación de funciones"
 description: "Documentación de funciones: phpDocumentor en su imagen oficial y TypeDoc como dependencia de desarrollo, generadas bajo demanda y en el CI"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 75
 ---
 

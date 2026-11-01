@@ -3,6 +3,7 @@ title: "ADR-0038: Versiones del stack"
 description: "Versiones del stack"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 48
 ---
 

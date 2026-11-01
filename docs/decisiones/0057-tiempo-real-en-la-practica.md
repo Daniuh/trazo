@@ -3,6 +3,7 @@ title: "ADR-0057: Tiempo real en la práctica: canales por alcance, avisos sin d
 description: "Tiempo real en la práctica: canales por alcance, avisos sin datos y Reverb detrás del gateway"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 67
 ---
 

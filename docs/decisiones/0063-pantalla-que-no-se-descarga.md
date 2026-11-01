@@ -3,6 +3,7 @@ title: "ADR-0063: Pantalla que no se descarga"
 description: "Pantalla que no se descarga: un aviso global con Recargar y un mensaje propio, sin pedir códigos de soporte inexistentes"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 73
 ---
 

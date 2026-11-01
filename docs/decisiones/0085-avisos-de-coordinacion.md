@@ -3,6 +3,7 @@ title: "ADR-0085: Avisos de coordinación para quienes reparten el trabajo"
 description: "Nuevo sin asignar, crítico reportado, reapertura pendiente y vencido llegan a quienes coordinan, por permiso y una sola vez"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 95
 ---
 

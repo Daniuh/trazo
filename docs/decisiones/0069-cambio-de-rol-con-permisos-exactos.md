@@ -3,6 +3,7 @@ title: "ADR-0069: Al cambiar de rol, la persona queda con los permisos exactos d
 description: "El cambio de rol borra todas las excepciones de permisos de la persona y el registro de auditoría guarda cuáles eran"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 79
 ---
 

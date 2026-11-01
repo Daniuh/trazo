@@ -3,6 +3,7 @@ title: "ADR-0080: Listado de incidentes como lista agrupada con el avance del pl
 description: "El listado pasa a una lista de dos líneas agrupada por vencimiento, estado, prioridad o asignado, con una barra que muestra cuánto del plazo se ha gastado; la tabla queda como segunda vista"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 90
 ---
 

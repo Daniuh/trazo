@@ -3,6 +3,7 @@ title: "ADR-0060: Pasada de calidad: CSP estricta, CORS cerrado, contrato OpenAP
 description: "Pasada de calidad: CSP estricta, CORS cerrado, contrato OpenAPI, ZAP y cobertura exigida"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 70
 ---
 

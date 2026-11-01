@@ -3,6 +3,7 @@ title: "ADR-0006: Contrato de la API: REST versionada, respuestas y errores"
 description: "Contrato de la API: REST versionada, respuestas y errores"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 16
 ---
 

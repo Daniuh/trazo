@@ -3,6 +3,7 @@ title: "ADR-0029: Gráficos con componentes SVG propios"
 description: "Gráficos con componentes SVG propios"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 39
 ---
 

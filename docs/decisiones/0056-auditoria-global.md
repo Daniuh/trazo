@@ -3,6 +3,7 @@ title: "ADR-0056: Auditoría global: dos registros con permisos separados, alcan
 description: "Auditoría global: dos registros con permisos separados, alcance por jerarquía y paginación por cursor"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 66
 ---
 

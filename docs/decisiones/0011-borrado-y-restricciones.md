@@ -3,6 +3,7 @@ title: "ADR-0011: Borrado lógico, usuarios desactivados y FK con RESTRICT"
 description: "Borrado lógico, usuarios desactivados y FK con RESTRICT"
 audience: tecnico
 area: decisiones
+tags: [datos]
 order: 21
 ---
 

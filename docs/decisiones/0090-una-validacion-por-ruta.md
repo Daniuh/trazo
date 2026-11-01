@@ -3,6 +3,7 @@ title: "ADR-0090: Una validación por ruta"
 description: "Cada endpoint con cuerpo tiene su propia clase de validación, sin reglas que cambien según la ruta, para que el contrato OpenAPI diga lo real"
 audience: tecnico
 area: decisiones
+tags: [arquitectura]
 order: 100
 ---
 

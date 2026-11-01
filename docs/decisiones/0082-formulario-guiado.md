@@ -3,6 +3,7 @@ title: "ADR-0082: Formulario del incidente que guía mientras se escribe"
 description: "La prioridad se elige en tarjetas con su plazo, el vencimiento con atajos, al crear se muestran incidentes parecidos y una vista previa dice cómo se verá"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 92
 ---
 

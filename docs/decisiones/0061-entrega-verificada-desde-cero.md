@@ -3,6 +3,7 @@ title: "ADR-0061: Entrega verificada desde cero"
 description: "Entrega verificada desde cero: clon limpio, rutas largas en Windows, volumen de node_modules y carga diferida estricta"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 71
 ---
 

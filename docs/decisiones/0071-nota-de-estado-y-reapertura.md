@@ -3,6 +3,7 @@ title: "ADR-0071: Nota al cambiar de estado y reapertura con aprobación"
 description: "Resuelto y Cancelado exigen una nota; lo cerrado o cancelado solo se reabre con motivo y la aprobación de quien supervisa"
 audience: tecnico
 area: decisiones
+tags: [producto]
 order: 81
 ---
 

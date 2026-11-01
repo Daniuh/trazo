@@ -3,6 +3,7 @@ title: "ADR-0089: Incidentes de muestra en el sitio de evaluación"
 description: "En producción los incidentes de demostración se cargan solo con una variable explícita, repartidos entre las cuentas por rol"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 99
 ---
 

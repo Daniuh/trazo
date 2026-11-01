@@ -3,6 +3,7 @@ title: "ADR-0066: Llave de la app sin depender del entrypoint"
 description: "La configuración lee la APP_KEY del volumen local cuando no llega por el entorno, para que docker compose exec funcione"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 76
 ---
 

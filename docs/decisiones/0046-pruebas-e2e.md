@@ -3,6 +3,7 @@ title: "ADR-0046: Pruebas E2E en las cuatro vistas, con axe bloqueante y sesión
 description: "Pruebas E2E en las cuatro vistas, con axe bloqueante y sesión por la API"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 56
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0022: Logs del sistema: solo eventos relevantes, agrupados por huell
 description: "Logs del sistema: solo eventos relevantes, agrupados por huella"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 32
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0088: Despliegue detrás del proxy de TLS que ya existe en el servid
 description: "Trazo no publica puertos: el Caddy del servidor le pasa su subdominio por una red compartida, sin reiniciar nada de los otros proyectos"
 audience: tecnico
 area: decisiones
+tags: [operacion]
 order: 98
 ---
 

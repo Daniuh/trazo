@@ -3,6 +3,7 @@ title: "ADR-0051: MFA en la práctica: token de un ingreso a medias, sin atajo l
 description: "MFA en la práctica: token de un ingreso a medias, sin atajo local y avisos por correo"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 61
 ---
 

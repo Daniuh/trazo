@@ -3,6 +3,7 @@ title: "ADR-0050: Editor del dashboard con grid-layout-plus, sin sus estilos iny
 description: "Editor del dashboard con grid-layout-plus, sin sus estilos inyectados y con alternativa de teclado"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 60
 ---
 

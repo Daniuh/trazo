@@ -3,6 +3,7 @@ title: "ADR-0075: Menús que se abren donde caben"
 description: "Cada menú mide su tamaño y el espacio libre antes de abrirse: abajo, arriba, al lado o bajando la página"
 audience: tecnico
 area: decisiones
+tags: [frontend]
 order: 85
 ---
 

@@ -3,6 +3,7 @@ title: "ADR-0062: Correos cifrados en la cola"
 description: "Correos cifrados en la cola: el contenido de cada correo pendiente o fallido es ilegible sin la clave de la aplicación"
 audience: tecnico
 area: decisiones
+tags: [seguridad]
 order: 72
 ---
 
