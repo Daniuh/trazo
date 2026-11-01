@@ -9,7 +9,7 @@ order: 19
 
 # admin_actions
 
-Registro de lo que hace la administración: quién, qué, sobre quién o sobre qué rol, y desde dónde. Solo de escritura, como el historial de incidentes. Lo usan la administración de usuarios y, más adelante, las acciones de sistema.
+Registro de lo que hace la administración: quién, qué, sobre quién o sobre qué rol, y desde dónde. Solo de escritura, como el historial de incidentes. Lo usan la administración de usuarios, la exportación de incidentes y las acciones de sistema.
 
 ## admin_action_types
 
@@ -18,7 +18,7 @@ Catálogo de tipos de acción.
 | Columna | Tipo | Restricciones | Descripción |
 |---|---|---|---|
 | `id` | TINYINT UNSIGNED | PK | |
-| `code` | VARCHAR(40) | UNIQUE, NOT NULL | `user_created`, `user_updated`, `user_activated`, `user_deactivated`, `user_role_changed`, `user_permissions_changed`, `user_mfa_reset`, `user_access_reset`, `role_created`, `role_updated`, `role_deleted`, `incidents_exported` |
+| `code` | VARCHAR(40) | UNIQUE, NOT NULL | `user_created`, `user_updated`, `user_activated`, `user_deactivated`, `user_role_changed`, `user_permissions_changed`, `user_mfa_reset`, `user_access_reset`, `role_created`, `role_updated`, `role_deleted`, `incidents_exported`, `system_workers_restarted`, `system_realtime_restarted`, `system_cache_cleared`, `system_maintenance_enabled`, `system_maintenance_disabled`, `system_jobs_retried`, `system_job_discarded` |
 | `name` | VARCHAR(80) | NOT NULL | Nombre visible |
 | `created_at`, `updated_at` | TIMESTAMP | | |
 

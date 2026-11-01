@@ -7,8 +7,10 @@ import { layout } from '@/design/tokens/layout'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { useRealtimeConnection } from '@/modules/realtime/application/useRealtimeConnection'
 import { useRealtimeNotices } from '@/modules/realtime/presentation/useRealtimeNotices'
+import { maintenanceNotice } from '@/shared/http'
 import AppIcon from '@/shared/ui/AppIcon.vue'
 import AppLogo from '@/shared/ui/brand/AppLogo.vue'
+import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import { useViewport } from '@/shared/ui/useViewport'
 import { visibleNavigation } from '../navigation'
 import AppNavigation from './AppNavigation.vue'
@@ -69,8 +71,13 @@ const closeOnMobile = () => {
           <AppLogo spinning />
           <span class="shell-loading__label">Cargando</span>
         </div>
+        <!-- Solo lo ve quien sigue trabajando durante el mantenimiento; a los demás la API les responde 503 -->
+        <AppAlert v-if="maintenanceNotice" tone="info" class="shell-maintenance">
+          Modo mantenimiento activo: solo quienes administran el sistema pueden usar Trazo.
+          <RouterLink :to="{ name: 'system-health' }">Ir a Sistema</RouterLink>
+        </AppAlert>
         <!-- Otra ruta u otro registro crean la vista de nuevo; cambiar solo filtros de la URL no -->
-        <RouterView v-else v-slot="{ Component, route }">
+        <RouterView v-if="!loading" v-slot="{ Component, route }">
           <component :is="Component" :key="`${String(route.name)}:${JSON.stringify(route.params)}`" />
         </RouterView>
       </main>
@@ -116,6 +123,10 @@ const closeOnMobile = () => {
 
 .shell-content {
   padding: $space-4;
+}
+
+.shell-maintenance {
+  margin-bottom: $space-4;
 }
 
 .shell-loading {

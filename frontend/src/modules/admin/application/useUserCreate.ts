@@ -5,7 +5,7 @@ import { fieldMessageFor, fieldMessagesFor, messageFor } from '@/shared/errors'
 import { toApiError } from '@/shared/http'
 import type { UserDetail, UserDraft } from '../domain/user'
 import { usersApi } from '../infrastructure/usersApi'
-import { needsCode } from './useUserDetail'
+import { needsCode } from '@/shared/http'
 import { profileErrors } from './profileRules'
 
 export function useUserCreate() {

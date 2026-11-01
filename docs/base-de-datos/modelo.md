@@ -34,6 +34,8 @@ erDiagram
   permissions ||--o{ user_permissions : "concedido o quitado"
   users ||--o{ admin_actions : "administra"
   admin_action_types ||--o{ admin_actions : tipo
+  system_event_types ||--o{ system_events : tipo
+  users |o--o{ system_events : "cambia su estado"
 ```
 
 Las tablas de las funcionalidades adicionales (MFA, recuperación de contraseña, logs del sistema, dashboard personalizable y tokens de sesión) se agregan con migraciones nuevas en la fase de cada funcionalidad, sin modificar las existentes.
@@ -54,6 +56,7 @@ Toda referencia es una clave foránea real; no hay relaciones polimórficas. La 
 | `user_permissions.user_id` → `users` | CASCADE | La excepción es parte de la cuenta |
 | `user_permissions.permission_id`, `user_permissions.granted_by` | RESTRICT | No se borra un permiso en uso ni a quien dio la excepción |
 | `admin_actions` → `users`, `admin_action_types` | RESTRICT | El registro de la administración es inmutable |
+| `system_events` → `system_event_types`, `system_events.status_changed_by` → `users` | RESTRICT | Un tipo en uso no se borra; los usuarios se desactivan, no se borran |
 | `admin_actions.target_role_id` → `roles` | SET NULL | Un rol creado se puede eliminar; su historial queda sin enlace, con el código y el nombre en el detalle |
 | `mfa_policies.role_id` → `roles` | CASCADE | La política es parte del rol |
 
@@ -81,6 +84,7 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | `mfa_policies`, `user_mfa_factors`, `user_recovery_codes` | [MFA](diccionario/mfa.md) |
 | `password_reset_codes` | [password_reset_codes](diccionario/password-reset-codes.md) |
 | `admin_action_types`, `admin_actions` | [admin_actions](diccionario/admin-actions.md) |
+| `system_event_types`, `system_events` | [system_events](diccionario/system-events.md) |
 | `failed_jobs` | Tabla estándar de Laravel para trabajos de cola fallidos |
 
 Datos iniciales: [Seeders](seeders.md).

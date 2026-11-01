@@ -36,3 +36,6 @@ El super admin necesita ver las fallas reales y los riesgos de seguridad sin per
 
 ## Consecuencias
 - Todo lo que aparece en la vista de logs merece atención.
+
+## Cómo se construyó
+Los detalles (qué se registra, agrupación en una sola sentencia, eventos sin datos sensibles y fin del ruido de las reglas de negocio en el log) están en el [ADR-0059](0059-sistema-en-la-practica.md).

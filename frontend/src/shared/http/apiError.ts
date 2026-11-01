@@ -94,3 +94,8 @@ export function toApiError(error: unknown): ApiError {
     retryAfter: Number.isFinite(retryAfter) ? retryAfter : null,
   })
 }
+
+// La API pide el código de la aplicación de autenticación para este cambio (reautenticación)
+export function needsCode(raw: unknown): boolean {
+  return toApiError(raw).code === 'REAUTHENTICATION_REQUIRED'
+}

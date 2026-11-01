@@ -98,14 +98,14 @@ Rendimiento medido sobre 523.088 filas: menos de 2 ms en cada caso, sin ordenar 
 | Capa | Pieza | Qué hace |
 |---|---|---|
 | Domain | `AuditAccess` | Permisos de cada pestaña y alcance de la administración |
-| Domain | `AdminAuditScope`, `AuditPeriod`, `AuditCursor` | Regla "solo hacia abajo"; rango por defecto; cursor que va y vuelve |
+| Domain | `AdminAuditScope`, `AuditPeriod` | Regla "solo hacia abajo"; rango por defecto. El cursor (`TimeCursor`) vive en [Shared](shared.md#cursor-de-listas): también lo usan los eventos del sistema |
 | Application | `ListIncidentAudit`, `ListAdminAudit`, `ReadAuditCatalog` | Casos de uso: revisan el permiso y piden la consulta |
 | Application | `Ports/*`, `Data/*` | Contratos de las consultas y los datos que devuelven |
 | Infrastructure | `DatabaseIncidentAudit`, `DatabaseAdminAudit` | Consultas en SQL. Traducen ULID, tipos e incidente a id antes de consultar, para usar el índice que corresponde |
 | Infrastructure | `AuditWindow`, `DatabaseAuditCatalog` | Rango, cursor y fila de más, comunes a las dos; catálogos |
 | Http | `AuditController`, `AuditResource` | Respuesta con `meta` y `links` |
 | Http | `Requests/AuditRequest` (+ `IncidentAuditRequest`, `AdminAuditRequest`) | Revisan el permiso antes de validar, igual que la administración (`ChecksPermission`) |
-| Http | `Rules/IncidentCode`, `Rules/Cursor` | Código de incidente normalizado a `INC-000123` y cursor válido |
+| Http | `Rules/IncidentCode` y `Rules/Cursor` (de Shared) | Código de incidente normalizado a `INC-000123` y cursor válido |
 
 Quien consulta se arma con `RequestAdmin` del módulo Users: nivel y permisos efectivos.
 

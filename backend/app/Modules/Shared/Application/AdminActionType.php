@@ -21,4 +21,11 @@ enum AdminActionType: string
     case RoleUpdated = 'role_updated';
     case RoleDeleted = 'role_deleted';
     case IncidentsExported = 'incidents_exported';
+    case SystemWorkersRestarted = 'system_workers_restarted';
+    case SystemRealtimeRestarted = 'system_realtime_restarted';
+    case SystemCacheCleared = 'system_cache_cleared';
+    case SystemMaintenanceEnabled = 'system_maintenance_enabled';
+    case SystemMaintenanceDisabled = 'system_maintenance_disabled';
+    case SystemJobsRetried = 'system_jobs_retried';
+    case SystemJobDiscarded = 'system_job_discarded';
 }

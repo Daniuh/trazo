@@ -13,6 +13,8 @@ use App\Modules\Auth\Application\Ports\PasswordResets;
 use App\Modules\Auth\Application\Ports\UserAccounts;
 use App\Modules\Auth\Domain\Exceptions\PasswordExceptions;
 use App\Modules\Auth\Domain\Password\ResetCode;
+use App\Modules\Shared\Application\Ports\SystemEvents;
+use App\Modules\Shared\Application\SystemEventType;
 use App\Modules\Shared\Domain\Exceptions\RuleViolationException;
 use Carbon\CarbonImmutable;
 use Psr\Log\LoggerInterface;
@@ -24,6 +26,7 @@ final readonly class VerifyResetCode
         private PasswordResets $resets,
         private MfaStore $mfa,
         private LoggerInterface $logger,
+        private SystemEvents $events,
         private int $maxAttempts,
         private int $ticketMinutes,
     ) {}
@@ -45,6 +48,9 @@ final readonly class VerifyResetCode
             if ($this->resets->recordFailure($reset) >= $this->maxAttempts) {
                 $this->resets->close($reset);
                 $this->logger->warning('Código de recuperación anulado por intentos fallidos', ['user_id' => $account->id]);
+                $this->events->record(SystemEventType::ResetCodeVoided, "user:{$account->id}", 'Código de recuperación de contraseña anulado por intentos fallidos', [
+                    'user_id' => $account->id,
+                ]);
             }
 
             throw PasswordExceptions::invalidResetCode();

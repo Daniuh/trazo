@@ -20,6 +20,7 @@ backend/
 │   ├── Dashboard/         → widgets, métricas en caché y diseño por persona
 │   ├── Incidents/         → ciclo de vida de los incidentes y catálogos
 │   ├── Realtime/          → avisos en tiempo real sin datos (Reverb) y autorización de canales
+│   ├── System/            → salud, eventos del sistema y acciones del Super admin (sin Docker)
 │   ├── Users/             → administración de personas, jerarquía y permisos efectivos
 │   └── Shared/            → lo transversal: errores, identificador de petición, hora y transacciones
 │       ├── Domain/
@@ -45,7 +46,7 @@ backend/
 | Users | Administración de personas y de roles, jerarquía y permisos por persona listos | [Users](users.md) |
 | Audit | Auditoría de incidentes y de administración lista | [Audit](audit.md) |
 | Realtime | Canales, avisos de incidentes, de asignación y de sesión listos | [Realtime](realtime.md) |
-| System | Pendiente | — |
+| System | Salud, eventos agrupados y acciones del Super admin listos | [System](system.md) |
 
 ## Cómo se agrega un módulo
 

@@ -106,6 +106,9 @@ function adminRows(entry: AdminAuditEntry, catalog: AuditCatalog): ChangeRow[] {
     else if (key === 'code' && showsCode) push('Código', String(value))
     else if (key === 'level') push('Nivel', plain(value))
     else if (key === 'rows') push('Filas exportadas', formatNumber(Number(value)))
+    else if (key === 'count') push('Jobs reintentados', formatNumber(Number(value)))
+    else if (key === 'job') push('Job', String(value))
+    else if (key === 'queue') push('Cola', String(value))
     else if (key === 'criteria' && isRecord(value)) rows.push(...exportCriteriaRows(value, catalog))
     else if (key === 'mfa') push('Verificación en dos pasos', plain(value, mfaText))
     else if (key === 'added') push('Permisos concedidos', permissionList(catalog, value))
@@ -138,5 +141,6 @@ export function targetText(entry: AuditEntry): string {
   if (entry.targetUser) return entry.targetUser.name
   if (entry.targetRole) return `Rol ${entry.targetRole.name}${entry.targetRole.deleted ? ' (eliminado)' : ''}`
   if (entry.type.code === 'incidents_exported') return 'Incidentes'
+  if (entry.type.code.startsWith('system_')) return 'Sistema'
   return '—'
 }

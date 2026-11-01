@@ -50,6 +50,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Propuesta | Valor |
 |---|---|
 | Ramas `hotfix/*` | Correcciones urgentes sin pasar por todo el flujo |
+| Avisos de eventos críticos | Un correo o una marca en el menú cuando aparece un evento crítico, sin tener que entrar a Sistema ([ADR-0059](../decisiones/0059-sistema-en-la-practica.md)) |
+| Monitoreo externo (Sentry, Grafana) | Trazas completas de los errores, métricas en el tiempo y alertas fuera de la app |
 | Despliegue sin caída (blue/green) | Actualizaciones sin interrupción |
 | Commits firmados | Garantía de autoría de cada cambio |
 | Pruebas de mutación | Verifican que las pruebas detectan errores reales |

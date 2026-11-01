@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Audit\Http\Requests;
 
-use App\Modules\Audit\Domain\AuditCursor;
 use App\Modules\Audit\Domain\AuditPeriod;
-use App\Modules\Audit\Http\Rules\Cursor;
+use App\Modules\Shared\Domain\TimeCursor;
+use App\Modules\Shared\Http\Rules\Cursor;
 use App\Modules\Users\Http\Requests\ChecksPermission;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -59,9 +59,9 @@ abstract class AuditRequest extends FormRequest
         return AuditPeriod::between($this->utcDate('filter.from'), $this->utcDate('filter.to'), new DateTimeImmutable('now', new DateTimeZone('UTC')));
     }
 
-    protected function cursor(): ?AuditCursor
+    protected function cursor(): ?TimeCursor
     {
-        return $this->filled('cursor') ? AuditCursor::decode($this->string('cursor')->toString()) : null;
+        return $this->filled('cursor') ? TimeCursor::decode($this->string('cursor')->toString()) : null;
     }
 
     protected function actor(): ?string

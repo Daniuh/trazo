@@ -21,7 +21,7 @@ import { useRoleForm } from '../application/useRoles'
 import { draftChanged, draftOf, ROOT_LEVEL, type Role } from '../domain/role'
 import PermissionChecklist from './components/PermissionChecklist.vue'
 import RoleFields from './components/RoleFields.vue'
-import { useReauth } from './useReauth'
+import { useReauth } from '@/shared/ui/feedback/useReauth'
 import { membersText, mfaPolicyText } from './userTexts'
 
 const route = useRoute()

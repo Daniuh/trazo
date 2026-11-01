@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 // Dónde sigue la lista: la fecha y el id del último registro entregado. El orden es (fecha, id) de mayor a menor, así
 // que la siguiente tanda empieza justo después, sin importar cuántos registros lleguen mientras tanto.
-// Documentado en docs/backend/audit.md
+// Lo usan la auditoría y los eventos del sistema. Documentado en docs/backend/shared.md
 
-namespace App\Modules\Audit\Domain;
+namespace App\Modules\Shared\Domain;
 
 use DateTimeImmutable;
 use DateTimeZone;
 
-final readonly class AuditCursor
+final readonly class TimeCursor
 {
     private const FORMAT = 'Y-m-d H:i:s';
 

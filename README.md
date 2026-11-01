@@ -128,6 +128,16 @@ En **Incidentes**, el Supervisor y el Super admin pueden descargar en CSV lo que
 - Hasta 50.000 incidentes por archivo y 5 exportaciones por minuto.
 - Cada exportación queda en **Auditoría → Administración**, con sus filtros y el número de filas.
 
+### Sistema
+
+El Super admin (`superadmin@trazo.test`) tiene el menú **Sistema**:
+
+- **Salud:** el estado de la base de datos, Redis, la cola, los workers, las tareas programadas, el tiempo real y el disco, actualizado cada 30 segundos.
+  - Desde ahí reinicia workers o el tiempo real, limpia la caché de datos, reintenta jobs fallidos y activa el modo mantenimiento.
+  - Cada acción pide el código de la aplicación de autenticación.
+- **Eventos:** fallas y alertas de seguridad agrupadas (por ejemplo, un ingreso bloqueado tras 5 contraseñas incorrectas), con cuántas veces pasó y su estado.
+- Con el modo mantenimiento activo, las demás cuentas ven "Trazo está en mantenimiento" y el Super admin sigue trabajando con un aviso arriba.
+
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 
 ## Variables de entorno
@@ -144,6 +154,7 @@ Están todas en [`.env.example`](.env.example), con su valor por defecto para lo
 | `SESSION_MAX_MINUTES` | `480` | Duración máxima de una sesión (8 horas) |
 | `SESSION_IDLE_MINUTES` | `60` | La sesión se cierra tras este tiempo sin uso |
 | `SEED_INCIDENTS` | `600` | Incidentes de prueba que se cargan (la prueba técnica pide al menos 500) |
+| `SYSTEM_EVENTS_RETENTION_DAYS` | `90` | Días que se guardan los eventos del sistema ya resueltos |
 | `DB_DATABASE`, `DB_USERNAME` | `trazo` | Base de datos y usuario de MySQL |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | `*_local_only` | Contraseñas de MySQL. **Solo para local**: en producción se definen otras |
 | `REDIS_PASSWORD` | `trazo_local_only` | Contraseña de Redis. **Solo para local** |

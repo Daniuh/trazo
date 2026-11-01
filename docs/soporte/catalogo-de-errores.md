@@ -121,6 +121,17 @@ Los cambios de un rol aplican de inmediato a todas las personas que lo tienen; n
 | Con estos filtros salen 60.000 incidentes y el máximo por archivo es 50.000… | La exportación pasa del tope de filas | Acotar los filtros (por ejemplo, un rango de fechas) y exportar por partes |
 | Hiciste demasiados intentos seguidos. Espera… (al exportar) | Más de 5 exportaciones en un minuto | Esperar el tiempo indicado |
 
+## Sistema
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Trazo está en mantenimiento. Vuelve a intentarlo en unos minutos. | El Super admin activó el modo mantenimiento | Esperar y pulsar "Reintentar"; quien administra el sistema puede desactivarlo desde Sistema |
+| El modo mantenimiento ya estaba activo… / ya estaba apagado… | Otra persona lo cambió mientras el panel estaba abierto | Actualizar el panel |
+| No hay jobs fallidos para reintentar. | Se pidió "Reintentar todos" sin ninguno en la lista | Nada; la cola está al día |
+| Ese job ya no está en la lista… | Otra persona lo reintentó o lo descartó | Actualizar la lista |
+| Ese evento ya no existe… | Se borró por antigüedad (resuelto hace más de 90 días) | Actualizar la lista |
+| Hiciste demasiados intentos seguidos. Espera… (en Sistema) | Más de 5 acciones de sistema en un minuto | Esperar el tiempo indicado |
+
 ## Dashboard
 
 | Código | Cuándo aparece | Mensaje |

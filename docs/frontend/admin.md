@@ -76,7 +76,7 @@ Portátil y monitor: dos columnas iguales, con Datos, Rol y Acceso a la izquierd
 
 ## Reautenticación
 
-`useReauth` intenta el cambio sin código. Si la API responde `REAUTHENTICATION_REQUIRED`, abre `AppCodeDialog` y lo reintenta con el código. Si la persona cierra el diálogo, el cambio no se hizo y el diálogo de origen (por ejemplo, el de cambiar rol) sigue abierto.
+`useReauth` (en `shared/ui/feedback`, porque también lo usa la [pantalla de sistema](system.md)) intenta el cambio sin código. Si la API responde `REAUTHENTICATION_REQUIRED`, abre `AppCodeDialog` y lo reintenta con el código. Si la persona cierra el diálogo, el cambio no se hizo y el diálogo de origen (por ejemplo, el de cambiar rol) sigue abierto.
 
 Restablecer el MFA o el acceso siempre lo pide, así que el diálogo del código se abre de una vez y sirve también como confirmación.
 
@@ -94,7 +94,7 @@ Restablecer el MFA o el acceso siempre lo pide, así que el diálogo del código
 | presentation | `UserListPage`, `list/UserToolbar`, `list/UserFilterFields`, `list/UserTable`, `list/UserCards` | Listado de usuarios |
 | presentation | `UserCreatePage`, `UserDetailPage`, `components/*` | Crear una cuenta, ficha, tarjetas y diálogos |
 | presentation | `RoleListPage`, `RoleFormPage`, `components/RoleFields`, `components/PermissionChecklist` | Roles; la lista de permisos la comparten la ficha de persona y la de rol |
-| presentation | `useReauth`, `userTexts` | Diálogo del código cuando la API lo pide; textos y tonos (qué hace cada rol, estado, último ingreso, política de MFA) |
+| presentation | `userTexts` | Textos y tonos (qué hace cada rol, estado, último ingreso, política de MFA). El diálogo del código usa `useReauth` de `shared/ui/feedback` |
 | — | `errors.ts`, `routes.ts`, `navigation.ts` | Mensajes, rutas y entradas del menú |
 
 ## Dónde está en el código

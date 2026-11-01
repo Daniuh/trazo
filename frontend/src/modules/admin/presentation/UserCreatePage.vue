@@ -17,7 +17,7 @@ import { useUserCreate } from '../application/useUserCreate'
 import type { UserDetail } from '../domain/user'
 import RoleChoice from './components/RoleChoice.vue'
 import UserProfileFields from './components/UserProfileFields.vue'
-import { useReauth } from './useReauth'
+import { useReauth } from '@/shared/ui/feedback/useReauth'
 
 const router = useRouter()
 const session = useSessionStore()
