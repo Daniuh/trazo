@@ -22,6 +22,13 @@ function tableCounts(): array
     return array_combine($tables, array_map(fn (string $t): int => DB::table($t)->count(), $tables));
 }
 
+// En producción db:seed pide confirmación: sin --force no corre nada, igual que en el arranque del contenedor
+function seedInProduction(string $seeder): void
+{
+    app()->detectEnvironment(fn (): string => 'production');
+    test()->artisan('db:seed', ['--class' => $seeder, '--force' => true])->assertSuccessful();
+}
+
 function permissionsOf(string $role): array
 {
     return Role::query()->where('code', $role)->firstOrFail()->permissions()->pluck('code')->sort()->values()->all();
@@ -92,9 +99,7 @@ it('crea usuarios de demostración con su rol y contraseña segura', function ()
 it('nunca crea usuarios de demostración en producción', function (): void {
     User::query()->where('email', 'like', '%@trazo.test')->each(fn (User $user) => $user->roles()->detach());
     User::query()->where('email', 'like', '%@trazo.test')->delete();
-    app()->detectEnvironment(fn (): string => 'production');
-
-    $this->seed(DemoUserSeeder::class);
+    seedInProduction(DemoUserSeeder::class);
 
     expect(User::query()->count())->toBe(0);
 });
@@ -108,6 +113,26 @@ it('volver a sembrar no gasta valores del autoincremental de los catálogos', fu
 
     // Si el seeder hubiera intentado insertar filas existentes, el siguiente id habría saltado
     expect($next())->toBe($before + 1);
+});
+
+it('en producción solo carga incidentes de demostración si se pide a propósito', function (): void {
+    config(['trazo.seed_incidents' => 20]);
+
+    seedInProduction(IncidentVolumeSeeder::class);
+    expect(DB::table('incidents')->count())->toBe(0);
+
+    config(['trazo.seed_incidents_in_production' => true]);
+    seedInProduction(IncidentVolumeSeeder::class);
+    expect(DB::table('incidents')->count())->toBe(20);
+});
+
+it('sin personas que atiendan los incidentes, los de demostración se omiten sin fallar', function (): void {
+    config(['trazo.seed_incidents' => 20]);
+    DB::table('users')->update(['is_active' => false]);
+
+    $this->seed(IncidentVolumeSeeder::class);
+
+    expect(DB::table('incidents')->count())->toBe(0);
 });
 
 it('carga el volumen de incidentes pedido, coherente y sin duplicar al repetir', function (): void {

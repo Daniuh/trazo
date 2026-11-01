@@ -30,6 +30,9 @@ return [
     // Incidentes de demostración que se cargan fuera de producción (la prueba pide al menos 500)
     'seed_incidents' => (int) env('SEED_INCIDENTS', 600),
 
+    // En producción solo se cargan si se pide a propósito (el sitio de evaluación), repartidos entre las cuentas por rol
+    'seed_incidents_in_production' => (bool) env('SEED_INCIDENTS_IN_PRODUCTION', false),
+
     'auth' => [
         // Una sesión sin uso durante este tiempo se cierra sola
         'idle_minutes' => (int) env('SESSION_IDLE_MINUTES', 60),

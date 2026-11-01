@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-// Incidentes de demostración en volumen (por defecto 600; se cambia con SEED_INCIDENTS). Nunca en producción.
+// Incidentes de demostración en volumen (por defecto 600; se cambia con SEED_INCIDENTS). En producción solo con
+// SEED_INCIDENTS_IN_PRODUCTION=true, repartidos entre las cuentas por rol que existan.
 // Cada uno trae su historial completo: creación, asignación y cambios de estado (ver IncidentStory).
 // Idempotente: completa hasta llegar al volumen pedido y no toca lo que ya existe. Inserta por lotes, sin Eloquent,
 // para poder cargar 100.000 registros en poco tiempo. Documentado en docs/base-de-datos/seeders.md
@@ -42,13 +43,21 @@ class IncidentVolumeSeeder extends Seeder
     public function run(): void
     {
         $missing = (int) config('trazo.seed_incidents') - DB::table('incidents')->count();
-        if (app()->isProduction() || $missing <= 0) {
+        $allowed = ! app()->isProduction() || (bool) config('trazo.seed_incidents_in_production');
+        if (! $allowed || $missing <= 0) {
             return;
         }
 
         // Semilla fija: los mismos datos en cada máquina
         DemoRandom::seed(2026);
         $context = $this->context();
+
+        // Sin quien atienda o asigne no hay historial coherente (en producción, si las cuentas por rol no se crearon)
+        if ($context['workers'] === [] || $context['managers'] === []) {
+            $this->command?->warn('Incidentes de demostración omitidos: no hay personas activas que los atiendan y asignen.');
+
+            return;
+        }
 
         for ($done = 0; $done < $missing; $done += self::CHUNK) {
             $rows = array_map(fn (): array => $this->row($context), range(1, min(self::CHUNK, $missing - $done)));
