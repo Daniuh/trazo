@@ -1,6 +1,6 @@
 ---
 title: Guía de administración
-description: Para Administrador y Super admin: cuentas, roles, permisos por persona, seguridad de las cuentas, auditoría y sistema.
+description: "Para Administrador y Super admin: cuentas, roles, permisos por persona, seguridad de las cuentas, auditoría y sistema."
 audience: directivo
 area: producto
 module: guias

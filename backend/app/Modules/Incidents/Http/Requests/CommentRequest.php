@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-// Validación de la conversación: un mensaje de 1 a 2.000 caracteres para escribir, y "before" (el ULID de un mensaje)
-// para leer los anteriores. Documentado en docs/backend/incidents.md
+// Validación para escribir en la conversación: un mensaje de 1 a 2.000 caracteres. Leer los anteriores usa
+// CommentPageRequest. Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http\Requests;
 
@@ -18,18 +18,11 @@ final class CommentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->isMethod('POST')
-            ? ['body' => ['required', 'string', 'max:'.self::BODY_MAX]]
-            : ['before' => ['sometimes', 'string', 'ulid']];
+        return ['body' => ['required', 'string', 'max:'.self::BODY_MAX]];
     }
 
     public function body(): string
     {
         return $this->string('body')->trim()->toString();
-    }
-
-    public function before(): ?string
-    {
-        return $this->filled('before') ? $this->string('before')->lower()->toString() : null;
     }
 }

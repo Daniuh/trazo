@@ -165,7 +165,7 @@ flowchart LR
 | Infrastructure | `AuthAccountSecurity` | Puente con el módulo Auth: cerrar sesiones, quitar el MFA y reautenticar |
 | Infrastructure | `MailAccountNotifier`, `Mail/AccountNotice`, `Mail/AccountWelcome` | Avisos por correo |
 | Http | `UserController`, `UserAccessController`, `RoleController`, `PermissionController`, `UserResource`, `RoleResource`, `RequestAdmin` | Endpoints y forma de la respuesta |
-| Http | `Requests/ListUsersRequest`, `UserRequest`, `UserAccessRequest`, `RoleRequest`, `ChecksPermission`, `Rules/RoleCode` | Validación, con el permiso revisado antes |
+| Http | `Requests/ListUsersRequest`, `CreateUserRequest` y `UpdateUserRequest` (sobre `UserRequest`), `UserAccessRequest` con `ChangeRoleRequest` y `ChangePermissionsRequest`, `CreateRoleRequest` y `UpdateRoleRequest` (sobre `RoleRequest`; [ADR-0090](../decisiones/0090-una-validacion-por-ruta.md)), `ChecksPermission`, `Rules/RoleCode` | Validación, con el permiso revisado antes |
 
 ## Dónde está en el código
 

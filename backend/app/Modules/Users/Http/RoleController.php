@@ -13,7 +13,8 @@ use App\Modules\Users\Application\DeleteRole;
 use App\Modules\Users\Application\ListRoles;
 use App\Modules\Users\Application\RoleGate;
 use App\Modules\Users\Application\UpdateRole;
-use App\Modules\Users\Http\Requests\RoleRequest;
+use App\Modules\Users\Http\Requests\CreateRoleRequest;
+use App\Modules\Users\Http\Requests\UpdateRoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -41,7 +42,7 @@ final readonly class RoleController
         return new JsonResponse(['data' => $this->resource->toArray($gate->load($admin, $role), $admin)]);
     }
 
-    public function store(RoleRequest $request, CreateRole $create): JsonResponse
+    public function store(CreateRoleRequest $request, CreateRole $create): JsonResponse
     {
         $admin = $this->requests->admin($request);
         $role = $create->handle($admin, $request->code(), $request->draft(), $request->mfaCode(), $this->requests->context($request));
@@ -49,7 +50,7 @@ final readonly class RoleController
         return new JsonResponse(['data' => $this->resource->toArray($role, $admin)], 201);
     }
 
-    public function update(RoleRequest $request, string $role, UpdateRole $update): JsonResponse
+    public function update(UpdateRoleRequest $request, string $role, UpdateRole $update): JsonResponse
     {
         $admin = $this->requests->admin($request);
         $saved = $update->handle($admin, $role, $request->draft(), $request->mfaCode(), $this->requests->context($request));

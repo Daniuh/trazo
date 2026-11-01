@@ -12,7 +12,8 @@ use App\Modules\Incidents\Application\ChangeIncidentStatus;
 use App\Modules\Incidents\Application\IncidentGate;
 use App\Modules\Incidents\Application\Ports\ActivityReader;
 use App\Modules\Incidents\Domain\IncidentAction;
-use App\Modules\Incidents\Http\Requests\WorkflowRequest;
+use App\Modules\Incidents\Http\Requests\AssignIncidentRequest;
+use App\Modules\Incidents\Http\Requests\ChangeStatusRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ final readonly class IncidentWorkflowController
         private IncidentResource $resource,
     ) {}
 
-    public function status(WorkflowRequest $request, string $incident, ChangeIncidentStatus $change): JsonResponse
+    public function status(ChangeStatusRequest $request, string $incident, ChangeIncidentStatus $change): JsonResponse
     {
         $actor = $this->requests->actor($request);
         $record = $change->handle($actor, $incident, $request->version(), $request->status(), $request->note(), $this->requests->context($request));
@@ -33,7 +34,7 @@ final readonly class IncidentWorkflowController
         return new JsonResponse(['data' => $this->resource->toArray($record, $actor)]);
     }
 
-    public function assignee(WorkflowRequest $request, string $incident, AssignIncident $assign): JsonResponse
+    public function assignee(AssignIncidentRequest $request, string $incident, AssignIncident $assign): JsonResponse
     {
         $actor = $this->requests->actor($request);
         $record = $assign->handle($actor, $incident, $request->version(), $request->assignee(), $this->requests->context($request));

@@ -10,8 +10,10 @@ namespace App\Modules\Incidents\Http;
 use App\Modules\Incidents\Application\Data\CommentRecord;
 use App\Modules\Incidents\Application\IncidentConversation;
 use App\Modules\Incidents\Domain\Actor;
+use App\Modules\Incidents\Http\Requests\CommentPageRequest;
 use App\Modules\Incidents\Http\Requests\CommentRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 final readonly class IncidentCommentController
 {
@@ -20,7 +22,7 @@ final readonly class IncidentCommentController
         private IncidentConversation $conversation,
     ) {}
 
-    public function index(CommentRequest $request, string $incident): JsonResponse
+    public function index(CommentPageRequest $request, string $incident): JsonResponse
     {
         $actor = $this->requests->actor($request);
         $page = $this->conversation->read($actor, $incident, $request->before());
@@ -44,7 +46,7 @@ final readonly class IncidentCommentController
         return new JsonResponse(['data' => $this->comment($this->conversation->write($actor, $incident, $request->body()), $actor)], 201);
     }
 
-    public function destroy(CommentRequest $request, string $incident, string $comment): JsonResponse
+    public function destroy(Request $request, string $incident, string $comment): JsonResponse
     {
         $actor = $this->requests->actor($request);
 

@@ -1,6 +1,6 @@
 ---
 title: Soporte
-description: Referencia para el equipo de soporte: errores y preguntas frecuentes.
+description: "Referencia para el equipo de soporte: errores y preguntas frecuentes."
 audience: soporte
 area: soporte
 order: 1
