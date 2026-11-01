@@ -9,7 +9,7 @@ order: 34
 # ADR-0024: Tiempo real con Reverb y mensajes sin datos
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Los listados y el dashboard deben reflejar los cambios que hacen otros usuarios, sin exponer información a quien no tiene permiso para verla.

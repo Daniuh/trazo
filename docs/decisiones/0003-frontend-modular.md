@@ -9,7 +9,7 @@ order: 13
 # ADR-0003: Frontend modular por funcionalidad con capas
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El frontend debe mantener la misma separación entre negocio y presentación que el backend, escalar con nuevas pantallas y permitir cambiar la librería de interfaz con el menor impacto posible.

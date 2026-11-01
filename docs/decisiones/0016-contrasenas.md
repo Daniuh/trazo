@@ -9,7 +9,7 @@ order: 26
 # ADR-0016: Argon2id y política de contraseñas
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Las contraseñas deben protegerse con el estándar actual, y las cuentas deben resistir intentos de fuerza bruta.

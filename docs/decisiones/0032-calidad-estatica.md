@@ -9,7 +9,7 @@ order: 42
 # ADR-0032: Análisis estático, estilo y seguridad automatizada
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La calidad del código y la seguridad deben verificarse en cada cambio, no solo en revisiones manuales.

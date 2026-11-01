@@ -9,7 +9,7 @@ order: 28
 # ADR-0018: Recuperación de contraseña por correo y TOTP
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Los usuarios necesitan recuperar el acceso por sí mismos, sin abrir una puerta a la toma de cuentas.

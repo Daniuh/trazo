@@ -9,7 +9,7 @@ order: 33
 # ADR-0023: Acciones de sistema dentro del alcance de la aplicación
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El super admin necesita resolver desde la interfaz problemas operativos comunes, como workers detenidos, una caché desactualizada o jobs fallidos.
@@ -41,3 +41,6 @@ Reiniciar la base de datos o los contenedores es una operación de infraestructu
 
 ## Consecuencias
 - Los problemas operativos más frecuentes se resuelven sin acceso al servidor y sin abrir un riesgo crítico.
+
+## Cómo se construyó
+Los detalles (señales de vida, caché que se limpia, mantenimiento en Redis, jobs fallidos sin contenido y reautenticación) están en el [ADR-0059](0059-sistema-en-la-practica.md).

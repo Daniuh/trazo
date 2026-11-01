@@ -9,7 +9,7 @@ order: 21
 # ADR-0011: Borrado lógico, usuarios desactivados y FK con RESTRICT
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La trazabilidad es prioritaria. Nunca debe perderse quién creó, atendió o modificó algo, y un borrado no debe arrastrar información con valor histórico.

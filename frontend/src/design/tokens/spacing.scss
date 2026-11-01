@@ -1,0 +1,69 @@
+// Espaciado (escala de 4 px), radios y medidas del layout. Los anchos del menú viven en layout.ts porque los usa Quasar desde JS.
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+$space-1: 0.25rem; // 4
+$space-2: 0.5rem; // 8
+$space-3: 0.75rem; // 12
+$space-4: 1rem; // 16
+$space-5: 1.5rem; // 24
+$space-6: 2rem; // 32
+$space-7: 3rem; // 48
+
+$radius-control: 8px; // botones y campos (Quasar opera los radios en px)
+$radius-card: 10px; // tarjetas y diálogos
+$radius-pill: 999px; // chips y barras
+$radius-badge: 4px; // etiquetas de estado
+$radius-menu: 4px; // paneles desplegables (menús y opciones de los selectores)
+
+// Layout
+$content-max-width: 80rem;
+
+// Dock: el menú flota abajo y centrado. Alto con los íconos (tablet en adelante) y con su nombre debajo (celular)
+$dock-height: 3.5rem; // cuadro de 44 px + 6 px arriba y abajo
+$dock-height-mobile: 4.5rem; // con el nombre bajo el ícono y aire arriba y abajo dentro del fondo de cada sección
+$dock-padding: 0.375rem;
+$dock-offset: $space-3; // separación con el borde inferior de la pantalla
+$radius-dock: 16px;
+$dock-label-gap: 0.125rem; // nombre bajo el ícono en el dock del celular: pegado, pero sin tocarlo
+$dock-divider-height: 1.5rem; // línea entre las secciones y la campana con la cuenta
+// Espacio libre al final de cada página para que el dock nunca tape lo último (dock + su separación arriba y abajo)
+$dock-clearance: $dock-height + 2 * $dock-offset;
+$dock-clearance-mobile: $dock-height-mobile + 2 * $space-2;
+$touch-target: 2.75rem; // 44 px: mínimo cómodo para el dedo
+$avatar-size: 2rem; // 32 px: círculo con las iniciales de la persona (historial y chat)
+$avatar-size-sm: 1.5rem; // 24 px: iniciales dentro de una fila del listado
+$avatar-size-lg: 2.5rem; // 40 px: personas de la ficha del incidente
+$control-height-compact: 2.25rem; // 36 px: botones y controles con mouse (portátil y monitor)
+$textarea-min-height: 6rem; // descripciones: unas cuatro líneas visibles al empezar
+$menu-min-width: 12rem; // ancho mínimo de los menús de opciones
+$menu-wide-width: 20rem; // menús con descripción por opción (p. ej. "Agregar widget")
+$filter-field-width: 11rem; // selectores de la barra de filtros del listado
+$field-height: 2.5rem; // alto de los campos (40 px, el de Quasar en modo denso); los botones de una barra de filtros lo igualan
+$preview-width: 26rem; // vista previa del listado en monitor
+$deadline-meter-width: 4.5rem; // barra del avance del plazo en la lista de incidentes
+$deadline-meter-height: 0.375rem;
+$deadline-bar-height: 0.5rem; // barra del plazo a lo ancho, en el encabezado del detalle
+$status-node-size: 0.875rem; // punto de cada estado en el camino del incidente
+$deadline-text-width: 8.5rem; // texto del plazo en tablet en adelante: así las barras quedan en columna
+$board-column-width: 12rem; // ancho mínimo de las columnas del Kanban: las 6 caben en monitor; en portátil se desplaza
+$calendar-cell-min-height: 7.5rem; // alto de cada día del calendario de "Mis incidentes" (3 incidentes y "+N más")
+$calendar-title-width: 11rem; // nombre del mes entre las flechas ("septiembre de 2026")
+$day-section-max-height: 20rem; // tope de alto de cada bloque de "Mi día" en celular y tablet; lo que no cabe se desplaza por dentro
+$datetime-calendar-width: 18rem; // calendario del selector de fecha en el menú de portátil y monitor
+$datetime-slots-height: 16rem; // lista de horas del selector de fecha: igual de alta que el calendario
+$auth-card-width: 25rem; // 400 px: tarjeta de las pantallas sin sesión (login)
+$qr-size: 11rem; // código QR para la aplicación de autenticación (176 px, se escanea bien en cualquier teléfono)
+$code-column-min-width: 8.5rem; // columna de cada código de recuperación (caben 10 caracteres y el guion)
+
+// Dashboard y gráficos
+$dashboard-row-height: 4.5rem; // alto de una fila de la grilla de 12 columnas (portátil y monitor)
+$dashboard-resize-handle: 1.25rem; // manija para cambiar el tamaño en el modo Personalizar
+$chart-bar-height: 0.625rem; // grosor de las barras horizontales
+$chart-label-width: 7rem; // columna de nombres en las barras
+$chart-donut-size: 8rem; // diámetro de la dona
+$chart-donut-max: 15rem; // diámetro máximo cuando la tarjeta tiene alto de sobra
+$chart-columns-height: 8rem; // alto de las columnas de la tendencia y del área del balance del backlog
+$chart-ring-size: 4.5rem; // anillo del cumplimiento del plazo (72 px)
+$risk-cell-height: 2.25rem; // celda del mapa de riesgo: cabe el número y se toca bien en el celular
+$flow-stage-min-width: 5.5rem; // etapa del flujo de estados cuando van en fila
+$flow-row-from: 32rem; // ancho del widget desde el que el flujo de estados pasa de columna a fila

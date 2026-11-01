@@ -1,0 +1,62 @@
+# Escaneo activo de la API con el plan de automatización de ZAP: importa el contrato OpenAPI, agrega el token de
+# sesión a cada petición, ataca cada ruta y escribe los reportes desde ZAP. El token llega en la variable TRAZO_TOKEN.
+# Documentado en docs/seguridad/zap.md
+env:
+  contexts:
+    - name: trazo-api
+      urls:
+        - http://gateway:8080/api/v1
+      includePaths:
+        - http://gateway:8080/api/v1/.*
+      excludePaths:
+        # Cerrar sesión revocaría el token del propio escaneo
+        - http://gateway:8080/api/v1/auth/logout.*
+        # El contrato se genera en varios segundos y no recibe datos: solo haría esperar al escaneo
+        - http://gateway:8080/api/v1/docs.*
+  parameters:
+    failOnError: true
+    progressToStdout: true
+
+jobs:
+  - type: replacer
+    parameters:
+      deleteAllRules: true
+    rules:
+      - description: Sesión de prueba
+        matchType: req_header
+        matchString: Authorization
+        matchRegex: false
+        replacementString: Bearer ${TRAZO_TOKEN}
+
+  - type: openapi
+    parameters:
+      apiFile: /zap/openapi.json
+      targetUrl: http://gateway:8080/api
+
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 5
+
+  - type: activeScan
+    parameters:
+      context: trazo-api
+      maxScanDurationInMins: 45
+      threadPerHost: 2
+
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 5
+
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: /zap/wrk
+      reportFile: api.html
+    risks: [high, medium, low, info]
+
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: /zap/wrk
+      reportFile: api.json
+    risks: [high, medium, low, info]

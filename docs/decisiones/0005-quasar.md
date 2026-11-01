@@ -9,7 +9,7 @@ order: 15
 # ADR-0005: Quasar como librería de interfaz
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba sugiere Quasar o Vuetify. Se necesita una tabla con paginación del lado del servidor, una grilla responsive sólida y un tema que se alimente de tokens de diseño.

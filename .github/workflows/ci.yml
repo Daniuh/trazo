@@ -1,0 +1,207 @@
+# Integración continua: valida cada PR hacia dev, stage y main, y cada llegada a esas ramas.
+# Ningún PR se fusiona si un trabajo falla. Documentado en docs/operacion/integracion-continua.md
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, stage, main]
+  push:
+    branches: [dev, stage, main]
+  workflow_dispatch:
+
+# Solo lectura del repositorio: ningún trabajo necesita escribir
+permissions:
+  contents: read
+
+# Un push nuevo al mismo PR cancela la corrida anterior
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  # El título del PR se vuelve el mensaje del squash, así que sigue Conventional Commits
+  pr-title:
+    name: Título del PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # El título pasa por una variable y no se interpola en el script, para evitar inyección
+      - name: Validar formato
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          printf '%s\n' "$TITLE" > "$RUNNER_TEMP/title"
+          node scripts/git/check-commit-msg.mjs "$RUNNER_TEMP/title"
+
+  docs:
+    name: Documentación
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Enlaces entre documentación y código
+        run: node scripts/docs/check-links.mjs
+
+  # PHPDoc y TSDoc generados como sitio: falla si un comentario está roto. El resultado queda como artefacto
+  api-docs:
+    name: Documentación de funciones
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend (TypeDoc)
+        working-directory: frontend
+        run: npm ci && npm run docs:ts
+      - name: Backend (phpDocumentor)
+        run: |
+          mkdir -p docs-build
+          docker compose -p trazo --profile docs run --rm phpdoc
+          grep -q "No errors have been found" docs-build/backend/reports/errors.html \
+            || { echo "::error title=phpDocumentor::Hay PHPDoc con errores. Revisar docs-build/backend/reports/errors.html"; exit 1; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentacion-de-funciones
+          path: |
+            docs-build/backend
+            docs-build/frontend
+          retention-days: 14
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Tipos, lint, estilos y formato
+        run: npm run typecheck && npm run lint
+      # Falla si dominio y aplicación quedan por debajo del 90 % (umbral en vite.config.ts)
+      - name: Pruebas con cobertura
+        run: npm run test:coverage
+      - name: Build de producción
+        run: npm run build
+
+  # El backend se prueba dentro del mismo stack de Docker, en el modo desarrollo: trae Pest, Pint, Larastan y PCOV
+  backend:
+    name: Backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      COMPOSE_FILE: docker-compose.yml:docker-compose.override.yml:docker-compose.dev.yml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Levantar el stack
+        run: docker compose -p trazo up -d --build --wait
+      - name: Pint y Larastan
+        run: docker compose -p trazo exec -T app sh -c "composer lint && composer analyse"
+      # Falla si dominio y aplicación quedan por debajo del 90 % o el total por debajo del 80 % (tests/coverage-check.php)
+      - name: Pest con cobertura
+        run: docker compose -p trazo exec -T app composer coverage
+      - name: El gateway responde
+        run: |
+          curl --fail --silent --show-error http://localhost:8088/up > /dev/null
+          curl --fail --silent --show-error http://localhost:8088/ > /dev/null
+      - name: Logs del stack
+        if: failure()
+        run: docker compose -p trazo logs --no-color --tail=200
+      - name: Bajar el stack
+        if: always()
+        run: docker compose -p trazo down -v
+
+  # Flujos críticos en las cuatro vistas, con revisión de accesibilidad (axe), contra el stack completo en el modo final:
+  # el mismo build y la misma CSP que verá quien use Trazo
+  e2e:
+    name: E2E
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Levantar el stack
+        run: docker compose -p trazo up -d --build --wait
+      - name: Dependencias y navegador
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Pruebas E2E
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Logs del stack
+        if: failure()
+        run: docker compose -p trazo logs --no-color --tail=200
+      - name: Bajar el stack
+        if: always()
+        run: docker compose -p trazo down -v
+
+  # Las imágenes de producción deben construirse siempre; el despliegue las publicará en GHCR
+  images:
+    name: Imágenes de producción
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Construir
+        run: docker compose -p trazo -f docker-compose.yml build
+
+  security:
+    name: Seguridad
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # Gitleaks revisa todo el historial
+          persist-credentials: false
+      - name: Secretos (Gitleaks)
+        run: docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --no-banner --redact
+      - name: Dependencias del backend
+        run: docker run --rm -v "$PWD/backend:/app" -w /app composer:2.10.3 audit --locked --no-interaction
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Bloquea lo que llega al navegador; las herramientas de desarrollo se reportan sin bloquear
+      - name: Dependencias del frontend (producción)
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+      - name: Dependencias del frontend (desarrollo, informativo)
+        working-directory: frontend
+        run: npm audit --audit-level=high || echo "::warning title=npm audit::Hay avisos en dependencias de desarrollo. Revisar el detalle de este paso."
+      - name: Dependencias de la raíz
+        run: npm audit --audit-level=high

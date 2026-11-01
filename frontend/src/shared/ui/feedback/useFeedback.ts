@@ -1,0 +1,51 @@
+// Confirmaciones y notificaciones con el estilo de Trazo. Las pantallas los usan sin conocer Quasar. Los avisos salen
+// arriba a la derecha, porque abajo está el dock.
+// Documentado en docs/frontend/sistema-de-diseno/componentes.md
+import { useQuasar } from 'quasar'
+import { messageFor } from '@/shared/errors'
+import type { ApiError } from '@/shared/http'
+import AppConfirmDialog from './AppConfirmDialog.vue'
+
+export interface ConfirmOptions {
+  title: string
+  message: string
+  confirmLabel: string
+  danger?: boolean
+}
+
+export function useFeedback() {
+  const $q = useQuasar()
+
+  const confirm = (options: ConfirmOptions) =>
+    new Promise<boolean>((resolve) => {
+      $q.dialog({ component: AppConfirmDialog, componentProps: options })
+        .onOk(() => resolve(true))
+        .onCancel(() => resolve(false))
+    })
+
+  // Con una acción (p. ej. "Abrir"), el aviso se queda más tiempo para alcanzar a usarla
+  const notify = (message: string, action?: { label: string; handler: () => void }) =>
+    $q.notify({
+      message,
+      classes: 'app-notify',
+      position: 'top-right',
+      timeout: action ? 8000 : 4000,
+      actions: action ? [{ label: action.label, color: 'white', handler: action.handler }] : undefined,
+    })
+
+  // Los errores se quedan hasta que se cierran a mano: el usuario debe alcanzar a leerlos. La acción (p. ej.
+  // "Recargar") va antes de "Cerrar"
+  const notifyError = (error: ApiError, action?: { label: string; handler: () => void }) =>
+    $q.notify({
+      message: messageFor(error),
+      classes: 'app-notify app-notify--error',
+      position: 'top-right',
+      timeout: 0,
+      actions: [
+        ...(action ? [{ label: action.label, color: 'white', handler: action.handler }] : []),
+        { label: 'Cerrar', color: 'white' },
+      ],
+    })
+
+  return { confirm, notify, notifyError }
+}

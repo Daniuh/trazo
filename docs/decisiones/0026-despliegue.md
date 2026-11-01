@@ -9,7 +9,7 @@ order: 36
 # ADR-0026: Despliegue en VPS con el mismo docker compose
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El proyecto se presenta desplegado, y la base de datos no debe tener costo adicional.

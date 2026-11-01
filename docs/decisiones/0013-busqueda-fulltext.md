@@ -9,7 +9,7 @@ order: 23
 # ADR-0013: Búsqueda por texto con índice FULLTEXT
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El listado debe permitir búsqueda por texto, que es obligatoria, y sostener grandes volúmenes de datos.

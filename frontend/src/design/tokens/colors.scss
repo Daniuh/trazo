@@ -1,0 +1,124 @@
+// Colores de Trazo, tomados de la "o" del logo de Psicol.
+// Regla: sobre un fondo de color el texto es negro o blanco, el que dé contraste AA (calculado, no a ojo).
+// Documentado en docs/frontend/sistema-de-diseno/tokens.md
+
+// Base: acentos, gráficos e íconos. Con texto negro pasan AA (6,5 a 8,4:1)
+$color-blue-base: #03a8d5;
+$color-green-base: #86bb24;
+$color-orange-base: #ff9829;
+
+// Tonos oscuros: botones y texto de color sobre fondos claros (≥ 5:1 con blanco)
+$color-blue-strong: #027695;
+$color-green-strong: #507016;
+$color-orange-strong: #995b19;
+
+// Rojo armonizado: solo errores, prioridad crítica y "Vencido" (5,1:1 con blanco)
+$color-red: #c93a3a;
+
+// Neutros fríos, sin blanco puro
+$color-page: #eef3f6;
+$color-surface: #f7fafb;
+$color-border: #dde5ea;
+$color-border-strong: #c9ced4;
+$color-muted: #8a929c;
+$color-text-secondary: #5f6670;
+$color-neutral-dark: #3d434a;
+$color-text: #161616;
+$color-on-dark: #fff;
+
+// Roles
+$color-primary: $color-blue-strong;
+$color-success: $color-green-strong;
+$color-warning: $color-orange-strong;
+$color-danger: $color-red;
+$color-focus: $color-blue-strong;
+
+// Tonos de etiqueta: fondo + texto ya resueltos con su contraste. Texto blanco sobre el tono oscuro de cada
+// escala (5,2 a 10:1); el base no llega a AA con blanco
+$tones: (
+  'blue': (
+    $color-blue-strong,
+    $color-on-dark,
+  ),
+  'green': (
+    $color-green-strong,
+    $color-on-dark,
+  ),
+  'orange': (
+    $color-orange-strong,
+    $color-on-dark,
+  ),
+  'neutral': (
+    $color-text-secondary,
+    $color-on-dark,
+  ),
+  'dark': (
+    $color-neutral-dark,
+    $color-on-dark,
+  ),
+  'muted': (
+    $color-border,
+    $color-text-secondary,
+  ),
+  'danger': (
+    $color-red,
+    $color-on-dark,
+  ),
+);
+
+// Relleno de gráficos por tono: el color base de cada tono, salvo los neutros, que se oscurecen
+// para distinguirse del fondo de las barras ($color-page)
+$chart-fills: (
+  'blue': $color-blue-base,
+  'green': $color-green-base,
+  'orange': $color-orange-base,
+  'neutral': $color-border-strong,
+  'dark': $color-neutral-dark,
+  'muted': $color-muted,
+  'danger': $color-red,
+);
+
+// Barra del avance del plazo: con holgura, apretado (desde el 75 %) y vencido. Los colores base sobre el fondo
+// de la barra ($color-border); el texto que la acompaña lleva su propio color con contraste
+$deadline-fills: (
+  'ok': $color-green-base,
+  'warning': $color-orange-base,
+  'danger': $color-red,
+);
+
+// Mapa de riesgo: intensidad de cada celda según cuánto pesa frente a la más cargada. Fondo + texto ya resueltos:
+// negro sobre los rojos claros (≥ 7:1) y blanco sobre el rojo armonizado (5,1:1)
+$risk-levels: (
+  0: (
+    $color-page,
+    $color-text-secondary,
+  ),
+  1: (
+    #f6dcdc,
+    $color-text,
+  ),
+  2: (
+    #eaa9a9,
+    $color-text,
+  ),
+  3: (
+    $color-red,
+    $color-on-dark,
+  ),
+);
+
+// Área del balance del backlog: el azul base al 15 % bajo su línea
+$chart-area-fill: rgb(3 168 213 / 15%);
+
+// Modo Personalizar del dashboard: marco de los widgets y zona donde cae el que se arrastra (azul base al 15 %)
+$dashboard-edit-border: $color-blue-base;
+$dashboard-drop-zone: rgb(3 168 213 / 15%);
+
+// Fondo de las pantallas sin sesión (login, MFA, recuperación): halos muy suaves de los tres colores de marca, una trama
+// de puntos y la tarjeta casi opaca para que el texto mantenga su contraste
+$auth-aura-blue: rgb(3 168 213 / 24%);
+$auth-aura-green: rgb(134 187 36 / 20%);
+$auth-aura-orange: rgb(255 152 41 / 16%);
+$auth-dots: rgb(2 118 149 / 10%);
+$auth-card-surface: rgb(247 250 251 / 90%);
+$auth-fade-mask: rgb(0 0 0);

@@ -9,7 +9,7 @@ order: 19
 # ADR-0009: Sin relaciones polimórficas: toda referencia es una FK
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Toda referencia entre tablas, incluidas las que apuntan a usuarios, debe estar respaldada por una clave foránea real. Así ningún registro queda imposible de mapear en una migración o integración.

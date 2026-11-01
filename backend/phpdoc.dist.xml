@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Documentación de funciones del backend con phpDocumentor: el código de app/ con sus PHPDoc. Se genera con el
+     servicio phpdoc del perfil docs de Docker; la salida queda en docs-build/backend (fuera de Git).
+     Documentado en docs/backend/index.md -->
+<phpdocumentor configVersion="3" xmlns="https://www.phpdoc.org">
+    <title>Trazo · Backend</title>
+    <paths>
+        <output>../docs-build/backend</output>
+        <cache>../docs-build/.phpdoc-cache</cache>
+    </paths>
+    <version number="latest">
+        <api>
+            <source dsn=".">
+                <path>app</path>
+            </source>
+            <ignore-tags>
+                <ignore-tag>template</ignore-tag>
+            </ignore-tags>
+            <visibility>public</visibility>
+            <visibility>protected</visibility>
+            <default-package-name>Trazo</default-package-name>
+        </api>
+    </version>
+</phpdocumentor>

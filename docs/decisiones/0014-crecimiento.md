@@ -9,7 +9,7 @@ order: 24
 # ADR-0014: Estrategia de crecimiento por etapas, sin particionamiento
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El sistema debe crecer en datos y en usuarios sin romperse ni volverse difícil de mantener. La tabla que más crece es la de actividades, porque cada incidente genera varias.

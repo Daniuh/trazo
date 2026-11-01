@@ -9,7 +9,7 @@ order: 40
 # ADR-0030: Dashboard personalizable guardado en el servidor
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Cada usuario debe poder organizar su dashboard: mover, cambiar de tamaño, quitar y agregar widgets. Debe encontrarlo igual desde cualquier equipo, y nada de esto puede afectar la seguridad.

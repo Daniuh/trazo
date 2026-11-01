@@ -21,3 +21,9 @@ Thumbs.db
 # Logs y temporales
 *.log
 tmp/
+
+# Reportes de OWASP ZAP (se generan en local)
+zap-reports/
+
+# Documentación de funciones generada (phpDocumentor y TypeDoc): se produce en local o en el CI
+docs-build/

@@ -9,7 +9,7 @@ order: 37
 # ADR-0027: Diseño por tokens, mobile first y estilos por bloque de vista
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 El diseño debe vivir separado del código, sin valores escritos a mano. Además, tiene que adaptarse a celular, tablet, portátil y monitor, con control independiente de cada vista.

@@ -9,7 +9,7 @@ order: 35
 # ADR-0025: Contenedores: gateway de origen único y una sola imagen de Laravel
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 Todo el proyecto debe ejecutarse con Docker: Laravel, Nginx, la base de datos y el frontend. Idealmente, con un solo comando. Además, en la misma máquina pueden convivir otros proyectos.

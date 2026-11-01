@@ -1,0 +1,78 @@
+// Pantalla de carga inicial y fuente Inter: CSS puro que se ve antes de que cargue JavaScript.
+// Aparece solo si la carga pasa de ~300 ms y desaparece sola cuando Vue monta la app.
+// Documentado en docs/frontend/sistema-de-diseno/marca.md
+@use '@fontsource-variable/inter/index.css';
+@use '../tokens' as *;
+
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: $color-page;
+  opacity: 0;
+  animation: boot-fade-in $duration-base ease-out 300ms forwards;
+}
+
+.boot-loader__logo {
+  display: flex;
+  align-items: center;
+  color: $color-text;
+  font-family: $font-family;
+  font-size: 2.75rem;
+  font-weight: $font-weight-semibold;
+  letter-spacing: -0.02em;
+}
+
+.boot-loader__mark {
+  width: 0.68em;
+  height: 0.68em;
+  margin-left: 0.04em;
+  transform: translateY(0.06em);
+  animation: boot-spin 1.4s linear infinite;
+
+  circle {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 19.1 56.3;
+  }
+
+  .blue {
+    stroke: $color-blue-base;
+  }
+
+  .green {
+    stroke: $color-green-base;
+  }
+
+  .orange {
+    stroke: $color-orange-base;
+  }
+}
+
+.boot-loader__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@keyframes boot-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes boot-spin {
+  to {
+    transform: translateY(0.06em) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-loader__mark {
+    animation: none;
+  }
+}

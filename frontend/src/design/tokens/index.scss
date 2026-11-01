@@ -1,0 +1,8 @@
+// Punto de entrada de los tokens: los componentes hacen `@use '@/design/tokens' as *`.
+@forward 'colors';
+@forward 'typography';
+@forward 'spacing';
+@forward 'shadows';
+@forward 'breakpoints';
+@forward 'accessibility';
+@forward 'menu';

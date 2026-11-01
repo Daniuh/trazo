@@ -9,7 +9,7 @@ order: 11
 # ADR-0001: Monolito modular con capas limpias en el backend
 
 - **Estado:** Aceptada
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-31
 
 ## Contexto
 La prueba exige PHP 8+ y Laravel 10+. Además, el proyecto debe separar la lógica de negocio del framework, para poder crecer y, si algún día hace falta, cambiar de tecnología sin reescribir las reglas.
