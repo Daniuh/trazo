@@ -131,7 +131,7 @@ services:
         limits: { cpus: "0.5", memory: 256M }
 
   redis:
-    image: redis:8.4.7-alpine
+    image: redis:8.10.3-alpine
     command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-trazo_local_only}
