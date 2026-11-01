@@ -31,6 +31,17 @@ function shouldRetry(config: RetryableConfig, error: ApiError): boolean {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// Una descarga (responseType blob) trae su error como archivo: se lee para conservar el código de la API
+async function readBlobBody(raw: unknown): Promise<void> {
+  const response = (raw as { response?: { data?: unknown } }).response
+  if (!response || !(response.data instanceof Blob) || !response.data.type.includes('json')) return
+  try {
+    response.data = JSON.parse(await response.data.text()) as unknown
+  } catch {
+    // Sin un cuerpo legible, el error se arma solo con el estado HTTP
+  }
+}
+
 export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance {
   const tokens = options.tokens ?? tokenStore
   const events = options.events ?? httpEvents
@@ -55,6 +66,7 @@ export function createHttpClient(options: HttpClientOptions = {}): AxiosInstance
   })
 
   client.interceptors.response.use(undefined, async (raw: unknown) => {
+    await readBlobBody(raw)
     const error = toApiError(raw)
     const config = (raw as { config?: RetryableConfig }).config
 

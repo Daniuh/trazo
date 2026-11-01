@@ -57,6 +57,7 @@ Con las dos pestañas, arriba aparece el selector "Incidentes · Administración
   - Cada campo se escribe como "valor anterior → valor nuevo".
   - Roles y permisos se muestran por su nombre; si ya no existen, por su código.
   - La política de MFA usa el mismo texto de la pantalla de roles.
+  - Una exportación de incidentes dice "Sobre qué: Incidentes" y muestra las filas exportadas y cada filtro usado (búsqueda, estado, prioridad, personas, rangos de fechas, solo vencidos, eliminados). Sin filtros, lo aclara: "Ninguno: todo lo que la persona podía ver".
 
 ### Desde otras pantallas
 

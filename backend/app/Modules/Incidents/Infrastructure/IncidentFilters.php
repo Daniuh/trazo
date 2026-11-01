@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-// Filtros y búsqueda del listado traducidos a SQL. Los catálogos se filtran por su código estable
-// y las personas por su ULID; nunca llegan ids internos desde fuera. Documentado en docs/backend/incidents.md
+// Visibilidad, filtros, búsqueda y orden del listado traducidos a SQL; la exportación usa exactamente lo mismo.
+// Los catálogos se filtran por su código estable y las personas por su ULID; nunca llegan ids internos desde fuera.
+// Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Infrastructure;
 
 use App\Modules\Incidents\Application\Data\IncidentListCriteria;
 use App\Modules\Incidents\Application\Ports\IncidentCatalog;
+use App\Modules\Incidents\Domain\IncidentSort;
+use App\Modules\Incidents\Domain\StatusFlags;
+use App\Modules\Incidents\Domain\VisibilityScope;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
 use Closure;
 use DateTimeImmutable;
@@ -25,10 +29,47 @@ final readonly class IncidentFilters
     public function __construct(private IncidentCatalog $catalog) {}
 
     /**
-     * @param  Builder<Incident>  $query
-     * @param  list<int>  $pendingStatusIds
+     * Lo que la persona puede ver y pidió, sin orden ni página. Lo comparten el listado y la exportación.
+     *
+     * @return Builder<Incident>
      */
-    public function apply(Builder $query, IncidentListCriteria $criteria, array $pendingStatusIds): void
+    public function query(int $actorId, VisibilityScope $scope, IncidentListCriteria $criteria): Builder
+    {
+        $query = Incident::query()->select('incidents.*');
+        if ($criteria->deleted) {
+            $query->onlyTrashed();
+        }
+
+        VisibilitySql::apply($query, $actorId, $scope);
+        $this->apply($query, $criteria);
+
+        return $query;
+    }
+
+    /**
+     * Orden pedido y, siempre, el id como desempate: así las páginas no repiten ni saltan filas.
+     *
+     * @param  Builder<Incident>  $query
+     * @return Builder<Incident>
+     */
+    public function sort(Builder $query, IncidentListCriteria $criteria): Builder
+    {
+        $direction = $criteria->descending ? 'desc' : 'asc';
+
+        match ($criteria->sort) {
+            IncidentSort::Priority => $query->join('priorities', 'priorities.id', '=', 'incidents.priority_id')->orderBy('priorities.level', $direction),
+            IncidentSort::Status => $query->join('statuses', 'statuses.id', '=', 'incidents.status_id')->orderBy('statuses.sort_order', $direction),
+            IncidentSort::Code => null,
+            default => $query->orderBy('incidents.'.$criteria->sort->value, $direction),
+        };
+
+        return $query->orderBy('incidents.id', $direction);
+    }
+
+    /**
+     * @param  Builder<Incident>  $query
+     */
+    private function apply(Builder $query, IncidentListCriteria $criteria): void
     {
         if ($criteria->statuses !== []) {
             $query->whereIn('incidents.status_id', $this->ids($criteria->statuses, fn (string $code) => $this->catalog->status($code)?->id));
@@ -55,7 +96,7 @@ final readonly class IncidentFilters
 
         // "Vencido" no se guarda: pendiente y con el vencimiento ya pasado
         if ($criteria->overdue) {
-            $query->whereIn('incidents.status_id', $pendingStatusIds)->where('incidents.due_date', '<', now());
+            $query->whereIn('incidents.status_id', $this->pendingStatusIds())->where('incidents.due_date', '<', now());
         }
 
         if ($criteria->search !== null) {
@@ -108,6 +149,16 @@ final readonly class IncidentFilters
         $ids = array_values(array_filter(array_map($resolve, $codes), fn (?int $id): bool => $id !== null));
 
         return $ids === [] ? [0] : $ids;
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function pendingStatusIds(): array
+    {
+        $pending = array_filter($this->catalog->statuses(), fn (StatusFlags $status): bool => $status->isPending);
+
+        return array_values(array_map(fn (StatusFlags $status): int => $status->id, $pending));
     }
 
     /**

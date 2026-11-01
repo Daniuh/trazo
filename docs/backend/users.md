@@ -159,8 +159,8 @@ flowchart LR
 | Application | `ListUsers`, `CreateUser`, `UpdateUser`, `ChangeUserStatus`, `ChangeUserRole`, `ChangeUserPermissions`, `ResetUserAccess` | Casos de uso de personas |
 | Application | `ListRoles`, `CreateRole`, `UpdateRole`, `DeleteRole`, `RoleGate` | Casos de uso de roles; cargar, autorizar y revisar nivel y permisos |
 | Application | `UserGate`, `Administrators`, `UserProfiles`, `RootGuard` | Cargar y autorizar, armar a quien administra, la ficha y la protección del último Super admin |
-| Application | `UserRepository`, `UserListQuery`, `RoleCatalog`, `RoleRepository`, `EffectivePermissions`, `AccountSecurity`, `AdminLog`, `AccountNotifier` | Puertos |
-| Infrastructure | `EloquentUserRepository`, `EloquentUserList`, `UserMapper`, `DatabaseRoleCatalog`, `DatabaseRoleRepository`, `DatabaseAdminLog` | Personas, listado, roles (lectura y edición) y registro |
+| Application | `UserRepository`, `UserListQuery`, `RoleCatalog`, `RoleRepository`, `EffectivePermissions`, `AccountSecurity`, `AccountNotifier` | Puertos. El registro de acciones (`AdminLog`) vive en [Shared](shared.md#puertos-que-comparten-los-módulos) |
+| Infrastructure | `EloquentUserRepository`, `EloquentUserList`, `UserMapper`, `DatabaseRoleCatalog`, `DatabaseRoleRepository` | Personas, listado y roles (lectura y edición) |
 | Infrastructure | `UserPermissions`, `PermissionSql` | Permisos efectivos por persona y como filtro SQL |
 | Infrastructure | `AuthAccountSecurity` | Puente con el módulo Auth: cerrar sesiones, quitar el MFA y reautenticar |
 | Infrastructure | `MailAccountNotifier`, `Mail/AccountNotice`, `Mail/AccountWelcome` | Avisos por correo |

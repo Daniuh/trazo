@@ -1,5 +1,7 @@
-// Estado del listado de incidentes ligado a la URL (con useRouteList), más restaurar un eliminado y contar cuántos
-// resultados daría un borrador de filtros. Documentado en docs/frontend/incidents.md
+// Estado del listado de incidentes ligado a la URL (con useRouteList), más restaurar un eliminado, contar cuántos
+// resultados daría un borrador de filtros y exportar lo filtrado. Documentado en docs/frontend/incidents.md
+import { ref } from 'vue'
+import { saveFile } from '@/shared/download/saveFile'
 import { toApiError, type ApiError } from '@/shared/http'
 import { useRouteList } from '@/shared/listing/useRouteList'
 import { isSearchable, type IncidentSummary, type ListCriteria } from '../domain/listing'
@@ -34,5 +36,20 @@ export function useIncidentList() {
     }
   }
 
-  return { ...list, restore, countFor }
+  // Descarga en CSV exactamente lo que se ve filtrado; el servidor decide si se puede y cuánto
+  const exporting = ref(false)
+  async function exportCsv(): Promise<ApiError | null> {
+    exporting.value = true
+    try {
+      const { file, filename } = await listApi.export(list.criteria.value)
+      saveFile(file, filename)
+      return null
+    } catch (raw) {
+      return toApiError(raw)
+    } finally {
+      exporting.value = false
+    }
+  }
+
+  return { ...list, restore, countFor, exporting, exportCsv }
 }

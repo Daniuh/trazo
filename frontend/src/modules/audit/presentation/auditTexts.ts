@@ -3,6 +3,7 @@
 // nombre; si ya no existen, con su código. Documentado en docs/frontend/audit.md
 import { mfaPolicyText } from '@/modules/admin/presentation/userTexts'
 import { formatDateTime } from '@/shared/format/dates'
+import { formatNumber } from '@/shared/format/numbers'
 import type { AdminAuditEntry, AuditCatalog, AuditEntry, CodeName, IncidentAuditEntry } from '../domain/audit'
 
 export interface ChangeRow {
@@ -53,6 +54,37 @@ function permissionList(catalog: AuditCatalog, codes: unknown): string {
     : ''
 }
 
+function range(from: unknown, to: unknown): string {
+  const date = (value: unknown) => formatDateTime(String(value))
+  if (from && to) return `Del ${date(from)} al ${date(to)}`
+  if (from) return `Desde ${date(from)}`
+  return to ? `Hasta ${date(to)}` : ''
+}
+
+const names = (value: unknown) =>
+  Array.isArray(value) ? value.map((item) => (isRecord(item) ? String(item.name) : String(item))).join(', ') : ''
+
+// Filtros con los que se exportaron incidentes: estados y prioridades llegan con su nombre, personas por su id
+function exportCriteriaRows(criteria: Record<string, unknown>, catalog: AuditCatalog): ChangeRow[] {
+  const person = (id: unknown) => catalog.people.find((item) => item.id === id)?.name ?? String(id)
+  const assignees = [
+    ...(Array.isArray(criteria.assignee) ? criteria.assignee.map(person) : []),
+    ...(criteria.unassigned ? ['Sin asignar'] : []),
+  ]
+  const rows: ChangeRow[] = [
+    { label: 'Búsqueda', value: criteria.search ? `«${String(criteria.search)}»` : '' },
+    { label: 'Estado', value: names(criteria.status) },
+    { label: 'Prioridad', value: names(criteria.priority) },
+    { label: 'Asignado a', value: assignees.join(', ') },
+    { label: 'Creado por', value: criteria.creator ? person(criteria.creator) : '' },
+    { label: 'Creación', value: range(criteria.created_from, criteria.created_to) },
+    { label: 'Vencimiento', value: range(criteria.due_from, criteria.due_to) },
+    { label: 'Solo vencidos', value: criteria.overdue ? 'Sí' : '' },
+    { label: 'Eliminados', value: criteria.deleted ? 'Sí' : '' },
+  ].filter((row) => row.value !== '')
+  return rows.length > 0 ? rows : [{ label: 'Filtros', value: 'Ninguno: todo lo que la persona podía ver' }]
+}
+
 // Una línea por dato del detalle; lo que no cambió (null) no se muestra
 function adminRows(entry: AdminAuditEntry, catalog: AuditCatalog): ChangeRow[] {
   const rows: ChangeRow[] = []
@@ -73,6 +105,8 @@ function adminRows(entry: AdminAuditEntry, catalog: AuditCatalog): ChangeRow[] {
       )
     else if (key === 'code' && showsCode) push('Código', String(value))
     else if (key === 'level') push('Nivel', plain(value))
+    else if (key === 'rows') push('Filas exportadas', formatNumber(Number(value)))
+    else if (key === 'criteria' && isRecord(value)) rows.push(...exportCriteriaRows(value, catalog))
     else if (key === 'mfa') push('Verificación en dos pasos', plain(value, mfaText))
     else if (key === 'added') push('Permisos concedidos', permissionList(catalog, value))
     else if (key === 'removed') push('Permisos quitados', permissionList(catalog, value))
@@ -103,5 +137,6 @@ export function targetText(entry: AuditEntry): string {
   if (entry.tab === 'incidents') return `${entry.incident.code} · ${entry.incident.title}`
   if (entry.targetUser) return entry.targetUser.name
   if (entry.targetRole) return `Rol ${entry.targetRole.name}${entry.targetRole.deleted ? ' (eliminado)' : ''}`
+  if (entry.type.code === 'incidents_exported') return 'Incidentes'
   return '—'
 }

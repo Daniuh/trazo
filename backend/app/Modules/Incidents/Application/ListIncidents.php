@@ -24,9 +24,6 @@ final readonly class ListIncidents
             throw new ForbiddenException;
         }
 
-        // Quien puede restaurar ve todos los eliminados, como en el detalle
-        $scope = $criteria->deleted ? new VisibilityScope(true, false, false, false) : VisibilityScope::for($actor);
-
-        return $this->query->search($actor->id, $scope, $criteria);
+        return $this->query->search($actor->id, VisibilityScope::forList($actor, $criteria->deleted), $criteria);
     }
 }

@@ -26,6 +26,12 @@ final readonly class VisibilityScope
         );
     }
 
+    // Listado y exportación: quien puede restaurar ve todos los eliminados, como en el detalle
+    public static function forList(Actor $actor, bool $deleted): self
+    {
+        return $deleted ? new self(true, false, false, false) : self::for($actor);
+    }
+
     public function includes(int $actorId, IncidentState $incident): bool
     {
         return $this->all

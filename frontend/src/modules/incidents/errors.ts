@@ -14,6 +14,8 @@ const messages: MessageCatalog = {
   VERSION_CONFLICT:
     'Alguien más guardó cambios en este incidente mientras lo tenías abierto. Recarga para ver la versión actual antes de seguir.',
   INVALID_ASSIGNEE: 'Esta persona no puede recibir incidentes. Elige a alguien de la lista.',
+  EXPORT_TOO_LARGE:
+    'Con estos filtros salen {total} incidentes y el máximo por archivo es {max}. Acota los filtros, por ejemplo con un rango de fechas, y vuelve a exportar.',
   IDEMPOTENCY_IN_PROGRESS: 'Tu incidente se está creando. Espera unos segundos antes de intentarlo de nuevo.',
   IDEMPOTENCY_KEY_REUSED: 'No pudimos confirmar el envío. Recarga la página e inténtalo de nuevo.',
   INVALID_IDEMPOTENCY_KEY: 'No pudimos procesar el envío. Recarga la página e inténtalo de nuevo.',

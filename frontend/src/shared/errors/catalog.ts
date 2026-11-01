@@ -1,6 +1,7 @@
 // Catálogo único de mensajes de error. El backend envía códigos y aquí se convierten en texto claro.
 // Cada módulo registra sus propios códigos de negocio con registerErrorMessages.
 // Documentado en docs/frontend/http-y-errores.md
+import { formatNumber } from '@/shared/format/numbers'
 import type { ApiError, ErrorParams, FieldError } from '@/shared/http'
 import { FALLBACK_FIELD_MESSAGE, fieldMessages } from './fieldMessages'
 import { formatWait } from './formatWait'
@@ -17,9 +18,14 @@ export function registerErrorMessages(messages: MessageCatalog): void {
   Object.assign(errorMessages, messages)
 }
 
-// Reemplaza cada {nombre} de la plantilla por su valor
+// Reemplaza cada {nombre} de la plantilla por su valor; los números van con separador de miles (50.000)
 function fill(template: string, params: ErrorParams): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(params[key] ?? '')).trim()
+  return template
+    .replace(/\{(\w+)\}/g, (_, key: string) => {
+      const value = params[key]
+      return typeof value === 'number' ? formatNumber(value) : String(value ?? '')
+    })
+    .trim()
 }
 
 export function messageFor(error: ApiError): string {

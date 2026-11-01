@@ -120,6 +120,14 @@ En el menú **Auditoría** se ve quién hizo qué, cuándo y desde dónde (IP y 
 - Sin fechas muestra los últimos 30 días. Se filtra por persona, acción, incidente (por su código), persona o rol afectado, y se avanza con "Cargar más".
 - Los incidentes de demostración se crean con el seeder, así que su historial no tiene IP. Los cambios que hagas tú sí la traen.
 
+### Exportación
+
+En **Incidentes**, el Supervisor y el Super admin pueden descargar en CSV lo que tienen filtrado: **Exportar** en la barra (en celular y tablet, en el menú ⋯).
+
+- El archivo abre directo en Excel en español (separador punto y coma, tildes bien y fechas en hora de Colombia).
+- Hasta 50.000 incidentes por archivo y 5 exportaciones por minuto.
+- Cada exportación queda en **Auditoría → Administración**, con sus filtros y el número de filas.
+
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 
 ## Variables de entorno

@@ -69,3 +69,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0055](0055-edicion-de-roles.md) | Edición de roles: rol de la cima bloqueado, nivel único, roles de sistema y sin correo masivo |
 | [ADR-0056](0056-auditoria-global.md) | Auditoría global: dos registros con permisos separados, alcance por jerarquía y paginación por cursor |
 | [ADR-0057](0057-tiempo-real-en-la-practica.md) | Tiempo real en la práctica: canales por alcance, avisos sin datos y Reverb detrás del gateway |
+| [ADR-0058](0058-exportacion-en-la-practica.md) | Exportación en la práctica: CSV para Excel en español, tope de filas y registro en la auditoría |

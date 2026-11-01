@@ -9,35 +9,23 @@ namespace App\Modules\Incidents\Infrastructure;
 
 use App\Modules\Incidents\Application\Data\IncidentListCriteria;
 use App\Modules\Incidents\Application\Data\IncidentPage;
-use App\Modules\Incidents\Application\Ports\IncidentCatalog;
 use App\Modules\Incidents\Application\Ports\IncidentListQuery;
-use App\Modules\Incidents\Domain\IncidentSort;
-use App\Modules\Incidents\Domain\StatusFlags;
 use App\Modules\Incidents\Domain\VisibilityScope;
 use App\Modules\Incidents\Infrastructure\Models\Incident;
-use Illuminate\Database\Eloquent\Builder;
 
 final readonly class EloquentIncidentList implements IncidentListQuery
 {
     public function __construct(
-        private IncidentCatalog $catalog,
         private IncidentMapper $mapper,
         private IncidentFilters $filters,
     ) {}
 
     public function search(int $actorId, VisibilityScope $scope, IncidentListCriteria $criteria): IncidentPage
     {
-        $query = Incident::query()->select('incidents.*');
-        if ($criteria->deleted) {
-            $query->onlyTrashed();
-        }
-
-        VisibilitySql::apply($query, $actorId, $scope);
-        $this->filters->apply($query, $criteria, $this->pendingStatusIds());
-
+        $query = $this->filters->query($actorId, $scope, $criteria);
         $total = (clone $query)->count();
 
-        $items = $this->sorted($query, $criteria)
+        $items = $this->filters->sort($query, $criteria)
             ->with(['priority', 'status', 'creator:id,ulid,name', 'assignee:id,ulid,name'])
             ->forPage($criteria->page, $criteria->perPage)
             ->get();
@@ -48,35 +36,5 @@ final readonly class EloquentIncidentList implements IncidentListQuery
             $criteria->page,
             $criteria->perPage,
         );
-    }
-
-    /**
-     * Orden pedido y, siempre, el id como desempate: así las páginas no repiten ni saltan filas.
-     *
-     * @param  Builder<Incident>  $query
-     * @return Builder<Incident>
-     */
-    private function sorted(Builder $query, IncidentListCriteria $criteria): Builder
-    {
-        $direction = $criteria->descending ? 'desc' : 'asc';
-
-        match ($criteria->sort) {
-            IncidentSort::Priority => $query->join('priorities', 'priorities.id', '=', 'incidents.priority_id')->orderBy('priorities.level', $direction),
-            IncidentSort::Status => $query->join('statuses', 'statuses.id', '=', 'incidents.status_id')->orderBy('statuses.sort_order', $direction),
-            IncidentSort::Code => null,
-            default => $query->orderBy('incidents.'.$criteria->sort->value, $direction),
-        };
-
-        return $query->orderBy('incidents.id', $direction);
-    }
-
-    /**
-     * @return list<int>
-     */
-    private function pendingStatusIds(): array
-    {
-        $pending = array_filter($this->catalog->statuses(), fn (StatusFlags $status): bool => $status->isPending);
-
-        return array_values(array_map(fn (StatusFlags $status): int => $status->id, $pending));
     }
 }

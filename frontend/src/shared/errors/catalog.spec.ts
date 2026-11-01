@@ -65,3 +65,13 @@ describe('catálogo de errores', () => {
     all.forEach((message) => expect(message).not.toMatch(/\{\w+\}/))
   })
 })
+
+describe('parámetros numéricos', () => {
+  it('se muestran con separador de miles', () => {
+    registerErrorMessages({ TEST_NUMBERS: 'Son {total} de {max}.' })
+
+    expect(messageFor(httpError('TEST_NUMBERS', { params: { total: 60000, max: 50000 } }))).toBe(
+      'Son 60.000 de 50.000.',
+    )
+  })
+})

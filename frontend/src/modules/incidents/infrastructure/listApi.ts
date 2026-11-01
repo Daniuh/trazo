@@ -1,8 +1,11 @@
-// Repositorio del listado: arma los parámetros de GET /incidents y traduce la página que responde.
-// Documentado en docs/frontend/incidents.md
+// Repositorio del listado: arma los parámetros de GET /incidents, traduce la página que responde y descarga la
+// exportación en CSV con los mismos criterios. Documentado en docs/frontend/incidents.md
+import { filenameFrom } from '@/shared/download/saveFile'
 import { http } from '@/shared/http'
 import type { ListCriteria, ListPage } from '../domain/listing'
 import { toIncident, type IncidentDto } from './mappers'
+
+const EXPORT_TIMEOUT_MS = 120_000
 
 type SummaryDto = Omit<IncidentDto, 'description' | 'next_statuses'>
 
@@ -44,6 +47,20 @@ export const listApi = {
       total: data.meta.total,
       lastPage: data.meta.last_page,
     }
+  },
+
+  // Mismos filtros y orden del listado, sin página. Puede tardar más que una consulta normal
+  async export(criteria: ListCriteria): Promise<{ file: Blob; filename: string }> {
+    const params = toParams(criteria)
+    delete params.page
+    delete params.per_page
+    const response = await http.get<Blob>('/incidents/export', {
+      params,
+      responseType: 'blob',
+      timeout: EXPORT_TIMEOUT_MS,
+    })
+    const disposition = response.headers['content-disposition'] as string | undefined
+    return { file: response.data, filename: filenameFrom(disposition, 'incidentes.csv') }
   },
 
   async restore(id: string): Promise<void> {

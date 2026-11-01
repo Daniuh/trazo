@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/modules/auth/application/useSessionStore'
 import { useRealtime } from '@/modules/realtime/application/realtimeBus'
+import { formatNumber } from '@/shared/format/numbers'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppPagination from '@/shared/ui/AppPagination.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
@@ -24,11 +25,11 @@ import IncidentToolbar from './list/IncidentToolbar.vue'
 
 const router = useRouter()
 const session = useSessionStore()
-const { notify, notifyError } = useFeedback()
+const { confirm, notify, notifyError } = useFeedback()
 const { isLaptopUp, isDesktop } = useViewport()
 
 const list = useIncidentList()
-const { criteria, items, total, lastPage, loading, error } = list
+const { criteria, items, total, lastPage, loading, error, exporting } = list
 const options = useListFilterOptions()
 
 const previewId = ref<string | null>(null)
@@ -49,6 +50,20 @@ async function restore(id: string): Promise<void> {
   const failure = await list.restore(id)
   if (failure) notifyError(failure)
   else notify('Incidente restaurado.')
+}
+
+// Exporta exactamente lo filtrado, tras confirmar cuántos salen
+async function exportCsv(): Promise<void> {
+  const count = total.value === 1 ? '1 incidente' : `${formatNumber(total.value)} incidentes`
+  const accepted = await confirm({
+    title: 'Exportar incidentes',
+    message: `Se exportarán ${count} con los filtros y el orden actuales, en un archivo CSV que se abre con Excel.`,
+    confirmLabel: 'Exportar',
+  })
+  if (!accepted) return
+  const failure = await list.exportCsv()
+  if (failure) notifyError(failure)
+  else notify('Exportación lista. Revisa la carpeta de descargas.')
 }
 
 // Cambios de otras personas: se anuncian sin mover las filas mientras alguien lee. Se cuentan incidentes, no avisos
@@ -87,7 +102,11 @@ function clearFilters(): void {
       :my-id="options.myId.value"
       :can-see-deleted="options.canSeeDeleted.value"
       :count-for="list.countFor"
+      :can-export="session.can('incidents.export')"
+      :exporting="exporting"
+      :total="total"
       @change="list.update"
+      @export="exportCsv"
     />
     <ActiveFilters
       :criteria="criteria"

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-// Guarda cada acción administrativa en admin_actions, con su tipo del catálogo. Documentado en docs/backend/users.md
+// Guarda cada acción administrativa en admin_actions, con su tipo del catálogo. Documentado en docs/backend/shared.md
 
-namespace App\Modules\Users\Infrastructure;
+namespace App\Modules\Shared\Infrastructure;
 
+use App\Modules\Shared\Application\AdminActionType;
 use App\Modules\Shared\Application\Data\RequestContext;
-use App\Modules\Users\Application\AdminActionType;
-use App\Modules\Users\Application\Ports\AdminLog;
+use App\Modules\Shared\Application\Ports\AdminLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LogicException;

@@ -54,6 +54,12 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
 
 **Filtros en la URL.** Todo el criterio vive en la URL (`?status=open,in_progress&priority=critical&page=2`), así que un enlace compartido o una recarga muestran lo mismo. Lo que no se reconoce se ignora y vuelve al valor por defecto. Cambiar un filtro vuelve a la página 1.
 
+**Exportar.** Solo con `incidents.export`. Descarga en CSV exactamente lo que se ve filtrado, en el mismo orden ([Exportación](../backend/incidents.md#exportación)).
+
+- **Dónde:** en monitor, el botón "Exportar" al final de la barra. En portátil, el mismo botón solo con el ícono (con texto, la barra no cabe en una fila); su nombre accesible es "Exportar" y al pasar el cursor dice "Exportar CSV". En celular y tablet, el menú ⋯ de la barra ("Más opciones del listado") con "Exportar CSV".
+- **Cómo:** pide confirmación con el número de incidentes ("Se exportarán 1.234 incidentes…"). Mientras descarga, el botón muestra "Exportando…" y queda bloqueado. Al terminar avisa "Exportación lista. Revisa la carpeta de descargas.". Sin resultados, la opción queda desactivada.
+- **Errores:** si pasa del tope, el mensaje dice cuántos son y cuál es el máximo y pide acotar los filtros. Si se exporta más de 5 veces en un minuto, dice cuánto esperar.
+
 **Paginación.** "1–20 de 534", páginas con saltos (…) y 20, 50 o 100 por página. En celular, solo "anterior", "Página 3 de 27" y "siguiente".
 
 **Estados.** Esqueleto mientras carga la primera vez. Dos vacíos distintos: sin resultados para los filtros (con "Limpiar filtros") o sin incidentes todavía (con "Nuevo incidente", si se puede crear). Error con "Reintentar". Si llega una respuesta vieja después de una nueva, se descarta.
@@ -113,14 +119,14 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
 |---|---|---|
 | domain | `incident.ts` | Tipos del incidente, borrador, historial y catálogos; límites de largo |
 | domain | `listing.ts` | Criterios del listado, valores por defecto, campos de orden y tamaños de página |
-| infrastructure | `listApi.ts` | Parámetros de `GET /incidents`, página de respuesta y restaurar |
+| infrastructure | `listApi.ts` | Parámetros de `GET /incidents`, página de respuesta, restaurar y descarga de la exportación |
 | infrastructure | `incidentsApi.ts`, `mappers.ts` | Llamadas a la API y traducción entre `snake_case` y el modelo |
 | application | `useCatalogStore` | Catálogos, pedidos una vez por sesión |
 | application | `useIncidentForm` | Carga, validación visual, vencimiento sugerido, idempotencia y envío |
 | application | `useIncidentDetail` | Detalle, historial y acciones con manejo de conflictos |
 | application | `useAssignees` | Lista de personas asignables |
 | application | `listQuery.ts` | Criterios ↔ URL, en las dos direcciones |
-| application | `useIncidentList` | Listado ligado a la URL (sobre `useRouteList`, que descarta respuestas viejas), restaurar y conteo para el panel de filtros |
+| application | `useIncidentList` | Listado ligado a la URL (sobre `useRouteList`, que descarta respuestas viejas), restaurar, conteo para el panel de filtros y exportar (`exportCsv`, `exporting`) |
 | application | `useListFilterOptions` | Opciones de cada filtro según los catálogos y los permisos |
 | presentation | `IncidentListPage`, `IncidentFormPage`, `IncidentDetailPage` | Páginas |
 | presentation | `list/`: `IncidentToolbar`, `IncidentFilterFields`, `IncidentMoreFilters`, `IncidentFiltersSheet`, `ActiveFilters`, `IncidentTable`, `IncidentCards`, `IncidentPreview`, `sortOptions.ts` | Piezas del listado. La tabla va sobre `AppDataTable` y el panel de filtros sobre `AppFilterSheet` |
@@ -133,5 +139,6 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
 - [`frontend/src/modules/incidents/`](../../frontend/src/modules/incidents/)
 - [`frontend/src/shared/format/dates.ts`](../../frontend/src/shared/format/dates.ts)
 - Enlace al listado filtrado desde otros módulos: [`listLink.ts`](../../frontend/src/modules/incidents/application/listLink.ts) (`incidentListLocation`)
-- Pruebas: archivos `*.spec.ts` dentro del módulo y en `shared/format/`; flujos completos en [`frontend/e2e/incidents.spec.ts`](../../frontend/e2e/incidents.spec.ts).
+- Pruebas: archivos `*.spec.ts` dentro del módulo y en `shared/format/`; flujos completos en [`frontend/e2e/incidents.spec.ts`](../../frontend/e2e/incidents.spec.ts) y [`frontend/e2e/export.spec.ts`](../../frontend/e2e/export.spec.ts).
+- Exportar: [`IncidentToolbar.vue`](../../frontend/src/modules/incidents/presentation/list/IncidentToolbar.vue), [`IncidentListPage.vue`](../../frontend/src/modules/incidents/presentation/IncidentListPage.vue) y [`shared/download/saveFile.ts`](../../frontend/src/shared/download/saveFile.ts); decisión en el [ADR-0058](../decisiones/0058-exportacion-en-la-practica.md).
 - Decisiones: [ADR-0012](../decisiones/0012-bloqueo-optimista.md), [ADR-0037](../decisiones/0037-idempotencia.md), [ADR-0043](../decisiones/0043-reglas-de-acceso-en-el-dominio.md), [ADR-0044](../decisiones/0044-listado-de-incidentes.md) y [ADR-0045](../decisiones/0045-listado-en-el-front.md)

@@ -68,7 +68,7 @@ En la administración, cada registro trae `target_user` y `target_role` en lugar
 - **Alcance de la administración** (`AdminAuditScope`). Para quien no es la cima, un registro se ve si lo hizo esa persona, o si la persona o el rol afectados están por debajo de su nivel.
   - El nivel de una persona es el de su rol más alto **hoy**.
   - Un rol eliminado se mide por el nivel guardado en el detalle.
-  - Un registro sin persona ni rol afectado solo lo ve quien lo hizo y la cima.
+  - Un registro sin persona ni rol afectado solo lo ve quien lo hizo y la cima. Es el caso de las [exportaciones de incidentes](incidents.md#exportación) (`incidents_exported`), que guardan el número de filas y los filtros.
   - La misma regla está en SQL (`DatabaseAdminAudit`) y una prueba compara las dos registro por registro.
 - **Enlaces** (`links`): el back dice si quien consulta puede abrir lo que se nombra.
   - El incidente, con la misma regla del detalle (`IncidentAccess`).
