@@ -60,6 +60,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | CSS de Quasar solo con los componentes usados | Bajar los 38 kB comprimidos de la carga inicial, casi todos de estilos que no se usan |
 | Escaneo de ZAP en el CI | Repetir el escaneo pasivo en cada Pull Request, contra el stack del propio CI |
 | Despliegue sin caída (blue/green) | Actualizaciones sin interrupción |
+| Despliegue continuo con imágenes en GHCR | Al fusionar en `main`, el CI publica las imágenes y el servidor solo las descarga, sin construir allí ([ADR-0088](../decisiones/0088-despliegue-detras-del-proxy-existente.md)) |
+| Proxy de TLS como proyecto propio del servidor | Que el Caddy no dependa de ningún proyecto y cada sitio solo agregue su bloque ([ADR-0088](../decisiones/0088-despliegue-detras-del-proxy-existente.md)) |
 | Conservar los archivos de la versión anterior tras publicar | Quien tenía Trazo abierto sigue navegando sin recargar ([ADR-0063](../decisiones/0063-pantalla-que-no-se-descarga.md)) |
 | Recarga automática ante una versión nueva | Una sola recarga, y solo si no hay cambios sin guardar, en lugar del aviso con "Recargar" ([ADR-0063](../decisiones/0063-pantalla-que-no-se-descarga.md)) |
 | Commits firmados | Garantía de autoría de cada cambio |
