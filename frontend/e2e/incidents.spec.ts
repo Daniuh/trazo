@@ -46,7 +46,8 @@ test('el solicitante no ve los filtros de gestión', async ({ page }) => {
   await page.goto('/incidentes')
 
   await expect(page.getByRole('heading', { level: 1, name: 'Incidentes' })).toBeVisible()
-  await expect(page.getByLabel('Asignado')).toHaveCount(0)
+  // Exacto: un título de incidente puede contener la palabra "asignado"
+  await expect(page.getByLabel('Asignado', { exact: true })).toHaveCount(0)
   // "Más filtros" en portátil y monitor; "Filtros" (panel inferior) en celular y tablet
   await page.getByRole('button', { name: /^(Más filtros|Filtros)/ }).click()
   await expect(page.getByText('Ver eliminados')).toHaveCount(0)

@@ -8,11 +8,10 @@ import { toApiError } from '@/shared/http'
 import AppButton from '@/shared/ui/AppButton.vue'
 import AppAlert from '@/shared/ui/feedback/AppAlert.vue'
 import AppTextField from '@/shared/ui/form/AppTextField.vue'
+import { looksLikeEmail } from '@/shared/validation/email'
 import { LOGIN_ROUTE } from '../../application/authGuard'
 import { useRecoveryStore } from '../../application/useRecoveryStore'
 import AuthPanel from '../AuthPanel.vue'
-
-const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const router = useRouter()
 const recovery = useRecoveryStore()
@@ -27,7 +26,7 @@ async function submit(): Promise<void> {
   const value = email.value.trim()
   fieldError.value = !value
     ? fieldMessageFor({ code: 'REQUIRED' })
-    : EMAIL_SHAPE.test(value)
+    : looksLikeEmail(value)
       ? undefined
       : fieldMessageFor({ code: 'INVALID_EMAIL' })
   if (fieldError.value) return

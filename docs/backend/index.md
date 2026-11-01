@@ -18,9 +18,11 @@ backend/
 │   ├── Auth/              → sesión: login, logout, bloqueo progresivo
 │   ├── Dashboard/         → widgets, métricas en caché y diseño por persona
 │   ├── Incidents/         → ciclo de vida de los incidentes y catálogos
-│   ├── Users/             → usuarios, roles y permisos
-│   └── Shared/            → lo transversal: errores, identificador de petición
+│   ├── Users/             → administración de personas, jerarquía y permisos efectivos
+│   └── Shared/            → lo transversal: errores, identificador de petición, hora y transacciones
 │       ├── Domain/
+│       ├── Application/
+│       ├── Infrastructure/
 │       └── Http/
 ├── bootstrap/app.php      → rutas, middleware global y manejo de errores
 ├── routes/api.php         → carga las rutas de cada módulo bajo /api/v1
@@ -35,10 +37,10 @@ backend/
 | Módulo | Estado | Documento |
 |---|---|---|
 | Shared | Listo | [Shared](shared.md) |
-| Auth | Login, logout y sesión listos; MFA y recuperación pendientes | [Auth](auth.md) |
+| Auth | Login, sesión, MFA y recuperación y cambio de contraseña listos | [Auth](auth.md) |
 | Incidents | CRUD, estados, asignación, historial y listado listos | [Incidents](incidents.md) |
 | Dashboard | Widgets, métricas y diseño por persona listos | [Dashboard](dashboard.md) |
-| Users | Modelos y permisos efectivos (`UserPermissions`); administración pendiente | [Modelo de datos](../base-de-datos/modelo.md) |
+| Users | Administración de personas, jerarquía y permisos por persona listos; edición de roles pendiente | [Users](users.md) |
 | System | Pendiente | — |
 
 ## Cómo se agrega un módulo

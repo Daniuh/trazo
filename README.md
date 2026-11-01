@@ -61,7 +61,8 @@ Todos los usuarios tienen la misma contraseña: **`Trazo.Demo.2026`**
 
 | Correo | Rol | Qué puede hacer |
 |---|---|---|
-| `superadmin@trazo.test` | Super admin | Todos los permisos. Además de lo del supervisor, administrará usuarios, auditoría y sistema cuando esas secciones estén listas |
+| `superadmin@trazo.test` | Super admin | Todos los permisos: lo del supervisor, administrar a todas las personas (incluidos los administradores), restablecer la verificación en dos pasos o el acceso de cualquiera y, cuando estén listas, auditoría y sistema |
+| `admin@trazo.test` | Administrador | Crear y administrar a las personas por debajo de su nivel: datos, rol, permisos por persona, activar y desactivar. Ve la auditoría y sus propios incidentes |
 | `supervisor@trazo.test` | Supervisor | Ver, editar, asignar, eliminar y restaurar cualquier incidente, cambiar su estado y ver el resumen general |
 | `agente1@trazo.test`<br>`agente2@trazo.test`<br>`agente3@trazo.test` | Agente | Atender los incidentes asignados, tomar los que no tienen responsable y cambiar su estado |
 | `solicitante1@trazo.test`<br>`solicitante2@trazo.test`<br>`solicitante3@trazo.test` | Solicitante | Crear incidentes, seguir los suyos y editarlos mientras siguen en estado Abierto |
@@ -84,6 +85,15 @@ Desde **Mi cuenta** (menú de la persona, arriba a la derecha) se ve su estado y
 - **Cambiarla:** desde Mi cuenta, con la contraseña actual. Se cierran las demás sesiones y la actual sigue abierta.
 - **Requisitos:** de 12 a 128 caracteres y que no aparezca en filtraciones conocidas ni entre las más usadas.
 - En los dos casos llega un aviso "Tu contraseña cambió". Si cambias la contraseña de un usuario de demostración, ya no entrará con `Trazo.Demo.2026`.
+
+### Administración de usuarios
+
+En el menú **Usuarios** (Super admin y Administrador):
+
+- **Crear una cuenta:** nombre, correo y rol. No se define contraseña: a la persona le llega un correo de bienvenida (en local, a Mailpit) para crearla con "¿Olvidaste tu contraseña?".
+- **Jerarquía:** cada quien administra solo a las personas por debajo de su rol. El Administrador no toca a otro Administrador ni al Super admin.
+- **Permisos por persona:** en la ficha de cada persona, "Editar permisos" concede uno adicional o quita uno de su rol, sin crear roles nuevos.
+- **Acciones delicadas:** dar un rol o un permiso de administración, o restablecer la verificación en dos pasos o el acceso de alguien, piden el código de **tu** aplicación de autenticación. Por eso, quien administra debe tenerla activa.
 
 > Por seguridad, después de 5 intentos fallidos con el mismo correo el ingreso se pausa 1 minuto (y más tiempo si se insiste). Lo mismo con 5 códigos incorrectos seguidos: hay que volver a poner la contraseña. Es el comportamiento esperado.
 

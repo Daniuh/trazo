@@ -14,9 +14,9 @@ use App\Modules\Dashboard\Application\Ports\WidgetCatalog;
 use App\Modules\Dashboard\Domain\DashboardAccess;
 use App\Modules\Dashboard\Domain\Exceptions\DashboardExceptions;
 use App\Modules\Dashboard\Domain\WidgetCode;
-use App\Modules\Incidents\Application\Ports\Clock;
 use App\Modules\Incidents\Domain\Actor;
 use App\Modules\Incidents\Domain\VisibilityScope;
+use App\Modules\Shared\Application\Ports\Clock;
 use App\Modules\Shared\Domain\Exceptions\ForbiddenException;
 
 final readonly class ReadDashboardMetrics

@@ -18,8 +18,9 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | Seeder | Qué carga | Entorno |
 |---|---|---|
 | `IncidentCatalogSeeder` | Prioridades, estados, transiciones y tipos de actividad | Todos |
-| `AccessControlSeeder` | Roles, permisos y la matriz inicial | Todos |
+| `AccessControlSeeder` | Roles (con su nivel), permisos y la matriz inicial. La matriz solo se siembra para un rol o un permiso que se crea en esa ejecución ([ADR-0054](../decisiones/0054-matriz-de-permisos-no-destructiva.md)) | Todos |
 | `MfaPolicySeeder` | Política de MFA por rol: obligatorio, con un ingreso de gracia | Todos |
+| `AdminActionTypeSeeder` | Catálogo de acciones administrativas | Todos |
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
 | `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
 
@@ -32,6 +33,7 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | Correo | Rol |
 |---|---|
 | `superadmin@trazo.test` | Super admin |
+| `admin@trazo.test` | Administrador |
 | `supervisor@trazo.test` | Supervisor |
 | `agente1@trazo.test`, `agente2@trazo.test`, `agente3@trazo.test` | Agente |
 | `solicitante1@trazo.test`, `solicitante2@trazo.test`, `solicitante3@trazo.test` | Solicitante |

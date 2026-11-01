@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-// Quién puede recibir incidentes: cuentas activas cuyo rol incluye atender incidentes asignados.
+// Quién puede recibir incidentes: cuentas activas con el permiso de atender incidentes asignados (por su rol o
+// concedido a la persona, y sin que se lo hayan quitado).
 // Se decide por permiso, nunca por nombre de rol. Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Infrastructure;
@@ -10,6 +11,7 @@ namespace App\Modules\Incidents\Infrastructure;
 use App\Modules\Incidents\Application\Data\Person;
 use App\Modules\Incidents\Application\Ports\AssigneeDirectory;
 use App\Modules\Users\Infrastructure\Models\User;
+use App\Modules\Users\Infrastructure\PermissionSql;
 use Illuminate\Database\Eloquent\Builder;
 
 final class EloquentAssigneeDirectory implements AssigneeDirectory
@@ -35,14 +37,12 @@ final class EloquentAssigneeDirectory implements AssigneeDirectory
      */
     private function eligible(): Builder
     {
-        return User::query()
+        $query = User::query()
             ->select(['users.id', 'users.ulid', 'users.name'])
-            ->where('users.is_active', true)
-            ->whereExists(fn ($query) => $query->selectRaw('1')
-                ->from('user_role')
-                ->join('role_permission', 'role_permission.role_id', '=', 'user_role.role_id')
-                ->join('permissions', 'permissions.id', '=', 'role_permission.permission_id')
-                ->whereColumn('user_role.user_id', 'users.id')
-                ->where('permissions.code', self::WORK_PERMISSION));
+            ->where('users.is_active', true);
+
+        PermissionSql::havingPermission($query, self::WORK_PERMISSION);
+
+        return $query;
     }
 }

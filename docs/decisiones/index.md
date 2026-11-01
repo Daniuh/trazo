@@ -64,3 +64,5 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0050](0050-editor-del-dashboard.md) | Editor del dashboard con grid-layout-plus, sin sus estilos inyectados y con alternativa de teclado |
 | [ADR-0051](0051-mfa-en-la-practica.md) | MFA en la práctica: token de un ingreso a medias, sin atajo local y avisos por correo |
 | [ADR-0052](0052-recuperacion-y-cambio-de-contrasena.md) | Recuperación y cambio de contraseña: pase de un solo uso, HMAC, Have I Been Pwned y segundo factor |
+| [ADR-0053](0053-administracion-de-usuarios.md) | Administración de usuarios: jerarquía por nivel, permisos por persona y reautenticación |
+| [ADR-0054](0054-matriz-de-permisos-no-destructiva.md) | La matriz de permisos se siembra solo para roles y permisos nuevos |

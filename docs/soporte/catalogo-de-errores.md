@@ -62,6 +62,24 @@ Cada mensaje que puede ver un usuario, qué lo provoca y cómo ayudarle. Cuando 
 
 Después de recuperar la contraseña se cierran todas las sesiones abiertas; después de cambiarla desde Mi cuenta, todas menos la actual. En los dos casos llega un correo "Tu contraseña cambió". Si la persona no lo hizo, debe recuperar la contraseña de inmediato y avisar al equipo de seguridad.
 
+## Administración de usuarios
+
+| Mensaje que ve el usuario | Qué significa | Qué hacer |
+|---|---|---|
+| Tu propio rol, tus permisos, tu estado y tu acceso los cambia otra persona… | Se intentó cambiar la cuenta propia (solo se pueden corregir los datos propios) | Pedírselo a otra persona que administre Trazo |
+| Esta persona tiene un rol de tu mismo nivel o superior… | Solo se administra hacia abajo: un Administrador no toca a otro Administrador ni al Super admin | Pedírselo al Super admin |
+| No puedes dar ese rol: solo puedes asignar roles por debajo del tuyo. | El rol elegido está en su nivel o por encima | Elegir otro rol, o pedírselo al Super admin |
+| Solo puedes conceder permisos que tú también tienes… | Se marcó un permiso que quien administra no tiene | Desmarcarlo; quitar permisos sí se puede |
+| El Super admin tiene todos los permisos por su rol… | Al Super admin no se le conceden ni quitan permisos uno por uno | Ninguna; si debe tener menos acceso, cambiarle el rol |
+| Trazo necesita al menos un Super admin activo… | El cambio dejaría el sistema sin Super admin | Primero dar el rol Super admin a otra persona |
+| Esta cuenta ya está activa / desactivada… · Esta persona no tiene activa la verificación en dos pasos… | La ficha estaba desactualizada (otra persona hizo el cambio) | Recargar la página |
+| Para confirmar este cambio, escribe el código de tu aplicación de autenticación. | El cambio toca permisos de administración o restablece un acceso | Escribir el código en el diálogo que se abre |
+| Para hacer este cambio necesitas tener activa la verificación en dos pasos… | Quien administra no tiene MFA, así que no puede confirmar acciones sensibles | Activarla desde Mi cuenta |
+| Escribiste varios códigos incorrectos seguidos. Espera N y vuelve a intentarlo. | Cinco códigos incorrectos en un minuto | Esperar; revisar que la hora del teléfono sea automática |
+| Este valor ya está en uso. Prueba con otro. (junto al correo) | El correo ya es de otra cuenta | Usar otro correo, o buscar la cuenta existente en el listado |
+
+**Si alguien perdió su teléfono y sus códigos de recuperación,** el Super admin restablece su verificación en dos pasos desde su ficha; en el siguiente ingreso la configura de nuevo. **Si no puede ingresar por la contraseña,** puede usar "¿Olvidaste tu contraseña?" o el Super admin puede restablecer su acceso.
+
 ## Incidentes
 
 | Mensaje que ve el usuario | Qué significa | Qué hacer |

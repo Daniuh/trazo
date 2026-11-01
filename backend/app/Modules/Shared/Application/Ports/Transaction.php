@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 // Ejecuta varias escrituras como una sola: o se guardan todas o ninguna.
-// Documentado en docs/backend/incidents.md
+// Documentado en docs/backend/shared.md
 
-namespace App\Modules\Incidents\Application\Ports;
+namespace App\Modules\Shared\Application\Ports;
 
 use Closure;
 

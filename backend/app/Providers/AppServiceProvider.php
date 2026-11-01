@@ -7,6 +7,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Modules\Shared\Application\Ports\Clock;
+use App\Modules\Shared\Application\Ports\Transaction;
+use App\Modules\Shared\Infrastructure\LaravelSupport;
 use App\Modules\Users\Infrastructure\UserPermissions;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -15,6 +18,12 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /** @var array<class-string, class-string> Puertos que comparten todos los módulos */
+    public array $bindings = [
+        Clock::class => LaravelSupport::class,
+        Transaction::class => LaravelSupport::class,
+    ];
+
     public function register(): void
     {
         // Los permisos de cada usuario se consultan una sola vez por petición, aunque varios módulos los pidan

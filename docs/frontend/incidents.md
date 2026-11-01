@@ -119,10 +119,10 @@ Cada persona ve solo lo que la API le deja ver (ver [Módulo Incidents](../backe
 | application | `useIncidentDetail` | Detalle, historial y acciones con manejo de conflictos |
 | application | `useAssignees` | Lista de personas asignables |
 | application | `listQuery.ts` | Criterios ↔ URL, en las dos direcciones |
-| application | `useIncidentList` | Estado del listado ligado a la URL, descarte de respuestas viejas y conteo para el panel de filtros |
+| application | `useIncidentList` | Listado ligado a la URL (sobre `useRouteList`, que descarta respuestas viejas), restaurar y conteo para el panel de filtros |
 | application | `useListFilterOptions` | Opciones de cada filtro según los catálogos y los permisos |
 | presentation | `IncidentListPage`, `IncidentFormPage`, `IncidentDetailPage` | Páginas |
-| presentation | `list/`: `IncidentToolbar`, `IncidentFilterFields`, `IncidentMoreFilters`, `IncidentFiltersSheet`, `ActiveFilters`, `IncidentTable`, `IncidentCards`, `IncidentPreview`, `sortOptions.ts` | Piezas del listado |
+| presentation | `list/`: `IncidentToolbar`, `IncidentFilterFields`, `IncidentMoreFilters`, `IncidentFiltersSheet`, `ActiveFilters`, `IncidentTable`, `IncidentCards`, `IncidentPreview`, `sortOptions.ts` | Piezas del listado. La tabla va sobre `AppDataTable` y el panel de filtros sobre `AppFilterSheet` |
 | presentation | `useStatusChange`, `IncidentStatusButton` | Cambio de estado con confirmación, compartido por el detalle y la vista previa |
 | presentation | `IncidentForm`, `IncidentActions`, `IncidentBadges`, `IncidentFacts`, `IncidentHistory`, `AssignDialog` | Piezas reutilizables (las insignias se reutilizarán en el listado) |
 | presentation | `incidentTones.ts`, `historyText.ts` | Colores por código y frases del historial |

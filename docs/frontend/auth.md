@@ -95,7 +95,7 @@ Tres pantallas dentro del mismo marco del login (`AuthPanel`):
 
 - **Tus datos:** nombre, correo y rol.
 - **Contraseña:** "Cambiar contraseña" abre un diálogo (`ChangePasswordDialog`) con la actual, la nueva y su confirmación. Una contraseña actual equivocada o una nueva igual a la actual se marcan en su campo, sin cerrar el diálogo. Al cambiarla, avisa que se cerraron las demás sesiones; la actual sigue abierta.
-- **Verificación en dos pasos:** si está activa, cuántos códigos de recuperación quedan (con un aviso cuando quedan 2 o menos), "Generar códigos nuevos" y, si el rol no la exige, "Desactivar". Las dos acciones piden el código actual en un diálogo (`MfaCodeDialog`) que muestra el error sin cerrarse. Si no está activa, "Configurar".
+- **Verificación en dos pasos:** si está activa, cuántos códigos de recuperación quedan (con un aviso cuando quedan 2 o menos), "Generar códigos nuevos" y, si el rol no la exige, "Desactivar". Las dos acciones piden el código actual en un diálogo (`AppCodeDialog`, compartido) que muestra el error sin cerrarse. Si no está activa, "Configurar".
 
 ## Redirección segura
 
@@ -120,7 +120,7 @@ Después del login se vuelve a la página indicada en `?volver=`, solo si es una
 | presentation | `AuthPanel.vue` | Marco común de las pantallas sin sesión: logo, título y tarjeta centrada desde tablet |
 | presentation | `mfa/MfaVerifyPage`, `MfaSetupPage`, `RecoveryCodesPanel` | Segundo paso del ingreso, configuración del MFA y códigos de recuperación |
 | presentation | `password/ForgotPasswordPage`, `ResetCodePage`, `NewPasswordPage`, `NewPasswordFields` | Las tres pantallas de la recuperación y los campos de contraseña nueva con sus requisitos |
-| presentation | `account/AccountPage`, `MfaCodeDialog`, `ChangePasswordDialog` | Mi cuenta, el diálogo que pide el código actual y el del cambio de contraseña |
+| presentation | `account/AccountPage`, `ChangePasswordDialog` | Mi cuenta y el diálogo del cambio de contraseña (sobre `AppFormDialog`); el código actual lo pide `AppCodeDialog` |
 | — | `errors.ts`, `routes.ts` | Mensajes del módulo; rutas públicas `/ingresar`, `/ingresar/verificar`, `/configurar-mfa`, `/recuperar`, `/recuperar/codigo`, `/recuperar/nueva` y `/sin-conexion`, y `/mi-cuenta` dentro del layout |
 
 Los diálogos envuelven su formulario en un `div`: Quasar solo deja pasar los clics al primer `div` dentro de `QDialog`, y con un `form` en la raíz los clics caían al fondo y cerraban el diálogo.

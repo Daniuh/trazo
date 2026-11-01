@@ -3,12 +3,12 @@
 <script setup lang="ts">
 import { QCheckbox } from 'quasar'
 
-defineProps<{ label: string }>()
+defineProps<{ label: string; disabled?: boolean }>()
 const model = defineModel<boolean>({ default: false })
 </script>
 
 <template>
-  <QCheckbox v-model="model" class="app-checkbox" :label="label" color="primary" dense />
+  <QCheckbox v-model="model" class="app-checkbox" :label="label" :disable="disabled" color="primary" dense />
 </template>
 
 <style scoped lang="scss">

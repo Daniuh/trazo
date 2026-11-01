@@ -33,7 +33,12 @@ final readonly class SanctumSessionTokens implements SessionTokens
 
     public function issue(int $userId, LoginStep $step = LoginStep::Complete): IssuedSession
     {
-        return $this->create($userId, self::TOKEN_NAME, [self::SESSION_ABILITY], $this->maxMinutes, $step);
+        $session = $this->create($userId, self::TOKEN_NAME, [self::SESSION_ABILITY], $this->maxMinutes, $step);
+
+        // Toda sesión completa nace aquí, así que es el único lugar que anota el último ingreso
+        User::query()->whereKey($userId)->update(['last_login_at' => now()]);
+
+        return $session;
     }
 
     public function issueChallenge(int $userId, LoginStep $step): IssuedSession

@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Incidents\Http;
 
-use App\Modules\Incidents\Application\Data\RequestContext;
 use App\Modules\Incidents\Domain\Actor;
+use App\Modules\Shared\Application\Data\RequestContext;
 use App\Modules\Users\Infrastructure\UserPermissions;
 use Illuminate\Http\Request;
 

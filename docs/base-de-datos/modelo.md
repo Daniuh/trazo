@@ -30,6 +30,10 @@ erDiagram
   users ||--o| user_mfa_factors : "segundo factor"
   users ||--o{ user_recovery_codes : "recuperación"
   users ||--o{ password_reset_codes : "recupera la contraseña"
+  users ||--o{ user_permissions : "excepciones"
+  permissions ||--o{ user_permissions : "concedido o quitado"
+  users ||--o{ admin_actions : "administra"
+  admin_action_types ||--o{ admin_actions : tipo
 ```
 
 Las tablas de las funcionalidades adicionales (MFA, recuperación de contraseña, logs del sistema, dashboard personalizable y tokens de sesión) se agregan con migraciones nuevas en la fase de cada funcionalidad, sin modificar las existentes.
@@ -47,6 +51,9 @@ Toda referencia es una clave foránea real; no hay relaciones polimórficas. La 
 | `user_role.user_id` → `users` | CASCADE | Solo aplica a un usuario sin historial (si tiene historial, el borrado ya está bloqueado) |
 | `role_permission.role_id` → `roles` | CASCADE | Sin el rol, sus asignaciones no significan nada |
 | `user_role.role_id`, `role_permission.permission_id` | RESTRICT | No se borra un rol o permiso en uso |
+| `user_permissions.user_id` → `users` | CASCADE | La excepción es parte de la cuenta |
+| `user_permissions.permission_id`, `user_permissions.granted_by` | RESTRICT | No se borra un permiso en uso ni a quien dio la excepción |
+| `admin_actions` → `users`, `admin_action_types`, `roles` | RESTRICT | El registro de la administración es inmutable |
 
 Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`BIGINT`, `SMALLINT` o `TINYINT` sin signo).
 
@@ -63,7 +70,7 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | Tabla | Página |
 |---|---|
 | `users` | [users](diccionario/users.md) |
-| `roles`, `permissions`, `role_permission`, `user_role` | [Roles y permisos](diccionario/roles-y-permisos.md) |
+| `roles`, `permissions`, `role_permission`, `user_role`, `user_permissions` | [Roles y permisos](diccionario/roles-y-permisos.md) |
 | `priorities`, `statuses`, `status_transitions`, `activity_types` | [Catálogos](diccionario/catalogos.md) |
 | `incidents` | [incidents](diccionario/incidents.md) |
 | `incident_activities` | [incident_activities](diccionario/incident-activities.md) |
@@ -71,6 +78,7 @@ Las claves foráneas usan siempre el mismo tipo que la clave a la que apuntan (`
 | `dashboard_widgets`, `user_dashboard_widgets` | [Dashboard](diccionario/dashboard.md) |
 | `mfa_policies`, `user_mfa_factors`, `user_recovery_codes` | [MFA](diccionario/mfa.md) |
 | `password_reset_codes` | [password_reset_codes](diccionario/password-reset-codes.md) |
+| `admin_action_types`, `admin_actions` | [admin_actions](diccionario/admin-actions.md) |
 | `failed_jobs` | Tabla estándar de Laravel para trabajos de cola fallidos |
 
 Datos iniciales: [Seeders](seeders.md).

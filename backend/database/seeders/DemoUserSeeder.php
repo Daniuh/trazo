@@ -17,6 +17,7 @@ class DemoUserSeeder extends Seeder
     /** Correo => [nombre, rol] */
     private const USERS = [
         'superadmin@trazo.test' => ['Sofía Ramírez', 'super_admin'],
+        'admin@trazo.test' => ['Natalia Vargas', 'admin'],
         'supervisor@trazo.test' => ['Carlos Mejía', 'supervisor'],
         'agente1@trazo.test' => ['Laura Gómez', 'agent'],
         'agente2@trazo.test' => ['Andrés Castro', 'agent'],
