@@ -12,6 +12,8 @@ use App\Modules\Incidents\Application\RejectIncidentReopen;
 use App\Modules\Incidents\Application\ReopenIncident;
 use App\Modules\Incidents\Application\RequestIncidentReopen;
 use App\Modules\Incidents\Domain\Actor;
+use App\Modules\Incidents\Http\Requests\ApproveReopenRequest;
+use App\Modules\Incidents\Http\Requests\ReopenIncidentRequest;
 use App\Modules\Incidents\Http\Requests\ReopenRequest;
 use Illuminate\Http\JsonResponse;
 
@@ -29,14 +31,14 @@ final readonly class IncidentReopenController
         return $this->respond($open->handle($actor, $incident, $request->reason(), $this->requests->context($request)), $actor, 201);
     }
 
-    public function reopen(ReopenRequest $request, string $incident, ReopenIncident $reopen): JsonResponse
+    public function reopen(ReopenIncidentRequest $request, string $incident, ReopenIncident $reopen): JsonResponse
     {
         $actor = $this->requests->actor($request);
 
         return $this->respond($reopen->handle($actor, $incident, $request->version(), $request->reason(), $this->requests->context($request)), $actor);
     }
 
-    public function approve(ReopenRequest $request, string $incident, ReopenIncident $reopen): JsonResponse
+    public function approve(ApproveReopenRequest $request, string $incident, ReopenIncident $reopen): JsonResponse
     {
         $actor = $this->requests->actor($request);
 

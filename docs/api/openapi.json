@@ -1092,6 +1092,19 @@
                         }
                     },
                     {
+                        "name": "group_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "due",
+                                "status",
+                                "priority",
+                                "assignee"
+                            ]
+                        }
+                    },
+                    {
                         "name": "filter[status][]",
                         "in": "query",
                         "schema": {
@@ -1270,6 +1283,19 @@
                         }
                     },
                     {
+                        "name": "group_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "due",
+                                "status",
+                                "priority",
+                                "assignee"
+                            ]
+                        }
+                    },
+                    {
                         "name": "filter[status][]",
                         "in": "query",
                         "schema": {
@@ -1388,13 +1414,19 @@
                                                 },
                                                 "last_page": {
                                                     "type": "integer"
+                                                },
+                                                "groups": {
+                                                    "type": "array",
+                                                    "description": "Total de cada grupo de la p\u00e1gina con los mismos filtros (vac\u00edo si no se agrupa)",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
                                                 "page",
                                                 "per_page",
                                                 "total",
-                                                "last_page"
+                                                "last_page",
+                                                "groups"
                                             ]
                                         }
                                     },
@@ -1424,7 +1456,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/IncidentRequest"
+                                "$ref": "#/components/schemas/CreateIncidentRequest"
                             }
                         }
                     }
@@ -1625,7 +1657,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/IncidentRequest"
+                                "$ref": "#/components/schemas/UpdateIncidentRequest"
                             }
                         }
                     }
@@ -2031,13 +2063,6 @@
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    {
-                        "name": "before",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
                     }
                 ],
                 "responses": {
@@ -2119,9 +2144,6 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -2147,7 +2169,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ReopenRequest"
+                                "$ref": "#/components/schemas/ReopenIncidentRequest"
                             }
                         }
                     }
@@ -2359,7 +2381,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ReopenRequest"
+                                "$ref": "#/components/schemas/ApproveReopenRequest"
                             }
                         }
                     }
@@ -2571,7 +2593,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/WorkflowRequest"
+                                "$ref": "#/components/schemas/ChangeStatusRequest"
                             }
                         }
                     }
@@ -2677,7 +2699,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/WorkflowRequest"
+                                "$ref": "#/components/schemas/AssignIncidentRequest"
                             }
                         }
                     }
@@ -3803,7 +3825,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RoleRequest"
+                                "$ref": "#/components/schemas/CreateRoleRequest"
                             }
                         }
                     }
@@ -4015,7 +4037,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RoleRequest"
+                                "$ref": "#/components/schemas/UpdateRoleRequest"
                             }
                         }
                     }
@@ -4863,7 +4885,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserRequest"
+                                "$ref": "#/components/schemas/CreateUserRequest"
                             }
                         }
                     }
@@ -4883,6 +4905,12 @@
                                                     "type": "string"
                                                 },
                                                 "name": {
+                                                    "type": "string"
+                                                },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
                                                     "type": "string"
                                                 },
                                                 "email": {
@@ -4976,6 +5004,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5041,6 +5071,12 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
+                                                    "type": "string"
+                                                },
                                                 "email": {
                                                     "type": "string"
                                                 },
@@ -5132,6 +5168,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5177,7 +5215,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserRequest"
+                                "$ref": "#/components/schemas/UpdateUserRequest"
                             }
                         }
                     }
@@ -5197,6 +5235,12 @@
                                                     "type": "string"
                                                 },
                                                 "name": {
+                                                    "type": "string"
+                                                },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
                                                     "type": "string"
                                                 },
                                                 "email": {
@@ -5290,6 +5334,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5339,10 +5385,11 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserAccessRequest"
+                                "$ref": "#/components/schemas/ChangeRoleRequest"
                             }
                         }
                     }
@@ -5362,6 +5409,12 @@
                                                     "type": "string"
                                                 },
                                                 "name": {
+                                                    "type": "string"
+                                                },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
                                                     "type": "string"
                                                 },
                                                 "email": {
@@ -5455,6 +5508,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5504,10 +5559,11 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserAccessRequest"
+                                "$ref": "#/components/schemas/ChangePermissionsRequest"
                             }
                         }
                     }
@@ -5527,6 +5583,12 @@
                                                     "type": "string"
                                                 },
                                                 "name": {
+                                                    "type": "string"
+                                                },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
                                                     "type": "string"
                                                 },
                                                 "email": {
@@ -5620,6 +5682,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5694,6 +5758,12 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
+                                                    "type": "string"
+                                                },
                                                 "email": {
                                                     "type": "string"
                                                 },
@@ -5785,6 +5855,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -5859,6 +5931,12 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
+                                                    "type": "string"
+                                                },
                                                 "email": {
                                                     "type": "string"
                                                 },
@@ -5950,6 +6028,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -6025,6 +6105,12 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
+                                                    "type": "string"
+                                                },
                                                 "email": {
                                                     "type": "string"
                                                 },
@@ -6116,6 +6202,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -6190,6 +6278,12 @@
                                                 "name": {
                                                     "type": "string"
                                                 },
+                                                "given_names": {
+                                                    "type": "string"
+                                                },
+                                                "family_names": {
+                                                    "type": "string"
+                                                },
                                                 "email": {
                                                     "type": "string"
                                                 },
@@ -6281,6 +6375,8 @@
                                             "required": [
                                                 "id",
                                                 "name",
+                                                "given_names",
+                                                "family_names",
                                                 "email",
                                                 "is_active",
                                                 "role",
@@ -6335,6 +6431,40 @@
                 },
                 "title": "ActionRequest"
             },
+            "ApproveReopenRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "version"
+                ],
+                "title": "ApproveReopenRequest"
+            },
+            "AssignIncidentRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "assignee": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "null deja el incidente sin asignar"
+                    }
+                },
+                "required": [
+                    "version",
+                    "assignee"
+                ],
+                "title": "AssignIncidentRequest"
+            },
             "ChangePasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -6359,6 +6489,72 @@
                     "password_confirmation"
                 ],
                 "title": "ChangePasswordRequest"
+            },
+            "ChangePermissionsRequest": {
+                "type": "object",
+                "properties": {
+                    "mfa_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "permissions"
+                ],
+                "title": "ChangePermissionsRequest"
+            },
+            "ChangeRoleRequest": {
+                "type": "object",
+                "properties": {
+                    "mfa_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "role": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "role"
+                ],
+                "title": "ChangeRoleRequest"
+            },
+            "ChangeStatusRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "version",
+                    "status"
+                ],
+                "title": "ChangeStatusRequest"
             },
             "ChannelAuthRequest": {
                 "type": "object",
@@ -6395,6 +6591,135 @@
                 ],
                 "title": "CommentRequest"
             },
+            "CreateIncidentRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 80
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 5000
+                    },
+                    "priority": {
+                        "type": "string"
+                    },
+                    "due_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "assignee": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "No se env\u00eda: un incidente nuevo no tiene versi\u00f3n anterior"
+                    }
+                },
+                "required": [
+                    "title",
+                    "description",
+                    "priority"
+                ],
+                "title": "CreateIncidentRequest"
+            },
+            "CreateRoleRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 40
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 80
+                    },
+                    "level": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 99
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    },
+                    "mfa_required": {
+                        "type": "boolean"
+                    },
+                    "grace_logins": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 5
+                    },
+                    "mfa_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "code",
+                    "name",
+                    "level",
+                    "permissions",
+                    "mfa_required",
+                    "grace_logins"
+                ],
+                "title": "CreateRoleRequest"
+            },
+            "CreateUserRequest": {
+                "type": "object",
+                "properties": {
+                    "given_names": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "family_names": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "No se env\u00eda: el nombre completo lo arma la base"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 191
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "mfa_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "given_names",
+                    "family_names",
+                    "email",
+                    "role"
+                ],
+                "title": "CreateUserRequest"
+            },
             "EventStatus": {
                 "type": "string",
                 "enum": [
@@ -6429,46 +6754,6 @@
                     "email"
                 ],
                 "title": "ForgotPasswordRequest"
-            },
-            "IncidentRequest": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "minLength": 5,
-                        "maxLength": 80
-                    },
-                    "description": {
-                        "type": "string",
-                        "maxLength": 5000
-                    },
-                    "priority": {
-                        "type": "string"
-                    },
-                    "due_date": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "format": "date-time",
-                        "description": "Un vencimiento nuevo no puede quedar en el pasado"
-                    },
-                    "assignee": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "version": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "title",
-                    "description",
-                    "priority"
-                ],
-                "title": "IncidentRequest"
             },
             "LoginRequest": {
                 "type": "object",
@@ -6541,6 +6826,24 @@
                     "category"
                 ],
                 "title": "NotificationRequest"
+            },
+            "ReopenIncidentRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "reason": {
+                        "type": "string",
+                        "maxLength": 1000
+                    }
+                },
+                "required": [
+                    "version",
+                    "reason"
+                ],
+                "title": "ReopenIncidentRequest"
             },
             "ReopenRequest": {
                 "type": "object",
@@ -6626,57 +6929,6 @@
                 },
                 "title": "RetryJobsRequest"
             },
-            "RoleRequest": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "string",
-                        "minLength": 3,
-                        "maxLength": 40
-                    },
-                    "name": {
-                        "type": "string",
-                        "minLength": 2,
-                        "maxLength": 80
-                    },
-                    "level": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 99
-                    },
-                    "permissions": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "maxItems": 200,
-                        "uniqueItems": true
-                    },
-                    "mfa_required": {
-                        "type": "boolean"
-                    },
-                    "grace_logins": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 5
-                    },
-                    "mfa_code": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    }
-                },
-                "required": [
-                    "code",
-                    "name",
-                    "level",
-                    "permissions",
-                    "mfa_required",
-                    "grace_logins"
-                ],
-                "title": "RoleRequest"
-            },
             "SaveLayoutRequest": {
                 "type": "object",
                 "properties": {
@@ -6730,6 +6982,127 @@
                 ],
                 "title": "SaveLayoutRequest"
             },
+            "UpdateIncidentRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 80
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 5000
+                    },
+                    "priority": {
+                        "type": "string"
+                    },
+                    "due_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "assignee": {
+                        "type": "string",
+                        "description": "No se env\u00eda: la asignaci\u00f3n tiene su propio endpoint"
+                    },
+                    "version": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "title",
+                    "description",
+                    "priority",
+                    "version"
+                ],
+                "title": "UpdateIncidentRequest"
+            },
+            "UpdateRoleRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "description": "No se env\u00eda: el c\u00f3digo de un rol no cambia"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 80
+                    },
+                    "level": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 99
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 200,
+                        "uniqueItems": true
+                    },
+                    "mfa_required": {
+                        "type": "boolean"
+                    },
+                    "grace_logins": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 5
+                    },
+                    "mfa_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "name",
+                    "level",
+                    "permissions",
+                    "mfa_required",
+                    "grace_logins"
+                ],
+                "title": "UpdateRoleRequest"
+            },
+            "UpdateUserRequest": {
+                "type": "object",
+                "properties": {
+                    "given_names": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "family_names": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "No se env\u00eda: el nombre completo lo arma la base"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 191
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "No se env\u00eda: el rol tiene su propio endpoint"
+                    },
+                    "mfa_code": {
+                        "type": "string",
+                        "description": "No se env\u00eda: editar los datos no pide el c\u00f3digo de quien administra"
+                    }
+                },
+                "required": [
+                    "given_names",
+                    "family_names",
+                    "email"
+                ],
+                "title": "UpdateUserRequest"
+            },
             "UserAccessRequest": {
                 "type": "object",
                 "properties": {
@@ -6741,36 +7114,6 @@
                     }
                 },
                 "title": "UserAccessRequest"
-            },
-            "UserRequest": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "minLength": 2,
-                        "maxLength": 120
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 191
-                    },
-                    "role": {
-                        "type": "string"
-                    },
-                    "mfa_code": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    }
-                },
-                "required": [
-                    "name",
-                    "email",
-                    "role"
-                ],
-                "title": "UserRequest"
             },
             "VerifyMfaRequest": {
                 "type": "object",
@@ -6806,6 +7149,10 @@
             "WidgetCode": {
                 "type": "string",
                 "enum": [
+                    "operation_pulse",
+                    "risk_map",
+                    "status_flow",
+                    "backlog_balance",
                     "total_incidents",
                     "pending_incidents",
                     "overdue_incidents",
@@ -6818,26 +7165,6 @@
                     "workload_by_agent"
                 ],
                 "title": "WidgetCode"
-            },
-            "WorkflowRequest": {
-                "type": "object",
-                "properties": {
-                    "version": {
-                        "type": "integer",
-                        "minimum": 1
-                    },
-                    "assignee": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    }
-                },
-                "required": [
-                    "version",
-                    "assignee"
-                ],
-                "title": "WorkflowRequest"
             }
         },
         "responses": {

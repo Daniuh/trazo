@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-// Validación de entrada para crear y editar un incidente (forma, tamaño y referencias).
-// Al editar, el vencimiento solo se envía si cambia. Documentado en docs/backend/incidents.md
+// Base de las validaciones para crear y editar un incidente: título, descripción y prioridad, comunes a las dos.
+// Lo propio de cada una (vencimiento, asignado y versión) está en CreateIncidentRequest y UpdateIncidentRequest.
+// Documentado en docs/backend/incidents.md
 
 namespace App\Modules\Incidents\Http\Requests;
 
@@ -13,7 +14,7 @@ use DateTimeZone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-final class IncidentRequest extends FormRequest
+abstract class IncidentRequest extends FormRequest
 {
     // Un título concreto: cabe en una línea del listado, de una tarjeta y de un aviso (ADR-0073)
     public const int TITLE_MIN = 5;
@@ -21,20 +22,22 @@ final class IncidentRequest extends FormRequest
     public const int TITLE_MAX = 80;
 
     /**
+     * Reglas propias de crear o de editar.
+     *
+     * @return array<string, list<mixed>>
+     */
+    abstract protected function ownRules(): array;
+
+    /**
      * @return array<string, list<mixed>>
      */
     public function rules(): array
     {
-        $creating = $this->isMethod('POST');
-
         return [
             'title' => ['required', 'string', 'min:'.self::TITLE_MIN, 'max:'.self::TITLE_MAX],
             'description' => ['required', 'string', 'max:5000'],
             'priority' => ['required', 'string', Rule::exists('priorities', 'code')->where('is_active', true)],
-            // Un vencimiento nuevo no puede quedar en el pasado
-            'due_date' => [$creating ? 'nullable' : 'sometimes', 'date', 'after:now'],
-            'assignee' => $creating ? ['nullable', 'string', 'ulid'] : ['prohibited'],
-            'version' => $creating ? ['prohibited'] : ['required', 'integer', 'min:1'],
+            ...$this->ownRules(),
         ];
     }
 
@@ -48,15 +51,5 @@ final class IncidentRequest extends FormRequest
             $this->string('priority')->toString(),
             $dueDate?->setTimezone(new DateTimeZone('UTC')),
         );
-    }
-
-    public function assignee(): ?string
-    {
-        return $this->filled('assignee') ? $this->string('assignee')->lower()->toString() : null;
-    }
-
-    public function version(): int
-    {
-        return $this->integer('version');
     }
 }
