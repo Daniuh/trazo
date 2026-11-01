@@ -25,7 +25,7 @@ Los datos iniciales se cargan solos al levantar el stack: el servicio `init` eje
 | `NotificationTypeSeeder` | Catálogo de tipos de notificación, con su pestaña | Todos |
 | `DemoUserSeeder` | Usuarios de demostración | Todos **menos producción** |
 | `AccountSetSeeder` | Cuentas por rol de evaluación y propias, desde el entorno ([cuentas](../operacion/cuentas.md)) | Todos, si sus variables están definidas |
-| `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos **menos producción** |
+| `IncidentVolumeSeeder` | Incidentes de demostración en volumen | Todos; en producción solo con `SEED_INCIDENTS_IN_PRODUCTION=true` |
 
 ## Catálogo de widgets
 
@@ -45,7 +45,7 @@ La contraseña de todos es `Cometa.Demo.2026` (variable `DEMO_USER_PASSWORD`), q
 
 ## Incidentes de demostración
 
-`IncidentVolumeSeeder` carga **600 incidentes** por defecto (la prueba pide al menos 500). El volumen se cambia con la variable `SEED_INCIDENTS`, y nunca se cargan en producción.
+`IncidentVolumeSeeder` carga **600 incidentes** por defecto (la prueba pide al menos 500). El volumen se cambia con la variable `SEED_INCIDENTS`, y en producción solo se cargan si `SEED_INCIDENTS_IN_PRODUCTION=true`: así el sitio de evaluación arranca con datos, repartidos entre las [cuentas por rol](../operacion/cuentas.md). Si no hay personas activas que los atiendan y asignen, se omiten con un aviso ([ADR-0089](../decisiones/0089-incidentes-de-muestra-en-el-sitio-de-evaluacion.md)).
 
 - **Idempotente:** completa hasta llegar al volumen pedido. Si ya hay 600 o más, no hace nada.
 - **Datos coherentes y en español:**
