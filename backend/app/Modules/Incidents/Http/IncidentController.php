@@ -17,8 +17,9 @@ use App\Modules\Incidents\Application\ListMyIncidents;
 use App\Modules\Incidents\Application\Ports\IncidentComments;
 use App\Modules\Incidents\Application\UpdateIncident;
 use App\Modules\Incidents\Domain\IncidentAction;
-use App\Modules\Incidents\Http\Requests\IncidentRequest;
+use App\Modules\Incidents\Http\Requests\CreateIncidentRequest;
 use App\Modules\Incidents\Http\Requests\ListIncidentsRequest;
+use App\Modules\Incidents\Http\Requests\UpdateIncidentRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -67,7 +68,7 @@ final readonly class IncidentController
         return $csv->download($export->handle($this->requests->actor($request), $request->criteria(), $this->requests->context($request)));
     }
 
-    public function store(IncidentRequest $request, CreateIncident $create): JsonResponse
+    public function store(CreateIncidentRequest $request, CreateIncident $create): JsonResponse
     {
         $actor = $this->requests->actor($request);
         $incident = $create->handle($actor, $request->incidentInput(), $request->assignee(), $this->requests->context($request));
@@ -84,7 +85,7 @@ final readonly class IncidentController
         return new JsonResponse(['data' => [...$this->resource->toArray($record, $actor), 'comments_count' => $comments->count($record->id)]]);
     }
 
-    public function update(IncidentRequest $request, string $incident, UpdateIncident $update): JsonResponse
+    public function update(UpdateIncidentRequest $request, string $incident, UpdateIncident $update): JsonResponse
     {
         $actor = $this->requests->actor($request);
         $record = $update->handle($actor, $incident, $request->version(), $request->incidentInput(), $this->requests->context($request));

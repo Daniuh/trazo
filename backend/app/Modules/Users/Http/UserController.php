@@ -14,8 +14,9 @@ use App\Modules\Users\Application\UpdateUser;
 use App\Modules\Users\Application\UserGate;
 use App\Modules\Users\Application\UserProfiles;
 use App\Modules\Users\Domain\Administrator;
+use App\Modules\Users\Http\Requests\CreateUserRequest;
 use App\Modules\Users\Http\Requests\ListUsersRequest;
-use App\Modules\Users\Http\Requests\UserRequest;
+use App\Modules\Users\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -37,7 +38,7 @@ final readonly class UserController
         ]);
     }
 
-    public function store(UserRequest $request, CreateUser $create): JsonResponse
+    public function store(CreateUserRequest $request, CreateUser $create): JsonResponse
     {
         $admin = $this->requests->admin($request);
         $user = $create->handle($admin, $request->newUser(), $request->mfaCode(), $this->requests->context($request));
@@ -52,7 +53,7 @@ final readonly class UserController
         return new JsonResponse(['data' => $this->detail($gate->load($admin, $user), $admin)]);
     }
 
-    public function update(UserRequest $request, string $user, UpdateUser $update): JsonResponse
+    public function update(UpdateUserRequest $request, string $user, UpdateUser $update): JsonResponse
     {
         $admin = $this->requests->admin($request);
         $record = $update->handle($admin, $user, $request->personName(), $request->email(), $this->requests->context($request));

@@ -2,25 +2,28 @@
 
 declare(strict_types=1);
 
-// Validación para crear y editar una persona: nombres y apellidos, correo (normalizado y único) y, al crear, su rol y el código
-// de quien administra si el rol es sensible. Documentado en docs/backend/users.md
+// Base de las validaciones para crear y editar una persona: nombres y apellidos, y correo normalizado y único. Lo propio
+// de cada una (rol y código de quien administra al crear) está en CreateUserRequest y UpdateUserRequest.
+// Documentado en docs/backend/users.md
 
 namespace App\Modules\Users\Http\Requests;
 
 use App\Modules\Shared\Domain\EmailAddress;
-use App\Modules\Users\Application\Data\NewUser;
 use App\Modules\Users\Domain\PersonName;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
-final class UserRequest extends FormRequest
+abstract class UserRequest extends FormRequest
 {
     use ChecksPermission;
 
-    protected function requiredPermission(): string
-    {
-        return $this->isMethod('POST') ? 'users.create' : 'users.update';
-    }
+    /**
+     * Reglas propias de crear o de editar.
+     *
+     * @return array<string, list<mixed>>
+     */
+    abstract protected function ownRules(): array;
 
     // El correo se compara ya normalizado, igual que como se guarda
     protected function prepareForValidation(): void
@@ -40,27 +43,20 @@ final class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $creating = $this->isMethod('POST');
-        $unique = Rule::unique('users', 'email');
-        $current = $this->route('user');
-        if (! $creating && is_string($current)) {
-            $unique->where(fn ($query) => $query->where('ulid', '!=', strtolower($current)));
-        }
-
         return [
             'given_names' => ['required', 'string', 'max:'.PersonName::MAX_PART],
             'family_names' => ['required', 'string', 'max:'.PersonName::MAX_PART],
-            // El nombre completo lo arma la base: no se escribe
+            // No se envía: el nombre completo lo arma la base
             'name' => ['prohibited'],
-            'email' => ['required', 'string', 'email:rfc', 'max:191', $unique],
-            'role' => $creating ? ['required', 'string', Rule::exists('roles', 'code')] : ['prohibited'],
-            'mfa_code' => $creating ? ['nullable', 'string', 'digits:6'] : ['prohibited'],
+            'email' => ['required', 'string', 'email:rfc', 'max:191', $this->uniqueEmail()],
+            ...$this->ownRules(),
         ];
     }
 
-    public function newUser(): NewUser
+    // Al editar, la propia persona no cuenta como repetida
+    protected function uniqueEmail(): Unique
     {
-        return new NewUser($this->personName(), $this->email(), $this->string('role')->toString());
+        return Rule::unique('users', 'email');
     }
 
     public function personName(): PersonName
@@ -71,10 +67,5 @@ final class UserRequest extends FormRequest
     public function email(): string
     {
         return $this->string('email')->toString();
-    }
-
-    public function mfaCode(): ?string
-    {
-        return $this->filled('mfa_code') ? $this->string('mfa_code')->toString() : null;
     }
 }
