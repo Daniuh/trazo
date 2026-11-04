@@ -10,7 +10,7 @@ order: 100
 # ADR-0090: Una validación por ruta
 
 - **Estado:** Aceptada.
-- **Fecha:** 2026-11-02
+- **Fecha:** 2026-11-01
 
 ## Contexto
 Siete clases de validación servían a varias rutas y cambiaban sus reglas según la ruta o el método (`routeIs`, `isMethod`, el nombre de la ruta). Por ejemplo, una sola clase validaba el cambio de estado y la asignación, y otra la creación y la edición de un incidente.

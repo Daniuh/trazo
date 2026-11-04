@@ -52,6 +52,6 @@ El código es lo que las personas usan para referirse a un caso en un correo, un
 ## Dónde está en el código
 - Formato y lectura: [`IncidentCode.php`](../../backend/app/Modules/Incidents/Domain/IncidentCode.php).
 - Contador: [`IncidentCodes.php`](../../backend/app/Modules/Incidents/Infrastructure/IncidentCodes.php), usado por [`EloquentIncidentRepository.php`](../../backend/app/Modules/Incidents/Infrastructure/EloquentIncidentRepository.php) y por [`IncidentVolumeSeeder.php`](../../backend/database/seeders/IncidentVolumeSeeder.php).
-- Migraciones: [`000038`](../../backend/database/migrations/2026_10_28_000038_create_incident_code_sequences_table.php) y [`000039`](../../backend/database/migrations/2026_10_28_000039_renumber_incident_codes.php).
+- Migraciones: [`000038`](../../backend/database/migrations/2026_11_01_000038_create_incident_code_sequences_table.php) y [`000039`](../../backend/database/migrations/2026_11_01_000039_renumber_incident_codes.php).
 - Búsqueda: [`IncidentFilters.php`](../../backend/app/Modules/Incidents/Infrastructure/IncidentFilters.php), [`SearchText.php`](../../backend/app/Modules/Incidents/Http/Rules/SearchText.php) y [`listing.ts`](../../frontend/src/modules/incidents/domain/listing.ts). Auditoría: [`IncidentCode.php`](../../backend/app/Modules/Audit/Http/Rules/IncidentCode.php).
 - Pruebas: [`IncidentCodeTest.php`](../../backend/tests/Unit/Incidents/IncidentCodeTest.php) e [`IncidentCodesTest.php`](../../backend/tests/Feature/Incidents/IncidentCodesTest.php).

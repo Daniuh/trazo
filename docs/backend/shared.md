@@ -62,6 +62,10 @@ Toda la API tiene un límite de 120 peticiones por minuto: por usuario si hay se
 
 En desarrollo, `php artisan trazo:reset-limits` vacía solo esa base: la suite E2E lo usa al empezar para poder repetirse sin esperar 15 minutos. En producción el comando no se registra.
 
+## Nombres de migración
+
+Los archivos de migración llevan la fecha `2026_11_01` y un número de seis cifras que fija el orden. Una base creada cuando los archivos tenían su fecha de escritura (`2026_10_DD`) se pone al día sola: antes de `migrate`, `migrate:status` o `migrate:rollback`, `MigrationNames` cambia ese prefijo en la tabla `migrations`. No toca datos y en una base nueva no hace nada ([ADR-0091](../decisiones/0091-nombres-de-migracion-con-una-sola-fecha.md)).
+
 ## Carga diferida estricta
 
 Fuera de producción, `AppServiceProvider` activa `Model::preventLazyLoading()`: si un código lee una relación que no se pidió con `with()`, Eloquent lanza una excepción en lugar de hacer una consulta más por cada registro. Así un N+1 nuevo falla en desarrollo y en la suite, aunque nadie haya escrito una prueba que cuente consultas para esa pantalla. En producción queda apagado, para que un caso no previsto se vuelva lento y no se caiga ([ADR-0061](../decisiones/0061-entrega-verificada-desde-cero.md)).
@@ -107,4 +111,5 @@ La usa la [exportación de incidentes](incidents.md#exportación); cada módulo 
 - [`Http/CsvDownload.php`](../../backend/app/Modules/Shared/Http/CsvDownload.php): descarga en CSV.
 - [`Domain/TimeCursor.php`](../../backend/app/Modules/Shared/Domain/TimeCursor.php) y [`Http/Rules/Cursor.php`](../../backend/app/Modules/Shared/Http/Rules/Cursor.php): cursor de listas.
 - [`Application/Ports/SystemEvents.php`](../../backend/app/Modules/Shared/Application/Ports/SystemEvents.php) y [`Application/SystemEventType.php`](../../backend/app/Modules/Shared/Application/SystemEventType.php): registro de eventos del sistema.
-- Pruebas: [`tests/Feature/Shared/`](../../backend/tests/Feature/Shared/).
+- [`Infrastructure/Database/MigrationNames.php`](../../backend/app/Modules/Shared/Infrastructure/Database/MigrationNames.php): nombres de migración al día.
+- Pruebas: [`tests/Feature/Shared/`](../../backend/tests/Feature/Shared/) y [`tests/Feature/Database/MigrationNamesTest.php`](../../backend/tests/Feature/Database/MigrationNamesTest.php).

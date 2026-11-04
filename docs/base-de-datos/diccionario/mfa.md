@@ -68,7 +68,7 @@ Los 8 códigos de recuperación de cada persona. Solo se guarda su hash.
 
 ## Dónde está en el código
 
-- Migraciones: [`000018_create_mfa_policies_table`](../../../backend/database/migrations/2026_10_24_000018_create_mfa_policies_table.php), [`000019_create_user_mfa_factors_table`](../../../backend/database/migrations/2026_10_24_000019_create_user_mfa_factors_table.php), [`000020_create_user_recovery_codes_table`](../../../backend/database/migrations/2026_10_24_000020_create_user_recovery_codes_table.php) y [`000021_add_mfa_grace_used_to_users`](../../../backend/database/migrations/2026_10_24_000021_add_mfa_grace_used_to_users.php)
+- Migraciones: [`000018_create_mfa_policies_table`](../../../backend/database/migrations/2026_11_01_000018_create_mfa_policies_table.php), [`000019_create_user_mfa_factors_table`](../../../backend/database/migrations/2026_11_01_000019_create_user_mfa_factors_table.php), [`000020_create_user_recovery_codes_table`](../../../backend/database/migrations/2026_11_01_000020_create_user_recovery_codes_table.php) y [`000021_add_mfa_grace_used_to_users`](../../../backend/database/migrations/2026_11_01_000021_add_mfa_grace_used_to_users.php)
 - Modelo: [`UserMfaFactor`](../../../backend/app/Modules/Auth/Infrastructure/Models/UserMfaFactor.php)
 - Acceso: [`EloquentMfaStore`](../../../backend/app/Modules/Auth/Infrastructure/EloquentMfaStore.php) y [`DatabaseMfaPolicies`](../../../backend/app/Modules/Auth/Infrastructure/DatabaseMfaPolicies.php)
 - Política inicial: [`MfaPolicySeeder`](../../../backend/database/seeders/MfaPolicySeeder.php)

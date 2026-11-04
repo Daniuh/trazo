@@ -41,7 +41,7 @@ Los mensajes no se editan: lo único que cambia es el borrado, que tiene su prop
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_28_000040_create_incident_comments_table.php`](../../../backend/database/migrations/2026_10_28_000040_create_incident_comments_table.php)
+- Migración: [`2026_11_01_000040_create_incident_comments_table.php`](../../../backend/database/migrations/2026_11_01_000040_create_incident_comments_table.php)
 - Acceso: [`DatabaseIncidentComments`](../../../backend/app/Modules/Incidents/Infrastructure/DatabaseIncidentComments.php)
 - Reglas: [`CommentRules`](../../../backend/app/Modules/Incidents/Domain/CommentRules.php)
 - Explicación funcional: [Módulo Incidents](../../backend/incidents.md#conversación)

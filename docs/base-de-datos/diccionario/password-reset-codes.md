@@ -35,6 +35,6 @@ El código tiene un millón de combinaciones. Con un SHA-256 simple, quien tuvie
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_24_000022_create_password_reset_codes_table.php`](../../../backend/database/migrations/2026_10_24_000022_create_password_reset_codes_table.php)
+- Migración: [`2026_11_01_000022_create_password_reset_codes_table.php`](../../../backend/database/migrations/2026_11_01_000022_create_password_reset_codes_table.php)
 - Acceso: [`DatabasePasswordResets`](../../../backend/app/Modules/Auth/Infrastructure/DatabasePasswordResets.php)
 - Explicación funcional: [Módulo Auth](../../backend/auth.md)

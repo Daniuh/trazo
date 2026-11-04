@@ -11,12 +11,15 @@ use App\Modules\Shared\Application\Ports\AdminLog;
 use App\Modules\Shared\Application\Ports\Clock;
 use App\Modules\Shared\Application\Ports\Transaction;
 use App\Modules\Shared\Infrastructure\Console\ResetLimitsCommand;
+use App\Modules\Shared\Infrastructure\Database\MigrationNames;
 use App\Modules\Shared\Infrastructure\DatabaseAdminLog;
 use App\Modules\Shared\Infrastructure\LaravelSupport;
 use App\Modules\Users\Infrastructure\UserPermissions;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         Clock::class => LaravelSupport::class,
         Transaction::class => LaravelSupport::class,
     ];
+
+    /** Comandos que leen la tabla de migraciones */
+    private const MIGRATION_COMMANDS = ['migrate', 'migrate:status', 'migrate:rollback'];
 
     public function register(): void
     {
@@ -42,6 +48,13 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole() && $this->app->environment('local', 'testing')) {
             $this->commands([ResetLimitsCommand::class]);
         }
+
+        // Una base creada con los nombres de migración anteriores se pone al día antes de migrar (ADR-0091)
+        Event::listen(CommandStarting::class, function (CommandStarting $event): void {
+            if (in_array($event->command, self::MIGRATION_COMMANDS, true)) {
+                $this->app->make(MigrationNames::class)->update();
+            }
+        });
 
         // Fuera de producción, cargar una relación sin with() lanza una excepción: un N+1 nuevo no pasa las pruebas
         Model::preventLazyLoading(! $this->app->isProduction());

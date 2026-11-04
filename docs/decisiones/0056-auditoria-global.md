@@ -93,6 +93,6 @@ En todas, MySQL recorre el índice hacia atrás y se detiene al juntar la tanda,
 
 ## Dónde está en el código
 - Back: [`backend/app/Modules/Audit/`](../../backend/app/Modules/Audit/). Las reglas están en [`AuditAccess`](../../backend/app/Modules/Audit/Domain/AuditAccess.php) y [`AdminAuditScope`](../../backend/app/Modules/Audit/Domain/AdminAuditScope.php), y las consultas en [`DatabaseIncidentAudit`](../../backend/app/Modules/Audit/Infrastructure/DatabaseIncidentAudit.php) y [`DatabaseAdminAudit`](../../backend/app/Modules/Audit/Infrastructure/DatabaseAdminAudit.php).
-- Migraciones: [`000031` (divide el permiso)](../../backend/database/migrations/2026_10_24_000031_split_audit_view_permission.php) y [`000032` (índices)](../../backend/database/migrations/2026_10_24_000032_add_audit_indexes.php).
+- Migraciones: [`000031` (divide el permiso)](../../backend/database/migrations/2026_11_01_000031_split_audit_view_permission.php) y [`000032` (índices)](../../backend/database/migrations/2026_11_01_000032_add_audit_indexes.php).
 - Front: [`frontend/src/modules/audit/`](../../frontend/src/modules/audit/) y [`useCursorList`](../../frontend/src/shared/listing/useCursorList.ts).
 - Pruebas: [`AuditTest.php`](../../backend/tests/Feature/Audit/AuditTest.php), [`AuditDomainTest.php`](../../backend/tests/Unit/Audit/AuditDomainTest.php) y [`e2e/audit.spec.ts`](../../frontend/e2e/audit.spec.ts).

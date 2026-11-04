@@ -39,7 +39,7 @@ La lista ordena por `failed_at` sin índice propio. Es intencional: la tabla sol
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_21_000012_create_failed_jobs_table.php`](../../../backend/database/migrations/2026_10_21_000012_create_failed_jobs_table.php)
+- Migración: [`2026_11_01_000012_create_failed_jobs_table.php`](../../../backend/database/migrations/2026_11_01_000012_create_failed_jobs_table.php)
 - Acceso: [`DatabaseFailedJobs`](../../../backend/app/Modules/System/Infrastructure/DatabaseFailedJobs.php)
 - Configuración: [`config/queue.php`](../../../backend/config/queue.php) (`failed`)
 - Explicación funcional: [Módulo System](../../backend/system.md)

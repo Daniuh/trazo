@@ -51,7 +51,7 @@ CHECK `w ≥ 1`, `h ≥ 1` y `x + w ≤ 12`: un widget nunca se sale de la grill
 
 ## Dónde está en el código
 
-- Migraciones: [`000015`](../../../backend/database/migrations/2026_10_23_000015_create_dashboard_widgets_table.php) y [`000016`](../../../backend/database/migrations/2026_10_23_000016_create_user_dashboard_widgets_table.php)
+- Migraciones: [`000015`](../../../backend/database/migrations/2026_11_01_000015_create_dashboard_widgets_table.php) y [`000016`](../../../backend/database/migrations/2026_11_01_000016_create_user_dashboard_widgets_table.php)
 - Seeder: [`DashboardWidgetSeeder`](../../../backend/database/seeders/DashboardWidgetSeeder.php)
 - Lectura y escritura: [`DatabaseWidgetCatalog`](../../../backend/app/Modules/Dashboard/Infrastructure/DatabaseWidgetCatalog.php) y [`DatabaseLayoutStore`](../../../backend/app/Modules/Dashboard/Infrastructure/DatabaseLayoutStore.php)
 - Módulo: [Dashboard](../../backend/dashboard.md)
