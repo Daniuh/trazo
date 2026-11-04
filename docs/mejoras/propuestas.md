@@ -19,6 +19,8 @@ Estas mejoras se evaluaron y quedan documentadas para una etapa posterior. No se
 | Sesión con cookie httpOnly | Mayor resistencia al robo de sesión por XSS | La prueba evalúa el manejo explícito de token |
 | Medidor de fortaleza con zxcvbn | Estima cuánto tardaría en adivinarse una contraseña y lo muestra mientras se escribe | Es una dependencia nueva en el back y en el front; las reglas de patrones propias ([ADR-0070](../decisiones/0070-contrasenas-predecibles.md)) cubren los casos comunes |
 | Historial inmutable a nivel de base de datos | Ni un acceso directo a la base podría alterar la auditoría | Es configuración de infraestructura productiva |
+| Contenedores con sistema de archivos de solo lectura | Aunque alguien ejecutara código en un contenedor, no podría dejar archivos ni modificar el programa | Cada servicio escribe en carpetas temporales distintas que habría que declarar y probar una por una ([ADR-0092](../decisiones/0092-contenedores-sin-capacidades.md)) |
+| Respaldos copiados fuera del servidor | Si se pierde el servidor, los respaldos cifrados siguen a salvo | Requiere un almacenamiento externo y sus credenciales |
 
 ## Datos y escala
 
