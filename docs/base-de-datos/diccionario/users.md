@@ -39,5 +39,5 @@ Una cuenta creada desde la administración nace con una contraseña aleatoria qu
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_21_000001_create_users_table.php`](../../../backend/database/migrations/2026_10_21_000001_create_users_table.php)
+- Migración: [`2026_11_01_000001_create_users_table.php`](../../../backend/database/migrations/2026_11_01_000001_create_users_table.php)
 - Modelo: [`Users/Infrastructure/Models/User.php`](../../../backend/app/Modules/Users/Infrastructure/Models/User.php)

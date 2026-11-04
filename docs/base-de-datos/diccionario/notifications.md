@@ -70,7 +70,7 @@ Se borran a los 90 días de creados, leídos o no (`notifications:prune`, config
 
 ## Dónde está en el código
 
-- Migraciones: [`000041`](../../../backend/database/migrations/2026_10_28_000041_create_notification_types_table.php) y [`000042`](../../../backend/database/migrations/2026_10_28_000042_create_notifications_table.php)
+- Migraciones: [`000041`](../../../backend/database/migrations/2026_11_01_000041_create_notification_types_table.php) y [`000042`](../../../backend/database/migrations/2026_11_01_000042_create_notifications_table.php)
 - Catálogo: [`NotificationTypeSeeder`](../../../backend/database/seeders/NotificationTypeSeeder.php)
 - Acceso: [`DatabaseNotificationStore`](../../../backend/app/Modules/Notifications/Infrastructure/DatabaseNotificationStore.php)
 - Explicación funcional: [Módulo Notifications](../../backend/notifications.md)

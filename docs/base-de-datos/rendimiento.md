@@ -62,7 +62,7 @@ La primera versión ordenaba todo lo filtrado por grupo (`ORDER BY CASE …`) y 
 
 ## Ajuste que salió de la medición
 
-Los conteos también filtran por `deleted_at` (borrado lógico), y los índices de vencimiento no incluían esa columna. Por eso MySQL tenía que leer cada fila para comprobarla. La migración `2026_10_22_000014` reemplazó:
+Los conteos también filtran por `deleted_at` (borrado lógico), y los índices de vencimiento no incluían esa columna. Por eso MySQL tenía que leer cada fila para comprobarla. La migración `2026_11_01_000014` reemplazó:
 
 | Antes | Después |
 |---|---|
@@ -118,7 +118,7 @@ La primera medición mostró tres consultas lentas:
 - **El agente recorría la tabla en el conteo por estado y prioridad** (260 ms): su visibilidad usa `created_by` y `assigned_to`, que no estaban en el índice.
 - **"Asignados a mí"** (130 ms): MySQL recorría el índice de vencimientos completo, incluidos los cerrados, para no ordenar.
 
-La migración `2026_10_23_000017` las resolvió:
+La migración `2026_11_01_000017` las resolvió:
 
 | Antes | Después |
 |---|---|
@@ -189,7 +189,7 @@ El `EXPLAIN` mostraba que MySQL empezaba por la tabla de tipos y ordenaba todo e
 ## Dónde está en el código
 
 - Consulta: [`EloquentIncidentList.php`](../../backend/app/Modules/Incidents/Infrastructure/EloquentIncidentList.php) y [`IncidentFilters.php`](../../backend/app/Modules/Incidents/Infrastructure/IncidentFilters.php)
-- Migración: [`2026_10_22_000014_extend_incident_due_indexes_with_deleted_at.php`](../../backend/database/migrations/2026_10_22_000014_extend_incident_due_indexes_with_deleted_at.php)
+- Migración: [`2026_11_01_000014_extend_incident_due_indexes_with_deleted_at.php`](../../backend/database/migrations/2026_11_01_000014_extend_incident_due_indexes_with_deleted_at.php)
 - Scripts de medición: [`explain-incident-list.php`](../../backend/database/benchmarks/explain-incident-list.php) y [`explain-dashboard.php`](../../backend/database/benchmarks/explain-dashboard.php)
-- Índices del dashboard: [`2026_10_23_000017_add_dashboard_indexes_to_incidents.php`](../../backend/database/migrations/2026_10_23_000017_add_dashboard_indexes_to_incidents.php) y [`EloquentDashboardQueries.php`](../../backend/app/Modules/Dashboard/Infrastructure/EloquentDashboardQueries.php)
+- Índices del dashboard: [`2026_11_01_000017_add_dashboard_indexes_to_incidents.php`](../../backend/database/migrations/2026_11_01_000017_add_dashboard_indexes_to_incidents.php) y [`EloquentDashboardQueries.php`](../../backend/app/Modules/Dashboard/Infrastructure/EloquentDashboardQueries.php)
 - Seeder de volumen: [`IncidentVolumeSeeder.php`](../../backend/database/seeders/IncidentVolumeSeeder.php)

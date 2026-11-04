@@ -54,7 +54,7 @@ Los resueltos se borran a los 90 días de resolverse (`system:prune-events`, con
 
 ## Dónde está en el código
 
-- Migraciones: [`000033`](../../../backend/database/migrations/2026_10_25_000033_create_system_event_types_table.php) y [`000034`](../../../backend/database/migrations/2026_10_25_000034_create_system_events_table.php)
+- Migraciones: [`000033`](../../../backend/database/migrations/2026_11_01_000033_create_system_event_types_table.php) y [`000034`](../../../backend/database/migrations/2026_11_01_000034_create_system_events_table.php)
 - Catálogo: [`SystemEventTypeSeeder.php`](../../../backend/database/seeders/SystemEventTypeSeeder.php)
 - Escritura: [`DatabaseSystemEvents.php`](../../../backend/app/Modules/System/Infrastructure/DatabaseSystemEvents.php); lectura: [`DatabaseEventLog.php`](../../../backend/app/Modules/System/Infrastructure/DatabaseEventLog.php)
 - Explicación funcional: [Módulo System](../../backend/system.md)

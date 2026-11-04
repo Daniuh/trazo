@@ -98,7 +98,7 @@ Cerrado y Cancelado no tienen transiciones de salida. Se reabren por un camino a
 
 ## Dónde está en el código
 
-- Migraciones: [`000006`](../../../backend/database/migrations/2026_10_21_000006_create_priorities_table.php) a [`000009`](../../../backend/database/migrations/2026_10_21_000009_create_activity_types_table.php); `requires_note` en [`000035`](../../../backend/database/migrations/2026_10_27_000035_add_requires_note_to_statuses.php)
+- Migraciones: [`000006`](../../../backend/database/migrations/2026_11_01_000006_create_priorities_table.php) a [`000009`](../../../backend/database/migrations/2026_11_01_000009_create_activity_types_table.php); `requires_note` en [`000035`](../../../backend/database/migrations/2026_11_01_000035_add_requires_note_to_statuses.php)
 - Modelos: [`Incidents/Infrastructure/Models/`](../../../backend/app/Modules/Incidents/Infrastructure/Models/)
 - Datos: [`IncidentCatalogSeeder.php`](../../../backend/database/seeders/IncidentCatalogSeeder.php)
 - Decisión: [ADR-0008](../../decisiones/0008-catalogos.md)

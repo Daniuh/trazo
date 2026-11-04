@@ -37,7 +37,7 @@ Esta es la tabla que más crece. Su estrategia de crecimiento (archivado en luga
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_21_000011_create_incident_activities_table.php`](../../../backend/database/migrations/2026_10_21_000011_create_incident_activities_table.php)
-- Índices de la auditoría: [`000032`](../../../backend/database/migrations/2026_10_24_000032_add_audit_indexes.php) ([ADR-0056](../../decisiones/0056-auditoria-global.md))
-- Nota: [`000036`](../../../backend/database/migrations/2026_10_27_000036_add_note_to_incident_activities.php)
+- Migración: [`2026_11_01_000011_create_incident_activities_table.php`](../../../backend/database/migrations/2026_11_01_000011_create_incident_activities_table.php)
+- Índices de la auditoría: [`000032`](../../../backend/database/migrations/2026_11_01_000032_add_audit_indexes.php) ([ADR-0056](../../decisiones/0056-auditoria-global.md))
+- Nota: [`000036`](../../../backend/database/migrations/2026_11_01_000036_add_note_to_incident_activities.php)
 - Modelo: [`IncidentActivity.php`](../../../backend/app/Modules/Incidents/Infrastructure/Models/IncidentActivity.php)

@@ -39,6 +39,6 @@ Cuando alguien pide reabrir un incidente cerrado o cancelado, la solicitud queda
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_27_000037_create_incident_reopen_requests_table.php`](../../../backend/database/migrations/2026_10_27_000037_create_incident_reopen_requests_table.php)
+- Migración: [`2026_11_01_000037_create_incident_reopen_requests_table.php`](../../../backend/database/migrations/2026_11_01_000037_create_incident_reopen_requests_table.php)
 - Modelo: [`IncidentReopenRequest.php`](../../../backend/app/Modules/Incidents/Infrastructure/Models/IncidentReopenRequest.php)
 - Escritura: [`EloquentReopenRequests.php`](../../../backend/app/Modules/Incidents/Infrastructure/EloquentReopenRequests.php)

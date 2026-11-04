@@ -33,8 +33,8 @@ No referencia a ninguna tabla ni es referenciada: el año no es una entidad, y e
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_28_000038_create_incident_code_sequences_table.php`](../../../backend/database/migrations/2026_10_28_000038_create_incident_code_sequences_table.php)
-- Paso de los códigos anteriores: [`2026_10_28_000039_renumber_incident_codes.php`](../../../backend/database/migrations/2026_10_28_000039_renumber_incident_codes.php)
+- Migración: [`2026_11_01_000038_create_incident_code_sequences_table.php`](../../../backend/database/migrations/2026_11_01_000038_create_incident_code_sequences_table.php)
+- Paso de los códigos anteriores: [`2026_11_01_000039_renumber_incident_codes.php`](../../../backend/database/migrations/2026_11_01_000039_renumber_incident_codes.php)
 - Acceso: [`IncidentCodes`](../../../backend/app/Modules/Incidents/Infrastructure/IncidentCodes.php) (`next`, `assignPending`)
 - Formato: [`IncidentCode`](../../../backend/app/Modules/Incidents/Domain/IncidentCode.php)
 - Explicación funcional: [Módulo Incidents](../../backend/incidents.md)
