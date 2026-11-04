@@ -65,6 +65,20 @@ Se usa el plan de automatización porque el script `zap-api-scan.py` se cortaba 
 
 **Ninguna alerta alta:** sin inyección SQL, XSS, inclusión de rutas, ejecución remota ni fallas de control de acceso detectadas en 163 rutas con sus variantes. El escaneo activo llegó al tope de 45 minutos; una corrida más larga podría probar más variantes por parámetro.
 
+## Resultados (3 de noviembre de 2026)
+
+Sobre el modo final (las mismas imágenes del despliegue), con los contenedores sin capacidades de Linux ([ADR-0092](../decisiones/0092-contenedores-sin-capacidades.md)):
+
+| Escaneo | Alerta | Riesgo | Qué se hizo |
+|---|---|---|---|
+| Pasivo | Insufficient Site Isolation Against Spectre | Baja | **Corregido:** `Cross-Origin-Resource-Policy` y `Cross-Origin-Embedder-Policy` ([cabeceras](cabeceras.md)) |
+| Pasivo | Information Disclosure - Suspicious Comments | Informativa | Falso positivo: palabras como "select" dentro del JavaScript compilado de las librerías |
+| Pasivo | Storable and Cacheable Content | Informativa | Correcto: los `.js` y `.css` llevan huella en el nombre; la API responde `no-store` |
+| Pasivo | Modern Web Application | Informativa | ZAP reconoce que es una SPA |
+| Activo | User Agent Fuzzer, Authentication Request Identified, Sensitive Information in URL | Informativa | Nada que corregir (ver la tabla anterior) |
+
+**Ninguna alerta alta, media ni baja en el activo.** Más de mil peticiones de ataque contra las 69 rutas del contrato, sin un solo error 500. Lo único que quedó en los eventos de sistema fue el bloqueo del login por intentos fallidos, que es la defensa esperada.
+
 ## Dónde está en el código
 
 - Perfil: [`docker-compose.override.yml`](../../docker-compose.override.yml) (servicio `zap`)

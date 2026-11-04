@@ -21,6 +21,8 @@ Todas las respuestas pasan por el gateway (Nginx), que agrega las cabeceras de s
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Las rutas internas no se filtran a otros sitios |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` | La app no pide nada de eso |
 | `Cross-Origin-Opener-Policy` | `same-origin` | Otra pestaña no puede manejar la de Trazo |
+| `Cross-Origin-Resource-Policy` | `same-origin` | Otros sitios no pueden cargar los archivos de Trazo (protección frente a Spectre) |
+| `Cross-Origin-Embedder-Policy` | `require-corp` | La app solo carga recursos del propio origen; junto con la anterior deja la pestaña aislada (`crossOriginIsolated`) |
 
 ## Política de seguridad de contenido (CSP)
 

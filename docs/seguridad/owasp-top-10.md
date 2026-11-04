@@ -27,7 +27,7 @@ Para cada categoría: qué hace Trazo y dónde está la prueba que lo demuestra.
 ## A02 — Configuración de seguridad incorrecta
 
 - Cabeceras de seguridad, CSP estricta en producción, HSTS, `server_tokens off` y CORS cerrado ([Cabeceras](cabeceras.md)).
-- Contenedores sin root, versiones fijas, solo el puerto del gateway publicado, MySQL y Redis en una red interna sin salida.
+- Contenedores sin root y sin capacidades de Linux (`no-new-privileges`, `cap_drop: ALL`), versiones fijas, solo el puerto del gateway publicado, MySQL y Redis en una red interna sin salida.
 - `APP_DEBUG` apagado en producción; errores sin detalles técnicos (RFC 9457 con código propio).
 - Rutas de desarrollo fuera de producción: la guía visual solo existe en desarrollo; los comandos `trazo:reset-limits` y `trazo:dev-token` ni se registran en producción.
 - **Pruebas:** `ApiErrorFormatTest` comprueba que un 500 no revela nada. ZAP pasivo y activo. La E2E de accesibilidad falla ante cualquier violación de CSP.
