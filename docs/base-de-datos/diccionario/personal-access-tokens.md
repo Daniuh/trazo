@@ -47,5 +47,5 @@ Sanctum modela al dueño del token con una relación polimórfica (`tokenable_ty
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_22_000013_create_personal_access_tokens_table.php`](../../../backend/database/migrations/2026_10_22_000013_create_personal_access_tokens_table.php)
+- Migración: [`2026_11_01_000013_create_personal_access_tokens_table.php`](../../../backend/database/migrations/2026_11_01_000013_create_personal_access_tokens_table.php)
 - Reglas de la sesión: [Módulo Auth](../../backend/auth.md)

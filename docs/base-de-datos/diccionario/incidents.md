@@ -48,6 +48,6 @@ Los índices están validados con `EXPLAIN` sobre 100.000 registros: ver [Rendim
 
 ## Dónde está en el código
 
-- Migración: [`2026_10_21_000010_create_incidents_table.php`](../../../backend/database/migrations/2026_10_21_000010_create_incidents_table.php)
+- Migración: [`2026_11_01_000010_create_incidents_table.php`](../../../backend/database/migrations/2026_11_01_000010_create_incidents_table.php)
 - Modelo: [`Incidents/Infrastructure/Models/Incident.php`](../../../backend/app/Modules/Incidents/Infrastructure/Models/Incident.php)
 - Decisiones: [ADR-0012](../../decisiones/0012-bloqueo-optimista.md) y [ADR-0013](../../decisiones/0013-busqueda-fulltext.md)

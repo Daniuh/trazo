@@ -113,6 +113,6 @@ Quien consulta se arma con `RequestAdmin` del módulo Users: nivel y permisos ef
 
 - [`backend/app/Modules/Audit/`](../../backend/app/Modules/Audit/)
 - Rutas: [`Http/routes.php`](../../backend/app/Modules/Audit/Http/routes.php)
-- Migraciones: [`000031`](../../backend/database/migrations/2026_10_24_000031_split_audit_view_permission.php) y [`000032`](../../backend/database/migrations/2026_10_24_000032_add_audit_indexes.php)
+- Migraciones: [`000031`](../../backend/database/migrations/2026_11_01_000031_split_audit_view_permission.php) y [`000032`](../../backend/database/migrations/2026_11_01_000032_add_audit_indexes.php)
 - Pruebas: [`tests/Feature/Audit/AuditTest.php`](../../backend/tests/Feature/Audit/AuditTest.php) y [`tests/Unit/Audit/AuditDomainTest.php`](../../backend/tests/Unit/Audit/AuditDomainTest.php)
 - Decisión: [ADR-0056](../decisiones/0056-auditoria-global.md)
