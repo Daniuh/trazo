@@ -90,8 +90,9 @@ Medido en Windows con Docker Desktop: la pantalla de ingreso carga en ~0,13 s en
 
 - **Un solo origen.** El navegador habla solo con el gateway, así que no hay CORS y la superficie expuesta es mínima.
 - **Red interna para datos.** MySQL y Redis están en la red `data`, marcada como interna: no tienen puertos publicados ni salida a internet.
-- **Una imagen para cinco servicios.** `app`, `init`, `worker`, `scheduler` y `reverb` usan la misma imagen; no se repite configuración y todos ejecutan exactamente el mismo código.
+- **Una imagen para cinco servicios.** `app`, `init`, `worker`, `scheduler` y `reverb` usan la misma imagen; no se repite configuración y todos ejecutan exactamente el mismo código. Solo `init` la construye (es el primero en arrancar y los demás lo esperan): si los cinco la construyeran a la vez, Docker podría chocar al guardar la misma etiqueta y fallar con `image "trazo/api:local": already exists`.
 - **Sin root.** PHP-FPM, el frontend y el gateway corren con usuarios sin privilegios.
+- **Sin capacidades de Linux.** Todos los servicios llevan `no-new-privileges` y `cap_drop: ALL`: ningún proceso gana privilegios al ejecutar otro programa. MySQL, Redis y el respaldo arrancan como root solo para ajustar sus carpetas y pasan a su usuario; reciben únicamente `CHOWN`, `DAC_OVERRIDE`, `FOWNER`, `SETUID` y `SETGID`, y al pasar a su usuario quedan también sin ninguna ([ADR-0092](../decisiones/0092-contenedores-sin-capacidades.md)).
 - **Versiones fijas.** Todas las imágenes base tienen versión exacta.
 - **Builds multi-etapa.** La imagen de producción no lleva Composer ni herramientas de compilación.
 - **Arranque ordenado.** Cada servicio espera a que sus dependencias estén *sanas* (healthcheck), no solo iniciadas.

@@ -103,3 +103,4 @@ Cada decisión importante del proyecto queda registrada con su contexto, las alt
 | [ADR-0089](0089-incidentes-de-muestra-en-el-sitio-de-evaluacion.md) | El sitio desplegado para la evaluación arranca con incidentes de muestra, solo con una variable explícita |
 | [ADR-0090](0090-una-validacion-por-ruta.md) | Una clase de validación por ruta, sin reglas que cambien según la ruta, para que el contrato OpenAPI diga lo real |
 | [ADR-0091](0091-nombres-de-migracion-con-una-sola-fecha.md) | Nombres de migración con una sola fecha y bases existentes puestas al día solas antes de migrar |
+| [ADR-0092](0092-contenedores-sin-capacidades.md) | Contenedores con `no-new-privileges` y sin capacidades de Linux; solo las justas para los que arrancan como root |

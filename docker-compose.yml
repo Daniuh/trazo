@@ -2,12 +2,25 @@
 # Documentado en docs/operacion/docker.md
 name: trazo
 
+# Endurecimiento común: ningún proceso gana privilegios al ejecutar otro programa y no queda ninguna capacidad de
+# Linux. Si alguien lograra ejecutar código dentro de un contenedor, no tendría con qué escalar.
+x-hardened: &hardened
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+
+# MySQL, Redis y el respaldo arrancan como root solo para ajustar sus carpetas y luego pasan a su usuario; necesitan
+# justo esas capacidades y ninguna más
+x-hardened-root-start: &hardened-root-start
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
+  cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID]
+
+# Los cinco servicios de Laravel usan la misma imagen, pero solo init la construye: si todos la construyeran a la vez,
+# Docker choca al guardar la misma etiqueta ("already exists"). Los demás nunca la buscan en Docker Hub: no existe allí
 x-laravel: &laravel
+  <<: *hardened
   image: trazo/api:${TRAZO_IMAGE_TAG:-local}
-  build:
-    context: .
-    dockerfile: docker/php/Dockerfile
-    target: prod
+  pull_policy: never
   environment: &laravel-env
     APP_NAME: Trazo
     APP_ENV: ${APP_ENV:-local}
@@ -66,6 +79,7 @@ x-laravel: &laravel
 
 services:
   mysql:
+    <<: *hardened-root-start
     image: mysql:8.4.11
     # Configuración como parámetros: MySQL ignora archivos .cnf montados con permisos amplios (Windows/macOS)
     command:
@@ -100,6 +114,7 @@ services:
   # Respaldo diario de la base con la misma imagen de MySQL: volcado sin bloquear la app, comprimido y cifrado.
   # Usa el usuario de la app (no root) y solo la red interna. Documentado en docs/operacion/respaldos.md
   backup:
+    <<: *hardened-root-start
     image: mysql:8.4.11
     entrypoint: ["bash", "/usr/local/bin/trazo-backup"]
     command: ["schedule"]
@@ -133,6 +148,7 @@ services:
         limits: { cpus: "0.5", memory: 256M }
 
   redis:
+    <<: *hardened-root-start
     image: redis:8.4.7-alpine
     command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
     environment:
@@ -154,6 +170,10 @@ services:
   # Se ejecuta una vez antes de la API: migraciones y seeders (idempotentes, se pueden repetir)
   init:
     <<: *laravel
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: prod
     command: ["php", "artisan", "migrate", "--force", "--seed"]
     restart: "no"
     depends_on:
@@ -212,6 +232,7 @@ services:
         limits: { cpus: "0.5", memory: 256M }
 
   frontend:
+    <<: *hardened
     image: trazo/web:${TRAZO_IMAGE_TAG:-local}
     build:
       context: .
@@ -229,6 +250,7 @@ services:
         limits: { cpus: "0.25", memory: 128M }
 
   gateway:
+    <<: *hardened
     image: nginxinc/nginx-unprivileged:1.30.6-alpine
     ports:
       - "${TRAZO_HTTP_PORT:-8088}:8080"

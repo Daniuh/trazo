@@ -2,12 +2,9 @@
 # se activa con: docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml up -d
 # Es más lento en Windows y macOS (lee el código desde la carpeta del equipo). Documentado en docs/operacion/docker.md
 
+# Como en el base, solo init construye la imagen; los demás la usan
 x-laravel-dev: &laravel-dev
   image: trazo/api:dev
-  build:
-    context: .
-    dockerfile: docker/php/Dockerfile
-    target: dev
   environment:
     APP_DEBUG: "true"
     LOG_LEVEL: debug
@@ -21,7 +18,12 @@ services:
   # En desarrollo ajusta permisos e instala dependencias antes de migrar
   init:
     <<: *laravel-dev
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: dev
     user: root
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID]
     # El script se monta desde el repositorio, como el código: un cambio en él no exige reconstruir la imagen
     command: ["sh", "/usr/local/bin/trazo-dev-init"]
     volumes:
